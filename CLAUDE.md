@@ -63,7 +63,10 @@ Deep guides live in `.claude/skills/`. Use them when relevant:
 
 - `ui-design` — the working summary of `DESIGN.md` plus screen behaviour (states, a11y).
 - `database` — schema, Drizzle, migrations, money, multi-tenant queries.
-- `supabase` — auth, Row Level Security, storage, safe key usage.
+- `supabase-quotepilot` — **this app's** auth, tenant scoping, RLS policy shape,
+  public quote page, and storage. Read it for any Supabase work here.
+- `supabase` (vendor, in `.agents/skills/`) — general Supabase and Postgres guidance.
+  Use it alongside `supabase-quotepilot`, which wins where they overlap.
 
 ## Code quality standards
 
