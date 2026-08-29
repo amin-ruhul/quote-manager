@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { CustomerDetail } from "@/app/(app)/customers/[id]/customer-detail";
@@ -37,16 +37,14 @@ export default async function CustomerDetailPage({
   const { id } = await params;
   const { business } = await requireBusiness();
 
-  // Scoped by business_id; another owner's customer is a 404, not a leak.
-  const [customer] = await db
-    .select()
-    .from(customers)
-    .where(and(eq(customers.id, id), eq(customers.businessId, business.id)))
-    .limit(1);
-
-  if (!customer) notFound();
-
-  const [quoteRows, [totals]] = await Promise.all([
+  // Both queries only need business.id, so they go out together.
+  const [customerRows, quoteRows] = await Promise.all([
+    // Scoped by business_id; another owner's customer is a 404, not a leak.
+    db
+      .select()
+      .from(customers)
+      .where(and(eq(customers.id, id), eq(customers.businessId, business.id)))
+      .limit(1),
     db
       .select({
         id: quotes.id,
@@ -57,33 +55,26 @@ export default async function CustomerDetailPage({
         updatedAt: quotes.updatedAt,
       })
       .from(quotes)
-      .where(
-        and(
-          eq(quotes.customerId, customer.id),
-          eq(quotes.businessId, business.id),
-        ),
-      )
+      .where(and(eq(quotes.customerId, id), eq(quotes.businessId, business.id)))
       .orderBy(desc(quotes.updatedAt)),
-    db
-      .select({
-        quoted: sql<number>`coalesce(sum(${quotes.total}), 0)::int`,
-        won: sql<number>`coalesce(sum(${quotes.total}) filter (where ${quotes.status} = 'accepted'), 0)::int`,
-      })
-      .from(quotes)
-      .where(
-        and(
-          eq(quotes.customerId, customer.id),
-          eq(quotes.businessId, business.id),
-        ),
-      ),
   ]);
+
+  const customer = customerRows[0];
+  if (!customer) notFound();
+
+  // Summed here rather than in a third query — the rows are already loaded,
+  // and these are integer cents so the addition is exact.
+  const quotedCents = quoteRows.reduce((running, q) => running + q.total, 0);
+  const wonCents = quoteRows
+    .filter((q) => q.status === "accepted")
+    .reduce((running, q) => running + q.total, 0);
 
   return (
     <CustomerDetail
       customer={customer}
       quotes={quoteRows}
-      quotedCents={totals?.quoted ?? 0}
-      wonCents={totals?.won ?? 0}
+      quotedCents={quotedCents}
+      wonCents={wonCents}
       currency={business.currency as Currency}
     />
   );

@@ -18,12 +18,15 @@ export default async function QuoteBuilderPage({
   const { id } = await params;
   const { business } = await requireBusiness();
 
-  // Scoped by business_id; returns null for another owner's quote, so a guessed
-  // id is a 404 rather than a leak.
-  const quote = await getQuoteForBusiness(id, business.id);
-  if (!quote) notFound();
-
-  const [customerRows, pricebookRows] = await Promise.all([
+  /*
+   * The quote and the two pickers only need business.id, so they all go out at
+   * once. This page used to make four sequential round trips; now it makes two,
+   * which matters on a phone against a distant database.
+   */
+  const [quote, customerRows, pricebookRows] = await Promise.all([
+    // Scoped by business_id; null for another owner's quote, so a guessed id is
+    // a 404 rather than a leak.
+    getQuoteForBusiness(id, business.id),
     db
       .select()
       .from(customers)
@@ -35,6 +38,8 @@ export default async function QuoteBuilderPage({
       .where(eq(pricebookItems.businessId, business.id))
       .orderBy(asc(pricebookItems.category), asc(pricebookItems.name)),
   ]);
+
+  if (!quote) notFound();
 
   return (
     <QuoteBuilder

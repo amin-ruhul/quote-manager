@@ -76,31 +76,39 @@ export async function getQuoteForBusiness(
   quoteId: string,
   businessId: string,
 ): Promise<QuoteWithChildren | null> {
-  const [quote] = await db
-    .select()
-    .from(quotes)
-    .where(and(eq(quotes.id, quoteId), eq(quotes.businessId, businessId)))
-    .limit(1);
+  if (!z.uuid().safeParse(quoteId).success) return null;
 
-  if (!quote) return null;
-
-  const [items, options, attachments] = await Promise.all([
+  /*
+   * All four queries go out together rather than waiting for the parent row.
+   * The children are keyed on the requested quote id, but nothing is returned
+   * unless the parent SELECT — which is filtered by business_id — comes back,
+   * so another owner's rows can never leave this function.
+   */
+  const [quoteRows, items, options, attachments] = await Promise.all([
+    db
+      .select()
+      .from(quotes)
+      .where(and(eq(quotes.id, quoteId), eq(quotes.businessId, businessId)))
+      .limit(1),
     db
       .select()
       .from(quoteItems)
-      .where(eq(quoteItems.quoteId, quote.id))
+      .where(eq(quoteItems.quoteId, quoteId))
       .orderBy(asc(quoteItems.position)),
     db
       .select()
       .from(quoteOptions)
-      .where(eq(quoteOptions.quoteId, quote.id))
+      .where(eq(quoteOptions.quoteId, quoteId))
       .orderBy(asc(quoteOptions.position)),
     db
       .select()
       .from(quoteAttachments)
-      .where(eq(quoteAttachments.quoteId, quote.id))
+      .where(eq(quoteAttachments.quoteId, quoteId))
       .orderBy(asc(quoteAttachments.position)),
   ]);
+
+  const quote = quoteRows[0];
+  if (!quote) return null;
 
   return { quote, items, options, attachments };
 }

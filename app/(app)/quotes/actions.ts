@@ -2,7 +2,6 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 import { quotes } from "@/db/schema";
 import { requireBusiness } from "@/lib/auth";
@@ -23,37 +22,59 @@ export type QuoteFormState = {
   savedAt: number | null;
 };
 
-/** Creates an empty draft and opens the builder on it. */
-export async function createQuote(): Promise<void> {
+/**
+ * Creates an empty draft and returns its id for the caller to navigate to.
+ *
+ * Deliberately does NOT call redirect(): redirect() works by throwing, so a
+ * caller that wraps this in try/catch swallows the navigation and reports a
+ * failure for a quote that was in fact created. Returning the id keeps the
+ * success and failure paths ordinary values.
+ */
+export async function createQuote(): Promise<
+  { quoteId: string; error: null } | { quoteId: null; error: string }
+> {
   const { business } = await requireBusiness();
 
   const validUntil = new Date();
   validUntil.setDate(validUntil.getDate() + DEFAULT_QUOTE_VALID_DAYS);
 
-  const quoteId = await db.transaction(async (tx) => {
-    const quoteNumber = await nextQuoteNumber(tx, business.id);
+  try {
+    const quoteId = await db.transaction(async (tx) => {
+      const quoteNumber = await nextQuoteNumber(tx, business.id);
 
-    const [created] = await tx
-      .insert(quotes)
-      .values({
-        businessId: business.id,
-        quoteNumber,
-        title: "Untitled quote",
-        // Snapshot the rate now, so editing business settings later doesn't
-        // silently rewrite quotes already drafted.
-        taxRate: business.defaultTaxRate,
-        publicToken: generatePublicToken(),
-        validUntil,
-      })
-      .returning({ id: quotes.id });
+      const [created] = await tx
+        .insert(quotes)
+        .values({
+          businessId: business.id,
+          quoteNumber,
+          title: "Untitled quote",
+          // Snapshot the rate now, so editing business settings later doesn't
+          // silently rewrite quotes already drafted.
+          taxRate: business.defaultTaxRate,
+          publicToken: generatePublicToken(),
+          validUntil,
+        })
+        .returning({ id: quotes.id });
 
-    return created?.id ?? null;
-  });
+      return created?.id ?? null;
+    });
 
-  if (!quoteId) throw new Error("Could not create quote");
+    if (!quoteId) {
+      return {
+        quoteId: null,
+        error: "We couldn't start a new quote. Try again.",
+      };
+    }
 
-  revalidatePath("/quotes");
-  redirect(`/quotes/${quoteId}`);
+    revalidatePath("/quotes");
+    return { quoteId, error: null };
+  } catch (error) {
+    console.error("Creating quote failed", { businessId: business.id, error });
+    return {
+      quoteId: null,
+      error: "We couldn't start a new quote. Try again.",
+    };
+  }
 }
 
 export async function deleteQuote(
