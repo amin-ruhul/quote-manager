@@ -2,6 +2,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { db } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
@@ -20,17 +21,40 @@ import type { Business } from "@/db/schema";
  * Treat an unscoped Drizzle query as a bug.
  */
 
-/** The signed-in user, or null. Revalidates the token with Supabase. */
-export async function getUser() {
+export type SessionUser = { id: string; email: string | null };
+
+/**
+ * The signed-in user, or null.
+ *
+ * Uses getClaims() rather than getUser(): this project signs JWTs with ES256
+ * and publishes a JWKS, so the token is verified locally against the public key
+ * with no network call. getUser() costs a ~500ms round trip to Supabase Auth,
+ * and it was being paid three times per page load.
+ *
+ * Trade-off: local verification trusts the token until it expires, so a session
+ * revoked server-side stays valid until the access token refreshes. That is the
+ * right call for reading a pricebook; anything destructive should re-check.
+ *
+ * NEVER swap this for getSession(), which does no verification at all.
+ *
+ * cache() dedupes the call across the layout, the page and any server action in
+ * the same request.
+ */
+export const getUser = cache(async (): Promise<SessionUser | null> => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
-}
+  const { data, error } = await supabase.auth.getClaims();
+
+  const claims = data?.claims;
+  if (error || !claims?.sub) return null;
+
+  return {
+    id: claims.sub,
+    email: typeof claims.email === "string" ? claims.email : null,
+  };
+});
 
 /** The signed-in user, or a redirect to /login. */
-export async function requireUser() {
+export async function requireUser(): Promise<SessionUser> {
   const user = await getUser();
   if (!user) redirect("/login");
   return user;
@@ -47,18 +71,21 @@ export async function ensureProfile(userId: string, email: string) {
     .onConflictDoNothing({ target: profiles.id });
 }
 
-/** The user's business, or null when they haven't onboarded yet. */
-export async function getBusinessForOwner(
-  ownerId: string,
-): Promise<Business | null> {
-  const [business] = await db
-    .select()
-    .from(businesses)
-    .where(eq(businesses.ownerId, ownerId))
-    .limit(1);
+/**
+ * The user's business, or null when they haven't onboarded yet.
+ * Cached per request — generateMetadata and the page body both need it.
+ */
+export const getBusinessForOwner = cache(
+  async (ownerId: string): Promise<Business | null> => {
+    const [business] = await db
+      .select()
+      .from(businesses)
+      .where(eq(businesses.ownerId, ownerId))
+      .limit(1);
 
-  return business ?? null;
-}
+    return business ?? null;
+  },
+);
 
 /**
  * The current user plus their business. Sends them to onboarding if they have

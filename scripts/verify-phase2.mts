@@ -24,8 +24,12 @@ const {
   quoteOptions,
   quotes,
 } = await import("@/db/schema");
-const { getQuoteForBusiness, nextQuoteNumber, recalculateQuote, generatePublicToken } =
-  await import("@/lib/quotes");
+const {
+  getQuoteForBusiness,
+  nextQuoteNumber,
+  recalculateQuote,
+  generatePublicToken,
+} = await import("@/lib/quotes");
 
 let passed = 0;
 let failed = 0;
@@ -53,7 +57,9 @@ async function main() {
      values ('${userId}', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
              'verify-${userId}@example.test', '', now(), now())`,
   );
-  await db.insert(profiles).values({ id: userId, email: `verify@example.test` });
+  await db
+    .insert(profiles)
+    .values({ id: userId, email: `verify@example.test` });
 
   const [business] = await db
     .insert(businesses)
@@ -62,7 +68,10 @@ async function main() {
       name: "Verify Electric",
       defaultTaxRate: 825, // 8.25%
     })
-    .returning({ id: businesses.id, defaultTaxRate: businesses.defaultTaxRate });
+    .returning({
+      id: businesses.id,
+      defaultTaxRate: businesses.defaultTaxRate,
+    });
   businessId = business!.id;
 
   process.stdout.write("\nquote numbering\n");
@@ -189,12 +198,18 @@ async function main() {
 
   await recalculateQuote(quoteId);
   loaded = await getQuoteForBusiness(quoteId, businessId);
-  const standardTotal = loaded?.options.find((o) => o.id === standard!.id)?.total;
+  const standardTotal = loaded?.options.find(
+    (o) => o.id === standard!.id,
+  )?.total;
   const premiumTotal = loaded?.options.find((o) => o.id === premium!.id)?.total;
 
   check("standard = shared lines only", standardTotal, 153986);
   check("premium = shared + its own line", premiumTotal, 208111);
-  check("headline follows first option when none recommended", loaded?.quote.total, 153986);
+  check(
+    "headline follows first option when none recommended",
+    loaded?.quote.total,
+    153986,
+  );
 
   await db
     .update(quoteOptions)
@@ -227,7 +242,9 @@ async function main() {
   process.stdout.write("\ncustomer delete keeps quote history\n");
   await db
     .delete(customers)
-    .where(and(eq(customers.id, customer!.id), eq(customers.businessId, businessId)));
+    .where(
+      and(eq(customers.id, customer!.id), eq(customers.businessId, businessId)),
+    );
   const [afterDelete] = await db
     .select({ id: quotes.id, customerId: quotes.customerId })
     .from(quotes)

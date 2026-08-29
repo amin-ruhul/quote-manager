@@ -138,22 +138,38 @@ export async function recalculateQuote(quoteId: string): Promise<void> {
 
   const shared = items.filter((item) => item.optionId === null);
 
-  await db.transaction(async (tx) => {
-    for (const option of options) {
-      const optionLines = [
+  const optionTotals = options.map((option) => ({
+    id: option.id,
+    total: quoteTotals({
+      lines: [
         ...shared,
         ...items.filter((item) => item.optionId === option.id),
-      ];
-      const { total } = quoteTotals({
-        lines: optionLines,
-        discount: quote.discount,
-        taxRateBasisPoints: quote.taxRate,
-      });
+      ],
+      discount: quote.discount,
+      taxRateBasisPoints: quote.taxRate,
+    }).total,
+  }));
 
-      await tx
-        .update(quoteOptions)
-        .set({ total })
-        .where(eq(quoteOptions.id, option.id));
+  await db.transaction(async (tx) => {
+    /*
+     * One statement for every option, not one per option. Each round trip to
+     * the pooler costs ~100ms, and this runs on every line edit, so a
+     * three-option quote was paying three of them for no reason.
+     */
+    if (optionTotals.length > 0) {
+      const values = sql.join(
+        optionTotals.map(
+          (option) => sql`(${option.id}::uuid, ${option.total}::integer)`,
+        ),
+        sql`, `,
+      );
+
+      await tx.execute(sql`
+        update ${quoteOptions} as o
+        set total = v.total
+        from (values ${values}) as v(id, total)
+        where o.id = v.id
+      `);
     }
 
     // With options, the headline figure is the recommended one (else the first).

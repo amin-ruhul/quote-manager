@@ -2,6 +2,7 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+import { ensureProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 /*
@@ -65,15 +66,23 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient();
 
   if (parsed.token_hash) {
-    const { error } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       type: parsed.type,
       token_hash: parsed.token_hash,
     });
+    if (!error && data.user) {
+      await ensureProfile(data.user.id, data.user.email ?? "");
+    }
     return resultUrl(request, error ? "expired" : "success", parsed.next);
   }
 
   if (parsed.code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(parsed.code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(
+      parsed.code,
+    );
+    if (!error && data.user) {
+      await ensureProfile(data.user.id, data.user.email ?? "");
+    }
     return resultUrl(request, error ? "expired" : "success", parsed.next);
   }
 

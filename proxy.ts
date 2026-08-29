@@ -29,12 +29,6 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Must be getUser(), not getSession(): only getUser() revalidates the token
-  // with Supabase. getSession() trusts whatever is in the cookie.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { pathname } = request.nextUrl;
   const isProtected = [
     "/onboarding",
@@ -43,7 +37,16 @@ export async function proxy(request: NextRequest) {
     "/quotes",
   ].some((route) => pathname.startsWith(route));
 
-  if (!user && isProtected) {
+  // Public routes still get the cookie refresh above, but skip the identity
+  // check — no reason to put the landing and login pages on the auth path.
+  if (!isProtected) return response;
+
+  // getClaims() verifies the ES256 token locally against the published JWKS,
+  // so it costs no network round trip. Never getSession(): that verifies
+  // nothing at all.
+  const { data } = await supabase.auth.getClaims();
+
+  if (!data?.claims?.sub) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);

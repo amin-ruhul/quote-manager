@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { signOut } from "@/app/login/actions";
 import { Button } from "@/components/ui/button";
-import { ensureProfile, requireUser } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 
 /*
  * Shell for every signed-in screen. Mobile-first: the nav is a single sticky
@@ -11,8 +11,9 @@ import { ensureProfile, requireUser } from "@/lib/auth";
 export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const user = await requireUser();
-  await ensureProfile(user.id, user.email ?? "");
+  // The profile row is created on sign-in and on email confirmation, not here:
+  // doing it in the layout meant a database write on every single request.
+  await requireUser();
 
   return (
     <div className="min-h-dvh">
