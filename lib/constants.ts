@@ -75,6 +75,39 @@ export const ALLOWED_QUOTE_PHOTO_TYPES = [
   "image/webp",
 ] as const;
 
+/**
+ * Follow-up cadence (SPEC §12). 0 means the owner has turned nudges off.
+ * Stored in businesses.settings.followUpDays.
+ */
+export const FOLLOW_UP_DAY_OPTIONS = [0, 2, 5] as const;
+export type FollowUpDays = (typeof FOLLOW_UP_DAY_OPTIONS)[number];
+export const DEFAULT_FOLLOW_UP_DAYS: FollowUpDays = 2;
+
+/** One nudge per quote, so an unanswered quote never becomes harassment. */
+export const MAX_FOLLOW_UPS_PER_QUOTE = 1;
+
+/**
+ * Reads the cadence out of businesses.settings, defaulting safely.
+ * Lives here rather than lib/follow-ups.ts because the settings form is a
+ * client component and cannot import a server-only module.
+ */
+export function followUpDaysFor(settings: unknown): FollowUpDays {
+  const value = (settings as { followUpDays?: unknown } | null)?.followUpDays;
+  return FOLLOW_UP_DAY_OPTIONS.includes(value as FollowUpDays)
+    ? (value as FollowUpDays)
+    : DEFAULT_FOLLOW_UP_DAYS;
+}
+
+/** Quote events, all of which are recorded forever (golden rule 9). */
+export const QUOTE_EVENT_TYPES = [
+  "sent",
+  "viewed",
+  "accepted",
+  "declined",
+  "follow_up_sent",
+] as const;
+export type QuoteEventType = (typeof QUOTE_EVENT_TYPES)[number];
+
 /** Guardrails on free-text fields, mirrored by the Zod schemas at the boundaries. */
 export const MAX_NAME_LENGTH = 120;
 export const MAX_DESCRIPTION_LENGTH = 500;

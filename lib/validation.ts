@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import {
   CURRENCIES,
+  FOLLOW_UP_DAY_OPTIONS,
+  type FollowUpDays,
   MAX_DESCRIPTION_LENGTH,
   MAX_NAME_LENGTH,
   MAX_TAX_RATE_BASIS_POINTS,
@@ -59,6 +61,13 @@ export const businessProfileSchema = z.object({
   address: optionalText(300),
   licenseNumber: optionalText(80),
   currency: z.enum(CURRENCIES),
+  followUpDays: z.coerce
+    .number()
+    .refine(
+      (value) => FOLLOW_UP_DAY_OPTIONS.includes(value as FollowUpDays),
+      "Choose one of the follow-up options.",
+    )
+    .transform((value) => value as FollowUpDays),
   defaultTaxRate: z.string().transform((value, ctx) => {
     if (value.trim() === "") return 0;
     const basisPoints = parsePercentToBasisPoints(value);

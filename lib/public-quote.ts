@@ -13,6 +13,7 @@ import {
   quotes,
 } from "@/db/schema";
 import { db } from "@/lib/db";
+import { notifyOwnerViewed } from "@/lib/notify-owner";
 
 /*
  * The customer-facing quote (SPEC §11).
@@ -128,12 +129,19 @@ export async function recordQuoteViewed(
   quoteId: string,
   meta: Record<string, string>,
 ): Promise<void> {
-  await db.transaction(async (tx) => {
+  const firstOpen = await db.transaction(async (tx) => {
     await tx.insert(quoteEvents).values({ quoteId, type: "viewed", meta });
 
-    await tx
+    const moved = await tx
       .update(quotes)
       .set({ status: "viewed" })
-      .where(and(eq(quotes.id, quoteId), eq(quotes.status, "sent")));
+      .where(and(eq(quotes.id, quoteId), eq(quotes.status, "sent")))
+      .returning({ id: quotes.id });
+
+    // Only the sent -> viewed transition is the first open; later reloads
+    // update nothing, which is what stops the owner being emailed repeatedly.
+    return moved.length > 0;
   });
+
+  if (firstOpen) await notifyOwnerViewed(quoteId);
 }

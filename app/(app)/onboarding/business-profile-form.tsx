@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CURRENCIES } from "@/lib/constants";
+import { CURRENCIES, followUpDaysFor } from "@/lib/constants";
 import type { Business } from "@/db/schema";
 import { basisPointsToPercent } from "@/lib/money";
 
@@ -224,6 +224,27 @@ export function BusinessProfileForm({
           />
         </Field>
       </div>
+
+      <Field
+        id="followUpDays"
+        label="Follow up on unanswered quotes"
+        hint="We'll send one friendly nudge if a sent quote hasn't been accepted. Nudges stop as soon as it is."
+        error={state.fieldErrors.followUpDays}
+      >
+        <Select
+          name="followUpDays"
+          defaultValue={String(followUpDaysFor(business?.settings))}
+        >
+          <SelectTrigger id="followUpDays" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="2">After 2 days</SelectItem>
+            <SelectItem value="5">After 5 days</SelectItem>
+            <SelectItem value="0">Don&apos;t follow up</SelectItem>
+          </SelectContent>
+        </Select>
+      </Field>
 
       <SubmitButton isNew={business === null} />
     </form>

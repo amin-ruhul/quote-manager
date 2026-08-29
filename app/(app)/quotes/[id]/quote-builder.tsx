@@ -132,7 +132,13 @@ export function QuoteBuilder({
 
       <QuotePhotos quoteId={quote.id} attachments={attachments} />
 
-      <SharePanel quoteId={quote.id} isDraft={quote.status === "draft"} />
+      <SharePanel
+        quoteId={quote.id}
+        isDraft={quote.status === "draft"}
+        customerEmail={
+          customers.find((c) => c.id === quote.customerId)?.email ?? null
+        }
+      />
 
       <QuoteTotals
         subtotal={quote.subtotal}

@@ -35,6 +35,7 @@ export async function proxy(request: NextRequest) {
     "/pricebook",
     "/customers",
     "/quotes",
+    "/dashboard",
   ].some((route) => pathname.startsWith(route));
 
   // Public routes still get the cookie refresh above, but skip the identity

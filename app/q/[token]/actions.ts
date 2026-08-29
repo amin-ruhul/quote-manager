@@ -8,6 +8,7 @@ import { z } from "zod";
 import { quoteEvents, quotes } from "@/db/schema";
 import { MAX_NAME_LENGTH } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { notifyOwnerAccepted } from "@/lib/notify-owner";
 import { canAccept } from "@/lib/public-quote";
 import { clientIpFrom, rateLimit } from "@/lib/rate-limit";
 
@@ -132,6 +133,9 @@ export async function acceptQuote(
       acceptedAt: null,
     };
   }
+
+  // Best-effort, after the acceptance is safely recorded.
+  await notifyOwnerAccepted(quote.id, parsed.data.signedName);
 
   revalidatePath(`/q/${parsed.data.token}`);
   return { error: null, acceptedAt: Date.now() };

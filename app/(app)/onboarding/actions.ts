@@ -9,6 +9,7 @@ import type { DefaultPricebookItem } from "@/db/seed-data/electrician";
 import { requireUser } from "@/lib/auth";
 import {
   ALLOWED_LOGO_TYPES,
+  DEFAULT_FOLLOW_UP_DAYS,
   DEFAULT_INDUSTRY,
   LOGO_BUCKET,
   MAX_LOGO_BYTES,
@@ -109,6 +110,7 @@ export async function saveBusinessProfile(
     address: formData.get("address") ?? "",
     licenseNumber: formData.get("licenseNumber") ?? "",
     currency: formData.get("currency") ?? "USD",
+    followUpDays: formData.get("followUpDays") ?? DEFAULT_FOLLOW_UP_DAYS,
     defaultTaxRate: formData.get("defaultTaxRate") ?? "",
   });
 
@@ -118,6 +120,11 @@ export async function saveBusinessProfile(
       fieldErrors: toFieldErrors(parsed.error.issues),
     };
   }
+
+  // followUpDays isn't a column: trade settings live in businesses.settings
+  // so the core tables stay generic (SPEC §8).
+  const { followUpDays, ...profile } = parsed.data;
+  const settings = { followUpDays };
 
   let logoUrl: string | null = null;
   const logo = formData.get("logo");
@@ -140,14 +147,15 @@ export async function saveBusinessProfile(
     if (existing) {
       await db
         .update(businesses)
-        .set({ ...parsed.data, ...(logoUrl ? { logoUrl } : {}) })
+        .set({ ...profile, settings, ...(logoUrl ? { logoUrl } : {}) })
         .where(eq(businesses.ownerId, user.id));
     } else {
       await db.transaction(async (tx) => {
         const [created] = await tx
           .insert(businesses)
           .values({
-            ...parsed.data,
+            ...profile,
+            settings,
             ownerId: user.id,
             industry: DEFAULT_INDUSTRY,
             ...(logoUrl ? { logoUrl } : {}),

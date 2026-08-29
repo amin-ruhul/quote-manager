@@ -11,7 +11,7 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ next?: string }>;
 }) {
-  if (await getUser()) redirect("/pricebook");
+  if (await getUser()) redirect("/dashboard");
 
   const { next } = await searchParams;
   // Only same-site paths, so a crafted ?next= can't bounce the owner off-site.
