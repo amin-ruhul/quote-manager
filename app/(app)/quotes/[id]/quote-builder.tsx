@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { CustomerForm } from "@/app/(app)/customers/customer-form";
 import { deleteQuote } from "@/app/(app)/quotes/actions";
+import { AiDraftPanel } from "@/app/(app)/quotes/[id]/ai-draft-panel";
 import { QuoteDetailsForm } from "@/app/(app)/quotes/[id]/quote-details-form";
 import { QuoteLines } from "@/app/(app)/quotes/[id]/quote-lines";
 import { QuoteOptionsPanel } from "@/app/(app)/quotes/[id]/quote-options-panel";
@@ -92,6 +93,15 @@ export function QuoteBuilder({
         options={options}
         currency={currency}
       />
+
+      <section className="space-y-2">
+        <h2 className="font-semibold">Draft from a description</h2>
+        <AiDraftPanel
+          quoteId={quote.id}
+          currency={currency}
+          hasScope={Boolean(quote.scopeOfWork)}
+        />
+      </section>
 
       <div className="space-y-6">
         <h2 className="font-semibold">Line items</h2>
