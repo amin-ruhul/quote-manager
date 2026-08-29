@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 
-import { customerName } from "@/app/(app)/customers/customer-list";
+import { customerName } from "@/lib/customers";
 import {
   type QuoteFormState,
   saveQuoteDetails,
