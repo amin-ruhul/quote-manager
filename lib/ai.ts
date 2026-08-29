@@ -224,7 +224,19 @@ function getClient(): OpenAI {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY is not set");
   }
-  client ??= new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  /*
+   * maxRetries: 0 is deliberate. The SDK retries twice by default, and
+   * draftQuote() already retries once per SPEC §10 — stacked, one draft could
+   * fire six requests and bill for all of them. Retry policy lives in one
+   * place: draftQuote.
+   *
+   * The owner is waiting on this, so a hung request fails rather than hanging.
+   */
+  client ??= new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+    maxRetries: 0,
+    timeout: 30_000,
+  });
   return client;
 }
 
@@ -265,10 +277,31 @@ async function requestDraft(
     },
   });
 
+  // One line per billed call, so drafting cost is auditable in the server log.
+  console.info("AI draft call", {
+    model: response.model,
+    promptTokens: response.usage?.prompt_tokens,
+    completionTokens: response.usage?.completion_tokens,
+  });
+
   const content = response.choices[0]?.message?.content;
   if (!content) throw new Error("Model returned no content");
 
   return JSON.parse(content);
+}
+
+/**
+ * A bad key or a malformed request will fail identically on a second attempt,
+ * so retrying only burns another billed call. SPEC §10's retry is for invalid
+ * OUTPUT; transient failures are worth one more go.
+ */
+function isWorthRetrying(error: unknown): boolean {
+  if (error instanceof OpenAI.APIError) {
+    const status = error.status ?? 0;
+    return status === 429 || status >= 500;
+  }
+  // Parse or validation failure — exactly the case SPEC asks us to retry.
+  return true;
 }
 
 /**
@@ -296,6 +329,7 @@ export async function draftQuote(input: {
     } catch (error) {
       lastError = error;
       console.error("AI draft attempt failed", { attempt, error });
+      if (!isWorthRetrying(error)) break;
     }
   }
 
