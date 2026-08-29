@@ -57,7 +57,11 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Everything except static assets and image files.
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    /*
+     * Everything except static assets, image files, and the public customer
+     * quote page. /q has no session by design, so running the auth proxy over
+     * it would only add latency to the screen that has to feel instant.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|q/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

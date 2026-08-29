@@ -13,6 +13,7 @@ import { QuoteLines } from "@/app/(app)/quotes/[id]/quote-lines";
 import { QuoteOptionsPanel } from "@/app/(app)/quotes/[id]/quote-options-panel";
 import { QuotePhotos } from "@/app/(app)/quotes/[id]/quote-photos";
 import { QuoteTotals } from "@/app/(app)/quotes/[id]/quote-totals";
+import { SharePanel } from "@/app/(app)/quotes/[id]/share-panel";
 import { QuoteStatusPill } from "@/components/quote-status-pill";
 import {
   AlertDialog,
@@ -120,6 +121,8 @@ export function QuoteBuilder({
       </div>
 
       <QuotePhotos quoteId={quote.id} attachments={attachments} />
+
+      <SharePanel quoteId={quote.id} isDraft={quote.status === "draft"} />
 
       <QuoteTotals
         subtotal={quote.subtotal}

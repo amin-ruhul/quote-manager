@@ -17,7 +17,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:seed": "tsx db/seed.ts",
-    "verify:phase2": "tsx --tsconfig scripts/tsconfig.json scripts/verify-phase2.mts"
+    "verify:phase2": "tsx --tsconfig scripts/tsconfig.json scripts/verify-phase2.mts",
+    "verify:phase3": "tsx --tsconfig scripts/tsconfig.json scripts/verify-phase3.mts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.5",
