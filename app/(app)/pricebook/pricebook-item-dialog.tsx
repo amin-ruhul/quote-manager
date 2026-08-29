@@ -5,7 +5,6 @@ import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 
 import {
-  emptyPricebookFormState,
   type PricebookFormState,
   savePricebookItem,
 } from "@/app/(app)/pricebook/actions";
@@ -25,6 +24,12 @@ import { Textarea } from "@/components/ui/textarea";
 import type { PricebookItem } from "@/db/schema";
 import { PRICEBOOK_UNITS } from "@/lib/constants";
 import { centsToInputValue } from "@/lib/money";
+
+const initialState: PricebookFormState = {
+  error: null,
+  fieldErrors: {},
+  savedAt: null,
+};
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -57,7 +62,7 @@ export function PricebookItemDialog({
       }
       return result;
     },
-    emptyPricebookFormState,
+    initialState,
   );
 
   return (

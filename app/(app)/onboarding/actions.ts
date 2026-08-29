@@ -22,10 +22,11 @@ export type BusinessFormState = {
   fieldErrors: Record<string, string>;
 };
 
-export const emptyBusinessFormState: BusinessFormState = {
-  error: null,
-  fieldErrors: {},
-};
+/*
+ * Only async functions may be exported from a "use server" file — Next wraps
+ * every export as a callable server reference, so an exported object arrives on
+ * the client as a function. Initial state therefore lives in the component.
+ */
 
 function toFieldErrors(issues: { path: PropertyKey[]; message: string }[]) {
   const fieldErrors: Record<string, string> = {};
@@ -181,5 +182,5 @@ export async function saveBusinessProfile(
   revalidatePath("/pricebook");
 
   if (!existing) redirect("/pricebook");
-  return emptyBusinessFormState;
+  return { error: null, fieldErrors: {} };
 }

@@ -14,11 +14,11 @@ export type PricebookFormState = {
   savedAt: number | null;
 };
 
-export const emptyPricebookFormState: PricebookFormState = {
-  error: null,
-  fieldErrors: {},
-  savedAt: null,
-};
+/*
+ * Only async functions may be exported from a "use server" file — Next wraps
+ * every export as a callable server reference, so an exported object arrives on
+ * the client as a function. Initial state therefore lives in the component.
+ */
 
 function toFieldErrors(issues: { path: PropertyKey[]; message: string }[]) {
   const fieldErrors: Record<string, string> = {};

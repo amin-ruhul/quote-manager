@@ -7,7 +7,6 @@ import { toast } from "sonner";
 
 import {
   type BusinessFormState,
-  emptyBusinessFormState,
   saveBusinessProfile,
 } from "@/app/(app)/onboarding/actions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -25,6 +24,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { CURRENCIES } from "@/lib/constants";
 import type { Business } from "@/db/schema";
 import { basisPointsToPercent } from "@/lib/money";
+
+const initialState: BusinessFormState = { error: null, fieldErrors: {} };
 
 function Field({
   id,
@@ -73,7 +74,7 @@ export function BusinessProfileForm({
       if (!result.error && business) toast.success("Business profile saved.");
       return result;
     },
-    emptyBusinessFormState,
+    initialState,
   );
 
   const [logoPreview, setLogoPreview] = useState<string | null>(

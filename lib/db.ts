@@ -22,7 +22,13 @@ const globalForDb = globalThis as unknown as {
 };
 
 const queryClient =
-  globalForDb.queryClient ?? postgres(connectionString, { prepare: false });
+  globalForDb.queryClient ??
+  postgres(connectionString, {
+    // Supabase's pooler blocks new connections after repeated auth failures.
+    // Without a timeout the request hangs forever instead of surfacing why.
+    prepare: false,
+    connect_timeout: 10,
+  });
 
 if (process.env.NODE_ENV !== "production") {
   globalForDb.queryClient = queryClient;
