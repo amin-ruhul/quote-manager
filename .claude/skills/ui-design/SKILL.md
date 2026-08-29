@@ -50,8 +50,11 @@ letter-spacing as they grow (-0.02em at 32–48px, -0.04em at 60px+).
 ## Component conventions
 
 - **Primary button** — `bg-brand`, white text, weight 500, radius 8px. One per screen.
-- **Ghost button** — `bg-brand-wash`, brand text. The lower-commitment sibling (Preview).
-- **Text button** — transparent, ink-90. Tertiary (Cancel).
+- **Ghost button** — `bg-brand-wash`, brand text. The lower-commitment sibling that
+  still reads as a button. This is Button's `soft` variant.
+- **Text button** — transparent, ink-90. Tertiary (Cancel). This is Button's `ghost`
+  variant — the names are offset by one, because shadcn already used `ghost` for the
+  transparent case. Check the variant, not the word.
 - **Card** — white, 1px hairline border, radius 12px, padding 24px (16–20px on phones), **no shadow**.
 - **Accent card** — full-bleed single accent hue, no border, radius 12px. Use for the dashboard
   "won this month" moment, empty states, and free-tool feature blocks. Text black or white by contrast.

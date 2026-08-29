@@ -12,9 +12,21 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "QuotePilot",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  ),
+  title: {
+    default: "QuotePilot — send the quote before you leave the driveway",
+    template: "%s",
+  },
   description:
-    "Describe the job, send a professional quote in minutes, and let your customer approve it from their phone.",
+    "Quoting software for residential electricians. Describe the job, send a professional quote in minutes, and let your customer accept it on their phone.",
+  openGraph: {
+    title: "Send the quote before you leave the driveway",
+    description:
+      "Describe the job. QuotePilot builds the quote from your own prices and lets the customer accept it on their phone.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

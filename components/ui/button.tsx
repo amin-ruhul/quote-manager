@@ -18,6 +18,14 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+        /*
+         * DESIGN.md's "ghost button": brand-wash fill with brand text — the
+         * lower-commitment sibling of the primary. shadcn's `ghost` above is
+         * DESIGN.md's *text* button, so this is a separate variant rather than
+         * a redefinition. Use it where a secondary action still needs to read
+         * as a button, never as a second filled chromatic button.
+         */
+        soft: "bg-brand-wash text-brand hover:bg-brand-wash/70",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
