@@ -110,20 +110,42 @@ export async function savePricebookItem(
   return { error: null, fieldErrors: {}, savedAt: Date.now() };
 }
 
-export async function deletePricebookItem(formData: FormData) {
+export async function deletePricebookItem(
+  id: string,
+): Promise<{ error: string | null }> {
   const { business } = await requireBusiness();
 
-  const parsedId = idSchema.safeParse(formData.get("id"));
-  if (!parsedId.success) return;
+  const parsedId = idSchema.safeParse(id);
+  if (!parsedId.success) {
+    return {
+      error: parsedId.error.issues[0]?.message ?? "Something went wrong.",
+    };
+  }
 
-  await db
-    .delete(pricebookItems)
-    .where(
-      and(
-        eq(pricebookItems.id, parsedId.data),
-        eq(pricebookItems.businessId, business.id),
-      ),
-    );
+  try {
+    // The business_id predicate is what stops one owner deleting another's item.
+    const deleted = await db
+      .delete(pricebookItems)
+      .where(
+        and(
+          eq(pricebookItems.id, parsedId.data),
+          eq(pricebookItems.businessId, business.id),
+        ),
+      )
+      .returning({ id: pricebookItems.id });
+
+    if (deleted.length === 0) {
+      return { error: "That item no longer exists." };
+    }
+  } catch (error) {
+    console.error("Deleting pricebook item failed", {
+      businessId: business.id,
+      itemId: id,
+      error,
+    });
+    return { error: "We couldn't delete that item. Try again." };
+  }
 
   revalidatePath("/pricebook");
+  return { error: null };
 }

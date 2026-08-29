@@ -1,16 +1,14 @@
 "use client";
 
-import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
 
-import { deletePricebookItem } from "@/app/(app)/pricebook/actions";
 import { PricebookItemDialog } from "@/app/(app)/pricebook/pricebook-item-dialog";
+import { PricebookRow } from "@/app/(app)/pricebook/pricebook-row";
 import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 import type { PricebookItem } from "@/db/schema";
 import type { Currency } from "@/lib/constants";
-import { formatCents } from "@/lib/money";
 
 /** Groups items by category so a long pricebook stays scannable on a phone. */
 function groupByCategory(items: PricebookItem[]) {
@@ -22,27 +20,6 @@ function groupByCategory(items: PricebookItem[]) {
     else groups.set(key, [item]);
   }
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
-}
-
-/**
- * Deleting round-trips to the server and revalidates the list, which looked
- * frozen with no feedback. Must live inside the <form> for useFormStatus.
- */
-function DeleteItemButton({ itemName }: { itemName: string }) {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button
-      type="submit"
-      variant="ghost"
-      size="icon-sm"
-      aria-label={`Delete ${itemName}`}
-      className="text-destructive"
-      disabled={pending}
-    >
-      {pending ? <Loader2 className="animate-spin" /> : <Trash2 />}
-    </Button>
-  );
 }
 
 export function PricebookList({
@@ -94,38 +71,12 @@ export function PricebookList({
             <Panel asChild className="p-0">
               <ul className="divide-y divide-hairline">
                 {groupItems.map((item) => (
-                  <li key={item.id} className="flex items-start gap-3 p-4">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium">{item.name}</p>
-                      {item.description ? (
-                        <p className="mt-1 text-sm text-ink-60">
-                          {item.description}
-                        </p>
-                      ) : null}
-                      <p className="tabular mt-2 font-medium">
-                        {formatCents(item.price, currency)}
-                        <span className="font-normal text-ink-40">
-                          {" / "}
-                          {item.unit}
-                        </span>
-                      </p>
-                    </div>
-
-                    <div className="flex shrink-0 gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Edit ${item.name}`}
-                        onClick={() => setEditing(item)}
-                      >
-                        <Pencil />
-                      </Button>
-                      <form action={deletePricebookItem}>
-                        <input type="hidden" name="id" value={item.id} />
-                        <DeleteItemButton itemName={item.name} />
-                      </form>
-                    </div>
-                  </li>
+                  <PricebookRow
+                    key={item.id}
+                    item={item}
+                    currency={currency}
+                    onEdit={() => setEditing(item)}
+                  />
                 ))}
               </ul>
             </Panel>
