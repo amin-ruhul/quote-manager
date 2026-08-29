@@ -34,7 +34,12 @@ const initialState: PricebookFormState = {
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" size="lg" className="w-full" disabled={pending}>
+    <Button
+      type="submit"
+      size="lg"
+      className="w-full sm:w-auto"
+      disabled={pending}
+    >
       {pending ? "Saving…" : "Save item"}
     </Button>
   );
@@ -157,13 +162,15 @@ export function PricebookItemDialog({
           </datalist>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row-reverse">
+        {/* Full-width stack on a phone; content-width row on desktop, with the
+            primary action on the right. */}
+        <div className="flex flex-col gap-2 pt-2 sm:flex-row-reverse sm:justify-start">
           <SubmitButton />
           <Button
             type="button"
             variant="ghost"
             size="lg"
-            className="w-full"
+            className="w-full sm:w-auto"
             onClick={onClose}
           >
             Cancel

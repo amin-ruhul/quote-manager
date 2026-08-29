@@ -62,6 +62,10 @@ letter-spacing as they grow (-0.02em at 32–48px, -0.04em at 60px+).
   accepted `#0F7A38` on `#E4F4EB` · declined `#B0230F` on `#FDE7E2`.
 - **Money** — always tabular (`tnum`), formatted from integer cents to `$2,850.00`. Never a float.
 - **Motion** — ~200ms ease. No bounce; this is a pro tool.
+- **Button rows** — Button carries `shrink-0`, so two `w-full` buttons in one flex
+  row demand 200% and cannot shrink; with `flex-row-reverse` the overflow escapes
+  to the left, outside its card. Use `w-full sm:w-auto`: stacked full-width on a
+  phone, content-width row on desktop with the primary action on the right.
 
 ## Every screen
 

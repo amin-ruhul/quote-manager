@@ -1,7 +1,8 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 
 import { deletePricebookItem } from "@/app/(app)/pricebook/actions";
 import { PricebookItemDialog } from "@/app/(app)/pricebook/pricebook-item-dialog";
@@ -21,6 +22,27 @@ function groupByCategory(items: PricebookItem[]) {
     else groups.set(key, [item]);
   }
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
+}
+
+/**
+ * Deleting round-trips to the server and revalidates the list, which looked
+ * frozen with no feedback. Must live inside the <form> for useFormStatus.
+ */
+function DeleteItemButton({ itemName }: { itemName: string }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button
+      type="submit"
+      variant="ghost"
+      size="icon-sm"
+      aria-label={`Delete ${itemName}`}
+      className="text-destructive"
+      disabled={pending}
+    >
+      {pending ? <Loader2 className="animate-spin" /> : <Trash2 />}
+    </Button>
+  );
 }
 
 export function PricebookList({
@@ -100,15 +122,7 @@ export function PricebookList({
                       </Button>
                       <form action={deletePricebookItem}>
                         <input type="hidden" name="id" value={item.id} />
-                        <Button
-                          type="submit"
-                          variant="ghost"
-                          size="icon-sm"
-                          aria-label={`Delete ${item.name}`}
-                          className="text-destructive"
-                        >
-                          <Trash2 />
-                        </Button>
+                        <DeleteItemButton itemName={item.name} />
                       </form>
                     </div>
                   </li>
