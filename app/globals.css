@@ -1,0 +1,191 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Registers shadcn/ui's semantic variables as Tailwind utilities (bg-card, border-border…). */
+@theme inline {
+  --font-heading: var(--font-sans);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/*
+ * QuotePilot design tokens — see DESIGN.md (the source of truth).
+ * Tailwind v4 is CSS-first, so DESIGN.md's `tailwind.config.js` block lives here
+ * as @theme instead. Values are unchanged.
+ */
+@theme {
+  /* Surfaces — warm paper. The page is never pure white. */
+  --color-canvas: #f6f5f4;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f0ee;
+
+  /* Text — hierarchy comes from black alpha, not new grays. */
+  --color-ink: #000000;
+  --color-ink-90: rgba(0, 0, 0, 0.9);
+  --color-ink-60: rgba(0, 0, 0, 0.6);
+  --color-ink-40: rgba(0, 0, 0, 0.4);
+  --color-body: #615d59;
+
+  /* The one chromatic action. */
+  --color-brand: #0075de;
+  --color-brand-wash: #e6f3fe;
+
+  /* Accents — card backgrounds and pills only, never body text. */
+  --color-marigold: #ffb110;
+  --color-coral: #f64932;
+  --color-sky: #62aef0;
+  --color-saffron: #e89d01;
+  --color-mocha: #b18164;
+  --color-midnight: #02093a;
+
+  /* Quote lifecycle status pills (text / background pairs). */
+  --color-status-draft: rgba(0, 0, 0, 0.55);
+  --color-status-draft-bg: #f1f0ee;
+  --color-status-sent: #0075de;
+  --color-status-sent-bg: #e6f3fe;
+  --color-status-viewed: #8a5a00;
+  --color-status-viewed-bg: #fff3d6;
+  --color-status-accepted: #0f7a38;
+  --color-status-accepted-bg: #e4f4eb;
+  --color-status-declined: #b0230f;
+  --color-status-declined-bg: #fde7e2;
+
+  /* Hairlines instead of shadows. */
+  --color-hairline: rgba(0, 0, 0, 0.08);
+  --color-hairline-strong: rgba(0, 0, 0, 0.14);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, serif;
+
+  /*
+   * Display headings tighten as they grow (DESIGN.md). Baking this into the
+   * font-size scale means every large heading gets it without remembering.
+   */
+  --text-3xl--letter-spacing: -0.02em;
+  --text-4xl--letter-spacing: -0.02em;
+  --text-5xl--letter-spacing: -0.02em;
+  --text-6xl--letter-spacing: -0.04em;
+  --text-7xl--letter-spacing: -0.04em;
+  --text-8xl--letter-spacing: -0.04em;
+  --text-9xl--letter-spacing: -0.04em;
+
+  /*
+   * Nothing rounder than 12px except pills, so the larger steps are capped
+   * rather than left to shadcn's multipliers.
+   */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 12px;
+  --radius-2xl: 12px;
+  --radius-3xl: 12px;
+  --radius-4xl: 12px;
+
+  /* The only two sanctioned shadows (DESIGN.md "Elevation"). */
+  --shadow-nav:
+    0 0.7px 1.5px rgba(0, 0, 0, 0.015), 0 3px 9px rgba(0, 0, 0, 0.03);
+  --shadow-quote: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Map shadcn/ui's semantic variables onto the palette above. */
+:root {
+  --background: var(--color-canvas);
+  --foreground: var(--color-ink-90);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-ink-90);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-ink-90);
+  --primary: var(--color-brand);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-surface-2);
+  --secondary-foreground: var(--color-ink-90);
+  --muted: var(--color-surface-2);
+  --muted-foreground: var(--color-ink-60);
+  --accent: var(--color-brand-wash);
+  --accent-foreground: var(--color-brand);
+  --destructive: var(--color-status-declined);
+  --border: var(--color-hairline);
+  --input: var(--color-hairline-strong);
+  --ring: var(--color-brand);
+  --radius: 12px;
+  --sidebar: var(--color-surface);
+  --sidebar-foreground: var(--color-ink-90);
+  --sidebar-primary: var(--color-brand);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--color-brand-wash);
+  --sidebar-accent-foreground: var(--color-brand);
+  --sidebar-border: var(--color-hairline);
+  --sidebar-ring: var(--color-brand);
+}
+
+/*
+ * Light is the identity. Dark is stubbed from DESIGN.md's optional section so
+ * components stay coherent if it is ever switched on; nothing toggles it today.
+ */
+.dark {
+  --background: #17161a;
+  --foreground: rgba(255, 255, 255, 0.92);
+  --card: #201f24;
+  --card-foreground: rgba(255, 255, 255, 0.92);
+  --popover: #201f24;
+  --popover-foreground: rgba(255, 255, 255, 0.92);
+  --primary: #4c9bea;
+  --primary-foreground: #0b1220;
+  --secondary: #2a2930;
+  --secondary-foreground: rgba(255, 255, 255, 0.92);
+  --muted: #2a2930;
+  --muted-foreground: rgba(255, 255, 255, 0.6);
+  --accent: #23364a;
+  --accent-foreground: #4c9bea;
+  --destructive: #f2705a;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.16);
+  --ring: #4c9bea;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Money and figures are always tabular (DESIGN.md). */
+  .tabular {
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+  }
+}

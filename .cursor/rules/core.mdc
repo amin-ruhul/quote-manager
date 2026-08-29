@@ -1,0 +1,26 @@
+---
+description: QuotePilot core project rules
+alwaysApply: true
+---
+
+QuotePilot is a quote-first SaaS for residential electricians (V1). Follow SPEC.md
+and build phase by phase (SPEC §14). Implement only the requested phase.
+
+Stack: Next.js (App Router) + TypeScript, Tailwind + shadcn/ui, Supabase (Postgres +
+Auth), Drizzle ORM, OpenAI SDK, Resend, Paddle, Vercel.
+
+Golden rules:
+
+- Mobile-first always; the user is on a phone at a job site.
+- TypeScript strict; no `any` without a reason.
+- All external calls (OpenAI, Resend, Paddle, Supabase admin) go through /lib
+  wrappers. No raw external calls in components.
+- Secrets, AI, email, billing run server-side only. Never expose secret keys.
+- Multi-tenant: every query scoped by business_id + protected by RLS.
+- Money is integer cents, never floats.
+- AI never sets an unmatched price; pricebook is source of truth; owner reviews
+  every quote before sending.
+- Always record quote_events (viewed/accepted/etc.) — the data moat.
+- Validate AI output against the schema; retry once then graceful error.
+- Every screen handles loading, empty, and error states.
+- Small functions, boring libraries. Commit after each phase.

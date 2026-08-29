@@ -1,0 +1,14 @@
+---
+description: React/Next.js/Tailwind UI conventions
+globs: ["app/**/*.tsx", "components/**/*.tsx"]
+alwaysApply: false
+---
+
+- Mobile-first: design for ~375px width first, then scale up with sm:/md:/lg:.
+- Use shadcn/ui components; don't hand-roll inputs/buttons/dialogs.
+- Server Components by default; add "use client" only when interactivity needs it.
+- Big tap targets (min 44px). Clear primary action per screen.
+- Every screen: loading, empty, and error states.
+- The customer quote page (/q/[token]) must look premium and load fast — it's what
+  wins the job. No layout shift, works great on a phone.
+- Keep secret keys and server logic out of client components.

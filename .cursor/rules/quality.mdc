@@ -1,0 +1,68 @@
+---
+description: QuotePilot code quality & maintainability standards
+alwaysApply: true
+---
+
+# Simplicity first
+
+- Build for the current phase only. No speculative features or "future-proof" abstractions.
+- Rule of three: don't extract a helper/abstraction until the same code appears 3 times.
+- Prefer the boring, obvious solution. Fewer files, fewer dependencies, less magic.
+
+# Folder structure (keep files in their home)
+
+- app/ → routes & pages (App Router)
+- components/ui/ → shadcn/ui primitives
+- components/ → feature components
+- lib/ → external-service wrappers (ai, email, billing, db) + pure utils
+- db/ → Drizzle schema + migrations + seed
+- types/ → shared types (prefer inferring from Drizzle)
+- Server logic lives in server actions or route handlers, never in client components.
+
+# Naming
+
+- Files: kebab-case (quote-card.tsx). Components: PascalCase. Vars/functions: camelCase.
+- DB tables: snake_case, plural. Booleans: is/has/can. Handlers: handleX.
+- Names say intent: `acceptQuote`, not `doIt`. No abbreviations that aren't obvious.
+
+# One source of truth
+
+- Derive types from the Drizzle schema; don't hand-write duplicate shapes.
+- Put statuses, plan names, quota limits, follow-up days, etc. in `lib/constants.ts`.
+  No magic strings or magic numbers scattered in the code.
+
+# Validate at the edges
+
+- Validate ALL input at every API route / server action boundary with Zod.
+- Trust nothing from the client (never a client-sent business_id, price, or plan).
+
+# Errors
+
+- Never swallow errors silently. Catch at boundaries.
+- User-facing messages are friendly and actionable ("Enter a price" not "500 error").
+- Log server errors with enough context to debug. Fail loudly in dev, gracefully in prod.
+
+# Size & readability
+
+- Split a file/function when it passes ~200 lines or does more than one job.
+- Comments explain WHY, not WHAT. Delete dead code and commented-out blocks.
+- No `console.log` left in committed code (use a logger or remove).
+
+# Consistency
+
+- One way to fetch data, one way to build a form, one way to show a toast — then repeat it.
+- Match the patterns already in the codebase before inventing a new one.
+
+# Dependencies
+
+- Add a library only when it clearly saves real work. Pin versions. Avoid abandoned packages.
+
+# Tests (pragmatic, not 100%)
+
+- Write tests for the things that hurt if wrong: quote total math (cents), AI-output
+  parsing/validation, and the accept-quote flow. Skip trivial UI tests.
+
+# Cost & abuse control
+
+- Rate-limit public endpoints: the free calculator, the public quote view, and any AI call.
+  This protects your OpenAI bill and blocks abuse.
