@@ -135,9 +135,10 @@ NEXT_PUBLIC_APP_URL=
 
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-DATABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=   # sb_publishable_... (replaces the legacy anon key)
+SUPABASE_SECRET_KEY=                    # sb_secret_...      (replaces the legacy service_role key)
+DATABASE_URL=                           # transaction pooler :6543 — app queries
+DIRECT_URL=                             # session pooler :5432 — migrations only
 
 # OpenAI
 OPENAI_API_KEY=
@@ -376,7 +377,7 @@ You don't cold-call. The product and content pull customers in:
 - AI never sets an unmatched price; owner reviews every quote before sending.
 - All external calls (OpenAI, Resend, Paddle) go through `/lib` wrappers.
 - Record every quote view/accept/decline in `quote_events` from day 1 (future moat).
-- Never expose service-role or API keys to the client; AI + sending run server-side.
+- Never expose the Supabase secret key or any API key to the client; AI + sending run server-side.
 - Keep secrets in env; validate AI output against the schema (retry once, then graceful error).
 - Commit after each phase.
 

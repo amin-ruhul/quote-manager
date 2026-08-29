@@ -22,7 +22,8 @@ Next.js (App Router) + TypeScript · Tailwind CSS + shadcn/ui · Supabase (Postg
    Supabase admin client go through one module in `/lib` (e.g. `lib/ai.ts`,
    `lib/email.ts`, `lib/billing.ts`, `lib/db.ts`). No raw external calls in components.
 5. **Server-side secrets only.** AI calls, email, billing, and any use of the
-   Supabase service-role key run server-side. NEVER expose secret keys to the client.
+   Supabase secret key (`sb_secret_...`) run server-side. NEVER expose secret keys to
+   the client — anything named `NEXT_PUBLIC_*` is shipped to the browser.
 6. **Multi-tenant safety.** Every business owns its own data. Every DB query is
    scoped by `business_id`/owner, AND protected by Row Level Security (see the
    supabase skill). Never trust the client to send the right business_id.
