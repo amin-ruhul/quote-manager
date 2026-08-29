@@ -1,3 +1,4 @@
+import { Panel } from "@/components/panel";
 import { BusinessProfileForm } from "@/app/(app)/onboarding/business-profile-form";
 import { getBusinessForOwner, requireUser } from "@/lib/auth";
 
@@ -21,9 +22,9 @@ export default async function OnboardingPage() {
         </p>
       </header>
 
-      <div className="rounded-lg border border-hairline bg-surface p-5 sm:p-6">
+      <Panel>
         <BusinessProfileForm business={business} />
-      </div>
+      </Panel>
 
       {isNew ? (
         <p className="text-sm text-ink-60">

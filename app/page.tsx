@@ -1,3 +1,4 @@
+import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 
 /*
@@ -30,13 +31,13 @@ export default function HomePage() {
         </p>
       </div>
 
-      <div className="mt-16 rounded-lg border border-hairline bg-surface p-6">
+      <Panel className="mt-16">
         <h2 className="text-sm font-semibold">Scaffold ready</h2>
         <p className="mt-2 text-sm text-ink-60">
           Next.js App Router, Tailwind, shadcn/ui, and Drizzle are wired up. No
           features yet — the build continues phase by phase per SPEC §14.
         </p>
-      </div>
+      </Panel>
     </main>
   );
 }

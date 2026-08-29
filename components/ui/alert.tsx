@@ -9,8 +9,10 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: "bg-card text-card-foreground",
+        // DESIGN.md puts colour in tinted backgrounds, not in text on white.
+        // Same pairing as the "declined" status pill.
         destructive:
-          "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current",
+          "border-transparent bg-status-declined-bg text-status-declined *:data-[slot=alert-description]:text-status-declined *:[svg]:text-current",
       },
     },
     defaultVariants: {

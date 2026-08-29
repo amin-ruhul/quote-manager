@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 
 /** Catches render/data failures on any signed-in screen. Never a blank page. */
@@ -17,7 +18,7 @@ export default function AppError({
   }, [error]);
 
   return (
-    <div className="rounded-lg border border-hairline bg-surface p-6">
+    <Panel>
       <h1 className="text-xl font-semibold">Something went wrong</h1>
       <p className="mt-2 text-body">
         We couldn&apos;t load this screen. Your data is safe — try again.
@@ -25,6 +26,6 @@ export default function AppError({
       <Button size="lg" className="mt-6 w-full sm:w-auto" onClick={reset}>
         Try again
       </Button>
-    </div>
+    </Panel>
   );
 }

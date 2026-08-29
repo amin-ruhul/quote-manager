@@ -1,3 +1,4 @@
+import { Panel } from "@/components/panel";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PricebookLoading() {
@@ -10,7 +11,7 @@ export default function PricebookLoading() {
       <Skeleton className="h-12 w-full" />
       <div className="space-y-2">
         <Skeleton className="h-5 w-32" />
-        <div className="divide-y divide-hairline rounded-lg border border-hairline bg-surface">
+        <Panel className="divide-y divide-hairline p-0">
           {[0, 1, 2].map((row) => (
             <div key={row} className="space-y-2 p-4">
               <Skeleton className="h-5 w-2/3" />
@@ -18,7 +19,7 @@ export default function PricebookLoading() {
               <Skeleton className="h-5 w-24" />
             </div>
           ))}
-        </div>
+        </Panel>
       </div>
     </div>
   );

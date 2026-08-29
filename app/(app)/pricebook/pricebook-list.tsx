@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { deletePricebookItem } from "@/app/(app)/pricebook/actions";
 import { PricebookItemDialog } from "@/app/(app)/pricebook/pricebook-item-dialog";
+import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 import type { PricebookItem } from "@/db/schema";
 import type { Currency } from "@/lib/constants";
@@ -68,50 +69,52 @@ export function PricebookList({
         groupByCategory(items).map(([category, groupItems]) => (
           <section key={category} className="space-y-2">
             <h2 className="text-sm font-medium text-ink-60">{category}</h2>
-            <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface">
-              {groupItems.map((item) => (
-                <li key={item.id} className="flex items-start gap-3 p-4">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{item.name}</p>
-                    {item.description ? (
-                      <p className="mt-1 text-sm text-ink-60">
-                        {item.description}
+            <Panel asChild className="p-0">
+              <ul className="divide-y divide-hairline">
+                {groupItems.map((item) => (
+                  <li key={item.id} className="flex items-start gap-3 p-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium">{item.name}</p>
+                      {item.description ? (
+                        <p className="mt-1 text-sm text-ink-60">
+                          {item.description}
+                        </p>
+                      ) : null}
+                      <p className="tabular mt-2 font-medium">
+                        {formatCents(item.price, currency)}
+                        <span className="font-normal text-ink-40">
+                          {" / "}
+                          {item.unit}
+                        </span>
                       </p>
-                    ) : null}
-                    <p className="tabular mt-2 font-medium">
-                      {formatCents(item.price, currency)}
-                      <span className="font-normal text-ink-40">
-                        {" / "}
-                        {item.unit}
-                      </span>
-                    </p>
-                  </div>
+                    </div>
 
-                  <div className="flex shrink-0 gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={`Edit ${item.name}`}
-                      onClick={() => setEditing(item)}
-                    >
-                      <Pencil />
-                    </Button>
-                    <form action={deletePricebookItem}>
-                      <input type="hidden" name="id" value={item.id} />
+                    <div className="flex shrink-0 gap-1">
                       <Button
-                        type="submit"
                         variant="ghost"
                         size="icon-sm"
-                        aria-label={`Delete ${item.name}`}
-                        className="text-destructive"
+                        aria-label={`Edit ${item.name}`}
+                        onClick={() => setEditing(item)}
                       >
-                        <Trash2 />
+                        <Pencil />
                       </Button>
-                    </form>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                      <form action={deletePricebookItem}>
+                        <input type="hidden" name="id" value={item.id} />
+                        <Button
+                          type="submit"
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`Delete ${item.name}`}
+                          className="text-destructive"
+                        >
+                          <Trash2 />
+                        </Button>
+                      </form>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
           </section>
         ))
       )}

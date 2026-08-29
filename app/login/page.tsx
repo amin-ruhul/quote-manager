@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/app/login/login-form";
+import { Panel } from "@/components/panel";
 import { getUser } from "@/lib/auth";
 
 export const metadata = { title: "Sign in · QuotePilot" };
@@ -23,9 +24,9 @@ export default async function LoginPage({
         Sign in to set up your business and pricebook.
       </p>
 
-      <div className="mt-8 rounded-lg border border-hairline bg-surface p-6">
+      <Panel className="mt-8">
         <LoginForm next={safeNext} />
-      </div>
+      </Panel>
     </main>
   );
 }
