@@ -14,6 +14,7 @@ import {
   MAX_LOGO_BYTES,
 } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { toFieldErrors } from "@/lib/form-state";
 import { createClient } from "@/lib/supabase/server";
 import { businessProfileSchema } from "@/lib/validation";
 
@@ -27,15 +28,6 @@ export type BusinessFormState = {
  * every export as a callable server reference, so an exported object arrives on
  * the client as a function. Initial state therefore lives in the component.
  */
-
-function toFieldErrors(issues: { path: PropertyKey[]; message: string }[]) {
-  const fieldErrors: Record<string, string> = {};
-  for (const issue of issues) {
-    const key = String(issue.path[0] ?? "");
-    if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
-  }
-  return fieldErrors;
-}
 
 /**
  * Uploads the logo into a folder named after the user id, which is what the

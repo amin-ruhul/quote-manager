@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { pricebookItems } from "@/db/schema";
 import { requireBusiness } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { toFieldErrors } from "@/lib/form-state";
 import { idSchema, pricebookItemSchema } from "@/lib/validation";
 
 export type PricebookFormState = {
@@ -19,15 +20,6 @@ export type PricebookFormState = {
  * every export as a callable server reference, so an exported object arrives on
  * the client as a function. Initial state therefore lives in the component.
  */
-
-function toFieldErrors(issues: { path: PropertyKey[]; message: string }[]) {
-  const fieldErrors: Record<string, string> = {};
-  for (const issue of issues) {
-    const key = String(issue.path[0] ?? "");
-    if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
-  }
-  return fieldErrors;
-}
 
 function parseItem(formData: FormData) {
   return pricebookItemSchema.safeParse({

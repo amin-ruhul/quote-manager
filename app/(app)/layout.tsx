@@ -17,10 +17,17 @@ export default async function AppLayout({
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-10 bg-canvas/85 shadow-nav backdrop-blur">
-        <nav className="mx-auto flex max-w-3xl items-center gap-1 px-4 py-2">
-          <Link href="/pricebook" className="mr-auto font-semibold">
+        {/* Scrolls sideways on a phone rather than wrapping onto a second row. */}
+        <nav className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-4 py-2 whitespace-nowrap">
+          <Link href="/quotes" className="mr-auto font-semibold">
             QuotePilot
           </Link>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/quotes">Quotes</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/customers">Customers</Link>
+          </Button>
           <Button asChild variant="ghost" size="sm">
             <Link href="/pricebook">Pricebook</Link>
           </Button>

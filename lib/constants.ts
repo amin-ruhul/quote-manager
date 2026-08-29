@@ -29,6 +29,52 @@ export const DEFAULT_CURRENCY: Currency = "USD";
 export const BASIS_POINTS_PER_PERCENT = 100;
 export const MAX_TAX_RATE_BASIS_POINTS = 10_000; // 100%
 
+/** Quote lifecycle (SPEC §5). Status colours live in DESIGN.md's status table. */
+export const QUOTE_STATUSES = [
+  "draft",
+  "sent",
+  "viewed",
+  "accepted",
+  "declined",
+  "expired",
+] as const;
+export type QuoteStatus = (typeof QUOTE_STATUSES)[number];
+export const DEFAULT_QUOTE_STATUS: QuoteStatus = "draft";
+
+/** Line item kinds the generic engine supports (SPEC §8, §10). */
+export const QUOTE_ITEM_TYPES = [
+  "fixed",
+  "qty",
+  "hourly",
+  "material",
+  "labor",
+  "permit",
+  "fee",
+  "discount",
+] as const;
+export type QuoteItemType = (typeof QUOTE_ITEM_TYPES)[number];
+export const DEFAULT_QUOTE_ITEM_TYPE: QuoteItemType = "qty";
+
+/**
+ * Quantities are stored as integers scaled by 100, so "2.5 hours" is 250.
+ * Same reasoning as money-as-cents: a float quantity multiplied by a cents
+ * price reintroduces the rounding error we store integers to avoid.
+ */
+export const QUANTITY_SCALE = 100;
+
+/** How long a new quote stays valid, unless the owner changes the date. */
+export const DEFAULT_QUOTE_VALID_DAYS = 30;
+
+/** Quote photo uploads (Supabase Storage bucket `quote-photos`). */
+export const QUOTE_PHOTO_BUCKET = "quote-photos";
+export const MAX_QUOTE_PHOTO_BYTES = 8 * 1024 * 1024; // 8 MB
+export const MAX_QUOTE_PHOTOS = 12;
+export const ALLOWED_QUOTE_PHOTO_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+] as const;
+
 /** Guardrails on free-text fields, mirrored by the Zod schemas at the boundaries. */
 export const MAX_NAME_LENGTH = 120;
 export const MAX_DESCRIPTION_LENGTH = 500;
