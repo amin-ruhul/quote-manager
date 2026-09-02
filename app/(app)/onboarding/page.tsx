@@ -1,4 +1,5 @@
 import { Panel } from "@/components/panel";
+import { PushToggle } from "@/components/pwa/push-toggle";
 import { BusinessProfileForm } from "@/app/(app)/onboarding/business-profile-form";
 import { getBusinessForOwner, requireUser } from "@/lib/auth";
 
@@ -26,12 +27,18 @@ export default async function OnboardingPage() {
         <BusinessProfileForm business={business} />
       </Panel>
 
+      {/*
+        Only once they're set up: the first run is about getting a business
+        saved, not about notification settings.
+      */}
       {isNew ? (
         <p className="text-sm text-ink-60">
           We&apos;ll start your pricebook with common electrical jobs. Every
           price is yours to edit.
         </p>
-      ) : null}
+      ) : (
+        <PushToggle />
+      )}
     </div>
   );
 }

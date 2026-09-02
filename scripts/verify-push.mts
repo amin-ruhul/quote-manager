@@ -17,7 +17,8 @@ import { eq } from "drizzle-orm";
 config({ path: ".env.local" });
 
 const { db } = await import("@/lib/db");
-const { profiles, pushSubscriptions } = await import("@/db/schema");
+const { businesses, customers, profiles, pushSubscriptions, quotes } =
+  await import("@/db/schema");
 const {
   countPushSubscriptions,
   deletePushSubscription,
@@ -25,6 +26,7 @@ const {
   savePushSubscription,
   sendPushToOwner,
 } = await import("@/lib/push");
+const { notifyOwnerAccepted } = await import("@/lib/notify-owner");
 const { MAX_PUSH_SUBSCRIPTIONS_PER_OWNER } = await import("@/lib/constants");
 
 let passed = 0;
@@ -201,6 +203,67 @@ async function main() {
     check("counted as a failure", broken.failed, 1);
     check("not pruned", broken.pruned, 0);
     check("row kept", await countPushSubscriptions(ownerA), 1);
+  }
+
+  process.stdout.write("\nwired to the acceptance\n");
+  /*
+   * The step that matters: a customer accepting has to reach the owner's
+   * devices. notifyOwnerAccepted resolves the owner through the business, so
+   * this also proves that join.
+   *
+   * The business email is Resend's simulator address, which accepts and
+   * discards — no human is emailed by this script.
+   */
+  const [business] = await db
+    .insert(businesses)
+    .values({
+      ownerId: ownerB,
+      name: "Verify Electric",
+      email: "delivered@resend.dev",
+      currency: "USD",
+    })
+    .returning({ id: businesses.id });
+
+  const [customer] = await db
+    .insert(customers)
+    .values({
+      businessId: business!.id,
+      firstName: "John",
+      lastName: "Smith",
+    })
+    .returning({ id: customers.id });
+
+  const [quote] = await db
+    .insert(quotes)
+    .values({
+      businessId: business!.id,
+      customerId: customer!.id,
+      quoteNumber: "Q-9001",
+      title: "Panel replacement",
+      status: "accepted",
+      total: 285000,
+      publicToken: crypto.randomUUID(),
+    })
+    .returning({ id: quotes.id });
+
+  await savePushSubscription(ownerB, { endpoint: endpoint("accepted"), keys });
+  check("owner has a device", await countPushSubscriptions(ownerB), 1);
+
+  await notifyOwnerAccepted(quote!.id, "John Smith");
+
+  if (isPushConfigured()) {
+    /*
+     * The endpoint is invented, so the push service answers 404 and the row is
+     * pruned. That the row is gone is the observable proof that the accept
+     * path found this owner's devices and tried to reach them.
+     */
+    check(
+      "the acceptance reached the owner's devices",
+      await countPushSubscriptions(ownerB),
+      0,
+    );
+  } else {
+    process.stdout.write("  SKIP  push attempt (set the VAPID vars)\n");
   }
 
   process.stdout.write("\nrls\n");

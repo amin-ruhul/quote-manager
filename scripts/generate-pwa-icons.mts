@@ -33,6 +33,12 @@ type IconSpec = {
   /** How much of the icon the 24x24 mark grid spans. */
   markScale: number;
   label: string;
+  /**
+   * Android masks the notification badge down to its alpha channel, so that
+   * one is a white mark on transparency — a filled square is what you get
+   * otherwise.
+   */
+  transparent?: boolean;
 };
 
 /*
@@ -70,15 +76,26 @@ const ICONS: IconSpec[] = [
     markScale: 0.66,
     label: "apple touch 180",
   },
+  {
+    dir: PUBLIC_ICONS,
+    file: "badge-96.png",
+    size: 96,
+    markScale: 0.9,
+    label: "notification badge 96",
+    transparent: true,
+  },
 ];
 
-function iconSvg({ size, markScale }: IconSpec): string {
+function iconSvg({ size, markScale, transparent }: IconSpec): string {
   const grid = size * markScale;
   const offset = (size - grid) / 2;
   const scale = grid / BRAND_MARK_VIEWBOX;
+  const background = transparent
+    ? ""
+    : `<rect width="${size}" height="${size}" fill="${BRAND_BLUE}"/>`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <rect width="${size}" height="${size}" fill="${BRAND_BLUE}"/>
+  ${background}
   <g transform="translate(${offset} ${offset}) scale(${scale})">
     <path d="${BRAND_MARK_PATH}" fill="#FFFFFF"/>
   </g>
@@ -89,12 +106,14 @@ async function main() {
   await mkdir(PUBLIC_ICONS, { recursive: true });
 
   for (const spec of ICONS) {
-    const png = await sharp(Buffer.from(iconSvg(spec)))
-      // Home-screen icons must be opaque: iOS composites transparency onto
-      // black, which would put a dark ring around the mark.
-      .flatten({ background: BRAND_BLUE })
-      .png()
-      .toBuffer();
+    const image = sharp(Buffer.from(iconSvg(spec)));
+
+    // Home-screen icons must be opaque: iOS composites transparency onto
+    // black, which would put a dark ring around the mark. The badge is the
+    // exception — it needs its alpha channel.
+    if (!spec.transparent) image.flatten({ background: BRAND_BLUE });
+
+    const png = await image.png().toBuffer();
 
     const target = path.join(spec.dir, spec.file);
     await writeFile(target, png);

@@ -274,7 +274,7 @@ The engine supports item `type`s: fixed price, quantity × unit price, hourly la
 
 - **Send:** email via Resend with the quote link. (SMS is roadmap.)
 - **Follow-up automation (a cron / scheduled job):** if a sent quote isn't accepted after N days, auto-send a friendly nudge ("Hi John, any questions about your electrical quote?"). Owner configures: follow up after 2 days / 5 days / stop when accepted. Log a `follow_up_sent` event. **This directly drives the "win more jobs" promise.**
-- **Owner notifications:** email on quote viewed / accepted.
+- **Owner notifications:** email on quote viewed / accepted, plus a web push alert to the owner's phone on the same two events (Section 15). Both channels fire from `lib/notify-owner.ts` and are best-effort — a notification must never fail the customer's tap.
 - **Dashboard:** greeting + this-month stats (Quotes sent, Accepted, Acceptance rate, $ Quoted, $ Won) + recent quotes with status. Keep it one simple screen.
 
 ---
@@ -342,7 +342,11 @@ Build `/free/quote-calculator` (Section 13) + "Powered by" loop. Can be pulled e
 ## 15. Post-MVP roadmap
 
 - **SMS sending** (Twilio) — trades love text.
-- **Push notifications (PWA)** — "quote viewed / accepted" alerts that pull the electrician back in. Note: on iPhone, web push only works once the app is installed to the home screen (Apple's rule); Android is simpler. Do this after the installable manifest is in.
+- ~~**Push notifications (PWA)**~~ — **built** after Phase 5, alongside the PWA shell. "Quote viewed / accepted" alerts land on the owner's phone and pull them back in.
+  - `push_subscriptions` (owner-scoped, one row per device) · `lib/push.ts` (the only module that talks to web push) · `/api/push/subscribe|unsubscribe|test` · the `push` / `notificationclick` / `pushsubscriptionchange` handlers in `public/sw.js` · the toggle on the Business screen.
+  - Dead subscriptions are pruned on 404/410. Devices are capped per owner. Both alerts about one quote share a tag, so the win replaces "opened" rather than stacking.
+  - **On iPhone, web push only works once the app is installed to the home screen** (Apple's rule), which is why the toggle tells the owner to install first instead of showing a switch that does nothing. Android is simpler.
+  - Set `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT` (Section 7) or the feature hides itself.
 - **Deposit-on-accept** — customer pays a deposit when they accept. Powerful ("get the money committed"), but it means collecting money _on behalf of other businesses_ — a marketplace/Connect flow that is **complex and harder to set up from Bangladesh**. Roadmap, not V1.
 - **Benchmark data moat** — "electricians like you charge $X; quotes at this price win Y%." Built from accumulated `quote_events`.
 - **More trades** — plumber → HVAC → handyman → painter → landscaper (add an `industry_config` row each; engine unchanged).
