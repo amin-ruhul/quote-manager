@@ -70,12 +70,14 @@ export default async function CustomerDetailPage({
     .reduce((running, q) => running + q.total, 0);
 
   return (
-    <CustomerDetail
-      customer={customer}
-      quotes={quoteRows}
-      quotedCents={quotedCents}
-      wonCents={wonCents}
-      currency={business.currency as Currency}
-    />
+    <div className="mx-auto max-w-3xl">
+      <CustomerDetail
+        customer={customer}
+        quotes={quoteRows}
+        quotedCents={quotedCents}
+        wonCents={wonCents}
+        currency={business.currency as Currency}
+      />
+    </div>
   );
 }

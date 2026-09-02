@@ -2,7 +2,7 @@ import "server-only";
 
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 
-import { customers, quotes } from "@/db/schema";
+import { customers, pricebookItems, quotes } from "@/db/schema";
 import { db } from "@/lib/db";
 
 /*
@@ -88,5 +88,65 @@ export async function getRecentQuotes(
     .leftJoin(customers, eq(quotes.customerId, customers.id))
     .where(eq(quotes.businessId, businessId))
     .orderBy(desc(quotes.updatedAt))
+    .limit(limit);
+}
+
+export type RecentCustomer = {
+  id: string;
+  firstName: string;
+  lastName: string | null;
+  company: string | null;
+  email: string | null;
+  phone: string | null;
+};
+
+/** The people most recently added — the dashboard's shortcut into the list. */
+export async function getRecentCustomers(
+  businessId: string,
+  limit = 4,
+): Promise<RecentCustomer[]> {
+  return db
+    .select({
+      id: customers.id,
+      firstName: customers.firstName,
+      lastName: customers.lastName,
+      company: customers.company,
+      email: customers.email,
+      phone: customers.phone,
+    })
+    .from(customers)
+    .where(eq(customers.businessId, businessId))
+    .orderBy(desc(customers.createdAt))
+    .limit(limit);
+}
+
+export type PricebookHighlight = {
+  id: string;
+  name: string;
+  category: string | null;
+  unit: string;
+  /** Integer cents, like every other price in the app. */
+  price: number;
+};
+
+/**
+ * Recently touched prices. Ordered by updatedAt rather than name because the
+ * useful glance is "what did I change last", not the top of the alphabet.
+ */
+export async function getPricebookHighlights(
+  businessId: string,
+  limit = 4,
+): Promise<PricebookHighlight[]> {
+  return db
+    .select({
+      id: pricebookItems.id,
+      name: pricebookItems.name,
+      category: pricebookItems.category,
+      unit: pricebookItems.unit,
+      price: pricebookItems.price,
+    })
+    .from(pricebookItems)
+    .where(eq(pricebookItems.businessId, businessId))
+    .orderBy(desc(pricebookItems.updatedAt))
     .limit(limit);
 }

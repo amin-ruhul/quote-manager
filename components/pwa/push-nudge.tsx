@@ -3,6 +3,7 @@
 import { Panel } from "@/components/panel";
 import { usePushAlerts } from "@/components/pwa/use-push-alerts";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 /*
  * Dashboard nudge (SPEC §15): the owner is one tap from never hearing that a
@@ -14,7 +15,7 @@ import { Button } from "@/components/ui/button";
  * The Business screen's PushToggle is the full control, including the states
  * this one stays quiet about.
  */
-export function PushNudge() {
+export function PushNudge({ className }: { className?: string }) {
   const alerts = usePushAlerts();
   const { environment, blocked, subscribed, busy } = alerts;
 
@@ -27,7 +28,7 @@ export function PushNudge() {
 
   if (blocked) {
     return (
-      <Panel>
+      <Panel className={className}>
         <h2 className="font-semibold">Notifications are blocked</h2>
         <p className="mt-1 text-sm text-body">
           QuotePilot can&apos;t tell you when a customer opens or accepts your
@@ -39,7 +40,7 @@ export function PushNudge() {
   }
 
   return (
-    <Panel className="space-y-3">
+    <Panel className={cn("space-y-3", className)}>
       <div>
         <h2 className="font-semibold">Know the moment they say yes</h2>
         <p className="mt-1 text-sm text-body">

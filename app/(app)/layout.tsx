@@ -37,7 +37,7 @@ export default async function AppLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileNav />
 
-        <main className="mx-auto w-full max-w-3xl px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-8">
+        <main className="mx-auto w-full max-w-[1200px] px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-8">
           {children}
         </main>
       </div>

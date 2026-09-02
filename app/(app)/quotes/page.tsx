@@ -35,7 +35,7 @@ export default async function QuotesPage() {
   const currency = business.currency as Currency;
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <header>
         <h1 className="text-3xl font-semibold">Quotes</h1>
         <p className="mt-2 text-body">

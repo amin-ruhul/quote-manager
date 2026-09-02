@@ -2,6 +2,7 @@
 
 import { ChevronRight, Mail, Phone, Plus } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { CustomerForm } from "@/app/(app)/customers/customer-form";
@@ -11,7 +12,9 @@ import type { Customer } from "@/db/schema";
 import { customerName } from "@/lib/customers";
 
 export function CustomerList({ customers }: { customers: Customer[] }) {
-  const [isAdding, setIsAdding] = useState(false);
+  // ?new=1 comes from the dashboard's create button: land with the form open.
+  const openOnArrival = useSearchParams().get("new") === "1";
+  const [isAdding, setIsAdding] = useState(openOnArrival);
 
   if (isAdding) {
     return <CustomerForm customer={null} onClose={() => setIsAdding(false)} />;

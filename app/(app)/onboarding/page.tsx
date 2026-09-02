@@ -11,7 +11,7 @@ export default async function OnboardingPage() {
   const isNew = business === null;
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <header>
         <h1 className="text-3xl font-semibold">
           {isNew ? "Set up your business" : "Business profile"}

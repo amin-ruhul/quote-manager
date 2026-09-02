@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CustomerDetailLoading() {
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <Skeleton className="h-9 w-52" />
       <Panel className="space-y-3">
         <Skeleton className="h-5 w-40" />

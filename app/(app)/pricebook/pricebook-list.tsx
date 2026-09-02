@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { PricebookItemDialog } from "@/app/(app)/pricebook/pricebook-item-dialog";
@@ -30,7 +31,9 @@ export function PricebookList({
   currency: Currency;
 }) {
   const [editing, setEditing] = useState<PricebookItem | null>(null);
-  const [isAdding, setIsAdding] = useState(false);
+  // ?new=1 comes from the dashboard's create button: land with the form open.
+  const openOnArrival = useSearchParams().get("new") === "1";
+  const [isAdding, setIsAdding] = useState(openOnArrival);
 
   const categories = [
     ...new Set(items.map((item) => item.category).filter((c) => c !== null)),

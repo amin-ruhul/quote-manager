@@ -42,14 +42,18 @@ export default async function QuoteBuilderPage({
   if (!quote) notFound();
 
   return (
-    <QuoteBuilder
-      quote={quote.quote}
-      items={quote.items}
-      options={quote.options}
-      attachments={quote.attachments}
-      customers={customerRows}
-      pricebook={pricebookRows}
-      currency={business.currency as Currency}
-    />
+    // A quote builder is a form: it keeps the reading column even though
+    // the shell now allows 1200px.
+    <div className="mx-auto max-w-3xl">
+      <QuoteBuilder
+        quote={quote.quote}
+        items={quote.items}
+        options={quote.options}
+        attachments={quote.attachments}
+        customers={customerRows}
+        pricebook={pricebookRows}
+        currency={business.currency as Currency}
+      />
+    </div>
   );
 }
