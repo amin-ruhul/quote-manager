@@ -108,6 +108,32 @@ export const QUOTE_EVENT_TYPES = [
 ] as const;
 export type QuoteEventType = (typeof QUOTE_EVENT_TYPES)[number];
 
+/*
+ * Web push (SPEC §15). Alerts go to the owner's devices when a customer views
+ * or accepts a quote.
+ */
+
+/**
+ * How long a push service should keep trying to deliver. A day: if the phone
+ * was off, "you won the job" is still worth reading tomorrow morning.
+ */
+export const PUSH_TTL_SECONDS = 24 * 60 * 60;
+
+/**
+ * Devices kept per owner. Endpoints rotate, so without a cap an owner's row
+ * count creeps up forever — and every stale row is one more doomed request per
+ * alert. The oldest are dropped first.
+ */
+export const MAX_PUSH_SUBSCRIPTIONS_PER_OWNER = 10;
+
+/**
+ * Notification tags: a new alert about a quote replaces the older one on the
+ * lock screen instead of stacking up.
+ */
+export function pushTagForQuote(quoteId: string): string {
+  return `quote:${quoteId}`;
+}
+
 /** Guardrails on free-text fields, mirrored by the Zod schemas at the boundaries. */
 export const MAX_NAME_LENGTH = 120;
 export const MAX_DESCRIPTION_LENGTH = 500;

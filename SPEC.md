@@ -150,6 +150,11 @@ OPENAI_MODEL=gpt-5-mini          # example — set the current model id you want
 RESEND_API_KEY=
 EMAIL_FROM=
 
+# Web push (npx web-push generate-vapid-keys)
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+VAPID_SUBJECT=mailto:you@yourdomain.com
+
 # Paddle (Billing)
 PADDLE_ENVIRONMENT=sandbox
 PADDLE_API_KEY=
