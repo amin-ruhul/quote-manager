@@ -19,7 +19,7 @@ export default async function PricebookPage() {
     .orderBy(asc(pricebookItems.category), asc(pricebookItems.name));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="space-y-6">
       <header>
         <h1 className="text-3xl font-semibold">Pricebook</h1>
         <p className="mt-2 text-body">

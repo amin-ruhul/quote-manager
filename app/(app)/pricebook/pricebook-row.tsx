@@ -21,6 +21,9 @@ import type { PricebookItem } from "@/db/schema";
 import type { Currency } from "@/lib/constants";
 import { formatCents } from "@/lib/money";
 
+/** Shared with the deleting skeleton so a row doesn't jump while it goes. */
+const PRICEBOOK_COLUMNS = "lg:grid-cols-[minmax(0,1fr)_7rem_9rem_auto]";
+
 export function PricebookRow({
   item,
   currency,
@@ -46,10 +49,14 @@ export function PricebookRow({
    */
   if (isDeleting) {
     return (
-      <li className="flex items-center gap-3 p-4" aria-busy="true">
-        <div className="flex-1 space-y-2">
+      <li
+        className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 lg:gap-4 lg:px-5 lg:py-3 ${PRICEBOOK_COLUMNS}`}
+        aria-busy="true"
+      >
+        <div className="min-w-0 space-y-2 lg:contents">
           <Skeleton className="h-5 w-2/3" />
-          <Skeleton className="h-4 w-24" />
+          <Skeleton className="hidden h-4 w-12 lg:block" />
+          <Skeleton className="h-4 w-24 lg:ml-auto" />
         </div>
         <Loader2 className="size-4 animate-spin text-ink-40" />
         <span className="sr-only">Deleting {item.name}</span>
@@ -58,19 +65,38 @@ export function PricebookRow({
   }
 
   return (
-    <li className="flex items-start gap-3 p-4">
-      <div className="min-w-0 flex-1">
-        <p className="font-medium">{item.name}</p>
-        {item.description ? (
-          <p className="mt-1 text-sm text-ink-60">{item.description}</p>
-        ) : null}
-        <p className="tabular mt-2 font-medium">
+    /*
+     * Stacked on a phone; from lg the wrapper goes `display: contents` so unit
+     * and price become their own columns and the prices line up down the page —
+     * which is the whole point of a pricebook on a wide screen.
+     */
+    <li
+      className={`grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 p-4 lg:items-center lg:gap-4 lg:px-5 lg:py-3 ${PRICEBOOK_COLUMNS}`}
+    >
+      <div className="min-w-0 lg:contents">
+        <div className="min-w-0">
+          <p className="truncate font-medium">{item.name}</p>
+          {item.description ? (
+            <p className="mt-1 truncate text-sm text-ink-60">
+              {item.description}
+            </p>
+          ) : null}
+          <p className="tabular mt-2 font-medium lg:hidden">
+            {formatCents(item.price, currency)}
+            <span className="font-normal text-ink-40">
+              {" / "}
+              {item.unit}
+            </span>
+          </p>
+        </div>
+
+        <span className="hidden text-sm text-ink-60 lg:block">
+          per {item.unit}
+        </span>
+
+        <span className="tabular hidden font-medium lg:block lg:text-right">
           {formatCents(item.price, currency)}
-          <span className="font-normal text-ink-40">
-            {" / "}
-            {item.unit}
-          </span>
-        </p>
+        </span>
       </div>
 
       <div className="flex shrink-0 gap-1">
