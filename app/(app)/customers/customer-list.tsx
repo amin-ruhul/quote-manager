@@ -9,12 +9,17 @@ import { CustomerForm } from "@/app/(app)/customers/customer-form";
 import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 import type { Customer } from "@/db/schema";
+import type { Currency } from "@/lib/constants";
 import { customerName } from "@/lib/customers";
+import { formatCents } from "@/lib/money";
 import { cn } from "@/lib/utils";
+
+/** A customer plus what they are worth — aggregated in the page query. */
+export type CustomerRow = Customer & { quoteCount: number; wonCents: number };
 
 /** Shared by the header row and every customer row, so the columns line up. */
 const CUSTOMER_COLUMNS =
-  "lg:grid-cols-[minmax(0,1fr)_11rem_9rem_minmax(0,1fr)_auto]";
+  "lg:grid-cols-[minmax(0,1fr)_9rem_9rem_minmax(0,1fr)_4.5rem_7rem_auto]";
 
 /** A desktop-only cell. An em dash beats an empty column at reading a gap. */
 function Cell({
@@ -37,7 +42,13 @@ function Cell({
   );
 }
 
-export function CustomerList({ customers }: { customers: Customer[] }) {
+export function CustomerList({
+  customers,
+  currency,
+}: {
+  customers: CustomerRow[];
+  currency: Currency;
+}) {
   // ?new=1 comes from the dashboard's create button: land with the form open.
   const openOnArrival = useSearchParams().get("new") === "1";
   const [isAdding, setIsAdding] = useState(openOnArrival);
@@ -78,6 +89,8 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
             <span>Company</span>
             <span>Phone</span>
             <span>Email</span>
+            <span className="text-right">Quotes</span>
+            <span className="text-right">Won</span>
             <span />
           </div>
 
@@ -112,11 +125,41 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
                           </span>
                         ) : null}
                       </div>
+
+                      {/* On a phone the two figures ride under the contact
+                          details rather than claiming columns of their own. */}
+                      <p className="tabular mt-2 text-sm text-ink-60 lg:hidden">
+                        {customer.quoteCount === 0
+                          ? "No quotes yet"
+                          : `${customer.quoteCount} ${customer.quoteCount === 1 ? "quote" : "quotes"}`}
+                        {customer.wonCents > 0
+                          ? ` · ${formatCents(customer.wonCents, currency)} won`
+                          : ""}
+                      </p>
                     </div>
 
                     <Cell>{customer.company}</Cell>
                     <Cell tabular>{customer.phone}</Cell>
                     <Cell>{customer.email}</Cell>
+
+                    <span className="tabular hidden text-right text-sm text-ink-60 lg:block">
+                      {customer.quoteCount || "—"}
+                    </span>
+
+                    {/* Zero won reads as a dash, not $0.00: nothing yet is a
+                        different fact from a job worth nothing. */}
+                    <span
+                      className={cn(
+                        "tabular hidden text-right text-sm lg:block",
+                        customer.wonCents > 0
+                          ? "font-medium text-ink-90"
+                          : "text-ink-40",
+                      )}
+                    >
+                      {customer.wonCents > 0
+                        ? formatCents(customer.wonCents, currency)
+                        : "—"}
+                    </span>
                   </div>
 
                   <ChevronRight

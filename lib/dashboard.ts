@@ -11,6 +11,12 @@ import { db } from "@/lib/db";
  * add them up.
  */
 
+/**
+ * Rows per dashboard card. Enough to be a useful glance rather than a teaser,
+ * while the cards in a row stay near enough in height to end level.
+ */
+export const DASHBOARD_LIST_SIZE = 6;
+
 export type MonthStats = {
   sent: number;
   accepted: number;
@@ -71,7 +77,7 @@ export type RecentQuote = {
 
 export async function getRecentQuotes(
   businessId: string,
-  limit = 5,
+  limit = DASHBOARD_LIST_SIZE,
 ): Promise<RecentQuote[]> {
   return db
     .select({
@@ -103,7 +109,7 @@ export type RecentCustomer = {
 /** The people most recently added — the dashboard's shortcut into the list. */
 export async function getRecentCustomers(
   businessId: string,
-  limit = 4,
+  limit = DASHBOARD_LIST_SIZE,
 ): Promise<RecentCustomer[]> {
   return db
     .select({
@@ -135,7 +141,7 @@ export type PricebookHighlight = {
  */
 export async function getPricebookHighlights(
   businessId: string,
-  limit = 4,
+  limit = DASHBOARD_LIST_SIZE,
 ): Promise<PricebookHighlight[]> {
   return db
     .select({
