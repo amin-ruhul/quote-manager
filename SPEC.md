@@ -117,14 +117,16 @@ AI is **not** a moat — competitors copy it. The real, compounding advantages, 
 
 Give the electrician an app-like experience without the app stores. Keep it minimal — do NOT over-build it.
 
-**In V1 (do this, it's small):**
+**In V1 (do this, it's small):** — _built after Phase 5, ahead of Phase 6._
 
-- Add a web app manifest (`app/manifest.ts`): `name`, `short_name`, theme/background colors, `display: "standalone"`, and icons (192px + 512px, plus a maskable icon and an `apple-touch-icon`).
-- Add a minimal service worker (via `@serwist/next`) — just enough for installability + caching the app shell for fast loads. **No offline features yet.**
-- Result: the electrician taps **"Add to Home Screen"** and QuotePilot opens full-screen like a native app.
-- This is for the **electrician's app only.** The public customer quote page (`/q/[token]`) stays a plain, fast web page — **never** prompt a homeowner to install.
+- Web app manifest (`app/manifest.ts`): `name`, `short_name`, theme/background colors, `display: "standalone"`, and icons (192px + 512px, plus a maskable icon and an `apple-touch-icon`). Icons are generated from one shared mark by `npm run icons:generate` (`lib/brand.ts` → `public/icons/` and `app/apple-icon.png`).
+- A minimal **hand-written** service worker (`public/sw.js`) — just enough for installability + caching the hashed build assets for fast loads. **No offline features** beyond a fallback page (`public/offline.html`), which Chrome's installability check requires.
+  - _Deviation from the original plan:_ `@serwist/next` was dropped. Push (Section 15) needs custom `push` / `notificationclick` handlers in the worker anyway, which means driving Serwist in `injectManifest` mode — a build plugin to keep compatible with Next 16 in exchange for precaching we don't want. The whole worker is ~60 readable lines instead.
+  - **It never caches an HTML document or an API response.** Every signed-in page holds one business's customers and money, and the cache is shared across sessions in a browser profile.
+- Result: the electrician taps **"Add to Home Screen"** and QuotePilot opens full-screen like a native app. The nudge to do so is one dismissible card on the dashboard (`components/pwa/install-card.tsx`).
+- This is for the **electrician's app only.** The public customer quote page (`/q/[token]`) stays a plain, fast web page — **never** prompt a homeowner to install. The worker is registered from the signed-in shell only, and skips `/q/` in its fetch handler.
 
-Add it any time after Phase 1 (the app shell exists); it's independent of the other phases. Push notifications and offline are roadmap (Section 15).
+Push notifications and real offline are roadmap (Section 15). Note that the manifest is the **precondition for push on iPhone** — Safari only allows notifications once the app is installed.
 
 ---
 
@@ -320,8 +322,8 @@ Email send via Resend. Follow-up cron with owner settings. Owner notifications (
 
 ### Phase 6 — Auth polish + Paddle billing + freemium gate
 
-Supabase Auth (email + Google). Paddle.js checkout for Pro/Business, webhook (`/api/webhooks/paddle`, signature-verified) sets `profiles.plan`. Enforce limits (`lib/quota.ts`). Sandbox first. Also add the **installable PWA manifest + icons** (see the PWA section) so the electrician can Add to Home Screen.
-**Done when:** a Paddle sandbox purchase unlocks the paid tier; free tier is limited; and the app can be installed to a phone's home screen and opens full-screen.
+Supabase Auth (email + Google). Paddle.js checkout for Pro/Business, webhook (`/api/webhooks/paddle`, signature-verified) sets `profiles.plan`. Enforce limits (`lib/quota.ts`). Sandbox first. ~~Also add the installable PWA manifest + icons~~ — the PWA shipped early, see the PWA section.
+**Done when:** a Paddle sandbox purchase unlocks the paid tier and the free tier is limited.
 
 ### Phase 7 — Free lead-magnet tool (growth)
 

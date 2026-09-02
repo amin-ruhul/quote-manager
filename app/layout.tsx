@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
+import { BRAND_CANVAS } from "@/lib/brand";
 import "./globals.css";
 
 // Inter for all UI; Source Serif 4 only for sparing editorial moments (DESIGN.md).
@@ -27,6 +28,21 @@ export const metadata: Metadata = {
       "Describe the job. QuotePilot builds the quote from your own prices and lets the customer accept it on their phone.",
     type: "website",
   },
+  applicationName: "QuotePilot",
+  // Home-screen launch on iOS: full-screen, with the app's own name under the
+  // icon rather than the page title (SPEC §6). The icons themselves come from
+  // the app/icon and app/apple-icon file conventions — setting metadata.icons
+  // here would replace those generated links rather than adding to them.
+  appleWebApp: {
+    capable: true,
+    title: "QuotePilot",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  // Tints the browser and installed-app chrome to the warm canvas (DESIGN.md).
+  themeColor: BRAND_CANVAS,
 };
 
 export default function RootLayout({

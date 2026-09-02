@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>You're offline · QuotePilot</title>
+    <!--
+      Shown only when a page request fails with no network (see public/sw.js).
+      Deliberately plain HTML with no build step or webfont: it has to render
+      from cache when nothing else can load. Colours are DESIGN.md's tokens,
+      inlined because a stylesheet would be one more thing that can't load.
+    -->
+    <style>
+      html {
+        background: #f6f5f4;
+        color: rgba(0, 0, 0, 0.9);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 22rem;
+        width: 100%;
+      }
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 8px;
+      }
+      p {
+        color: #615d59;
+        margin: 0 0 20px;
+        line-height: 1.5;
+      }
+      button {
+        background: #0075de;
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        font: inherit;
+        font-weight: 500;
+        padding: 12px 16px;
+        width: 100%;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>You're offline</h1>
+      <p>
+        QuotePilot needs a connection to load your quotes. Check your signal and
+        try again.
+      </p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </div>
+  </body>
+</html>

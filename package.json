@@ -20,7 +20,8 @@
     "verify:phase2": "tsx --tsconfig scripts/tsconfig.json scripts/verify-phase2.mts",
     "verify:phase3": "tsx --tsconfig scripts/tsconfig.json scripts/verify-phase3.mts",
     "verify:phase4": "tsx --tsconfig scripts/tsconfig.json scripts/verify-phase4.mts",
-    "verify:phase5": "tsx --tsconfig scripts/tsconfig.json scripts/verify-phase5.mts"
+    "verify:phase5": "tsx --tsconfig scripts/tsconfig.json scripts/verify-phase5.mts",
+    "icons:generate": "tsx --tsconfig scripts/tsconfig.json scripts/generate-pwa-icons.mts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.5",
@@ -56,6 +57,7 @@
     "eslint-config-prettier": "10.1.8",
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.8.1",
+    "sharp": "0.35.4",
     "tailwindcss": "^4",
     "tsx": "4.23.12",
     "typescript": "^5",

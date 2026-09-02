@@ -59,10 +59,12 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Everything except static assets, image files, and the public customer
-     * quote page. /q has no session by design, so running the auth proxy over
-     * it would only add latency to the screen that has to feel instant.
+     * Everything except static assets, image files, the PWA shell files, and
+     * the public customer quote page. /q has no session by design, so running
+     * the auth proxy over it would only add latency to the screen that has to
+     * feel instant. The service worker and manifest are fetched by the browser
+     * itself, outside any session.
      */
-    "/((?!_next/static|_next/image|favicon.ico|q/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sw.js|offline.html|manifest.webmanifest|q/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Panel } from "@/components/panel";
+import { InstallCard } from "@/components/pwa/install-card";
 import { QuoteStatusPill } from "@/components/quote-status-pill";
 import { Button } from "@/components/ui/button";
 import { requireBusiness } from "@/lib/auth";
@@ -110,6 +111,9 @@ export default async function DashboardPage() {
           </Panel>
         )}
       </section>
+
+      {/* Renders nothing unless the app can actually be installed. */}
+      <InstallCard />
     </div>
   );
 }
