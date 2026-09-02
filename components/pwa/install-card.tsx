@@ -127,7 +127,7 @@ export function InstallCard() {
         <h2 className="font-semibold">Keep QuotePilot one tap away</h2>
         <p className="mt-1 text-sm text-body">
           {installState === "ios"
-            ? "Tap Share, then Add to Home Screen. QuotePilot opens full-screen, straight to your quotes."
+            ? "Tap Share, then Add to Home Screen. QuotePilot opens full-screen — and on iPhone that's the only way it can alert you when a customer accepts."
             : "Add it to your home screen and it opens full-screen, straight to your quotes."}
         </p>
       </div>

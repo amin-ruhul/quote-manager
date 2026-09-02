@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Panel } from "@/components/panel";
 import { InstallCard } from "@/components/pwa/install-card";
+import { PushNudge } from "@/components/pwa/push-nudge";
 import { QuoteStatusPill } from "@/components/quote-status-pill";
 import { Button } from "@/components/ui/button";
 import { requireBusiness } from "@/lib/auth";
@@ -56,6 +57,10 @@ export default async function DashboardPage() {
         />
         <Stat label="Quoted" value={formatCents(stats.quotedCents, currency)} />
       </div>
+
+      {/* Above the quote list, below the money: it's a call to action, not the
+          reason they opened the screen. Renders nothing once alerts are on. */}
+      <PushNudge />
 
       <section className="space-y-2">
         <div className="flex items-center justify-between">
