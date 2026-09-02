@@ -150,3 +150,85 @@ export async function getPricebookHighlights(
     .orderBy(desc(pricebookItems.updatedAt))
     .limit(limit);
 }
+
+export type MonthPerformance = {
+  /** `2026-09`, used as a stable key. */
+  key: string;
+  /** `Sep`, for the axis. */
+  label: string;
+  sent: number;
+  accepted: number;
+  /** Integer cents. */
+  wonCents: number;
+  /** Basis points, like every other rate in the app. */
+  acceptanceRateBasisPoints: number;
+};
+
+/**
+ * The last N months of quoting, in one pass — the dashboard's three charts are
+ * three readings of this same row set, so they cost one query rather than
+ * three, and can never disagree about a month.
+ *
+ * Buckets are UTC months (`date_trunc`), so a quote created late on the last
+ * day of a month lands where Postgres says it does rather than where the
+ * server's timezone would put it.
+ */
+export async function getMonthlyPerformance(
+  businessId: string,
+  months = 6,
+  now = new Date(),
+): Promise<MonthPerformance[]> {
+  const start = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (months - 1), 1),
+  );
+
+  const bucket = sql<string>`date_trunc('month', ${quotes.createdAt})`;
+
+  const rows = await db
+    .select({
+      bucket,
+      sent: sql<number>`count(*) filter (where ${quotes.status} <> 'draft')::int`,
+      accepted: sql<number>`count(*) filter (where ${quotes.status} = 'accepted')::int`,
+      wonCents: sql<number>`coalesce(sum(${quotes.total}) filter (where ${quotes.status} = 'accepted'), 0)::int`,
+    })
+    .from(quotes)
+    .where(and(eq(quotes.businessId, businessId), gte(quotes.createdAt, start)))
+    .groupBy(bucket)
+    .orderBy(bucket);
+
+  const byKey = new Map(
+    rows.map((row) => [new Date(row.bucket).toISOString().slice(0, 7), row]),
+  );
+
+  const formatMonth = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    timeZone: "UTC",
+  });
+
+  // Scaffold every month, so a quiet month is a gap in the trend rather than a
+  // month the chart silently skips.
+  return Array.from({ length: months }, (_, index) => {
+    const date = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth() - (months - 1) + index,
+        1,
+      ),
+    );
+    const key = date.toISOString().slice(0, 7);
+    const row = byKey.get(key);
+
+    const sent = row?.sent ?? 0;
+    const accepted = row?.accepted ?? 0;
+
+    return {
+      key,
+      label: formatMonth.format(date),
+      sent,
+      accepted,
+      wonCents: row?.wonCents ?? 0,
+      acceptanceRateBasisPoints:
+        sent > 0 ? Math.round((accepted / sent) * 10_000) : 0,
+    };
+  });
+}

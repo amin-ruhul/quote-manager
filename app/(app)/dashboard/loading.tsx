@@ -19,6 +19,11 @@ export default function DashboardLoading() {
           ))}
         </div>
 
+        <Panel className="lg:col-span-12">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="mt-4 h-20 w-full sm:h-24" />
+        </Panel>
+
         <SectionSkeleton className="lg:col-span-7" rows={3} />
 
         <div className="grid gap-4 lg:col-span-5 lg:content-start">

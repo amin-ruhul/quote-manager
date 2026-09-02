@@ -1,6 +1,8 @@
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
+import { ActivityCard } from "@/components/dashboard/activity-card";
+import { MonthlyColumns } from "@/components/dashboard/monthly-columns";
 import { SectionCard } from "@/components/dashboard/section-card";
 import { NewQuoteButton } from "@/components/new-quote-button";
 import { Panel } from "@/components/panel";
@@ -12,6 +14,7 @@ import { requireBusiness } from "@/lib/auth";
 import type { Currency, QuoteStatus } from "@/lib/constants";
 import { customerName } from "@/lib/customers";
 import {
+  getMonthlyPerformance,
   getMonthStats,
   getPricebookHighlights,
   getRecentCustomers,
@@ -26,11 +29,12 @@ export default async function DashboardPage() {
   const { business } = await requireBusiness();
   const since = startOfThisMonth();
 
-  const [stats, recent, recentCustomers, prices] = await Promise.all([
+  const [stats, recent, recentCustomers, prices, months] = await Promise.all([
     getMonthStats(business.id, since),
     getRecentQuotes(business.id),
     getRecentCustomers(business.id),
     getPricebookHighlights(business.id),
+    getMonthlyPerformance(business.id),
   ]);
 
   const currency = business.currency as Currency;
@@ -52,15 +56,38 @@ export default async function DashboardPage() {
        * owner actually reads in.
        */}
       <div className="grid gap-4 lg:grid-cols-12">
-        {/* Won is the number that matters, so it gets the accent card. */}
-        <div className="rounded-lg bg-marigold p-6 lg:col-span-7">
-          <p className="text-sm font-medium">Won this month</p>
-          <p className="tabular mt-1 text-4xl font-semibold">
-            {formatCents(stats.wonCents, currency)}
-          </p>
-          <p className="mt-1 text-sm">
-            {stats.accepted} of {stats.sent} quotes accepted
-          </p>
+        {/* Won is the number that matters, so it gets the accent card — and
+            the six-month trend rides inside it, drawn in ink on the marigold
+            so the chart costs the palette nothing. */}
+        <div className="flex flex-col gap-4 rounded-lg bg-marigold p-6 lg:col-span-7">
+          <div>
+            <p className="text-sm font-medium">Won this month</p>
+            <p className="tabular mt-1 text-4xl font-semibold">
+              {formatCents(stats.wonCents, currency)}
+            </p>
+            <p className="mt-1 text-sm">
+              {stats.accepted} of {stats.sent} quotes accepted
+            </p>
+          </div>
+
+          <MonthlyColumns
+            className="mt-auto"
+            onAccent
+            labels={months.map((month) => month.label)}
+            series={[
+              {
+                id: "won",
+                label: "Won",
+                // One colour for every bar. Shading them by size would burn
+                // the only free channel restating the height, and the ink
+                // already reads on marigold without borrowing a hue.
+                color: "rgba(0,0,0,0.85)",
+                values: months.map((month) => month.wonCents),
+              },
+            ]}
+            formatValue={(value) => formatCents(value, currency)}
+            caption="Money won, by month"
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-2 lg:col-span-5 lg:content-start">
@@ -77,6 +104,8 @@ export default async function DashboardPage() {
         </div>
 
         <PushNudge className="lg:col-span-12" />
+
+        <ActivityCard months={months} className="lg:col-span-12" />
 
         <SectionCard
           className="lg:col-span-7"
