@@ -49,9 +49,9 @@ export function MonthlyColumns({
   );
 
   return (
-    <figure className={cn("m-0", className)}>
+    <figure className={cn("m-0 flex flex-col", className)}>
       <div
-        className="flex h-20 items-end gap-1.5 sm:h-24"
+        className="flex min-h-20 flex-1 items-end gap-1.5 sm:min-h-24"
         aria-hidden
         role="presentation"
       >

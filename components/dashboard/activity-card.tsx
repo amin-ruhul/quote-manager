@@ -102,6 +102,9 @@ export function ActivityCard({
           {/* Two series always get a legend — identity is never colour alone. */}
           <ColumnLegend series={countSeries} />
           <MonthlyColumns
+            // Grows into whatever height the row gives the card, so a taller
+            // neighbour leaves a taller plot rather than dead space.
+            className="flex-1"
             labels={labels}
             series={countSeries}
             formatValue={(value) => String(value)}
@@ -110,6 +113,7 @@ export function ActivityCard({
         </>
       ) : (
         <MonthlyColumns
+          className="flex-1"
           labels={labels}
           series={rateSeries}
           // A rate is always read against 100%, so the ceiling is fixed —

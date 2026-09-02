@@ -21,7 +21,7 @@ export function NewQuoteButton({
   className = "w-full",
   variant = "default",
 }: {
-  size?: "default" | "lg";
+  size?: "sm" | "default" | "lg";
   className?: string;
   /** `soft` in the sidebar, so the chrome never becomes a page's second blue. */
   variant?: "default" | "soft";

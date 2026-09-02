@@ -38,11 +38,12 @@ export function SectionCard({
 }) {
   return (
     <Panel className={cn("flex flex-col p-0", className)}>
-      <div className="flex items-center justify-between gap-2 border-b border-hairline px-4 py-3 sm:px-5">
+      {/* The create action sits in the header, where it is visible without
+          scrolling the list first. Small, so it reads as one control beside a
+          heading rather than a slab across the card. */}
+      <div className="flex items-center justify-between gap-2 border-b border-hairline py-2.5 pr-3 pl-4 sm:pl-5">
         <h2 className="font-semibold">{title}</h2>
-        <Button asChild variant="ghost" size="sm">
-          <Link href={seeAllHref}>{seeAllLabel}</Link>
-        </Button>
+        {action}
       </div>
 
       {isEmpty ? (
@@ -53,7 +54,15 @@ export function SectionCard({
         <div className="flex-1">{children}</div>
       )}
 
-      <div className="border-t border-hairline p-3">{action}</div>
+      {/* "See all" closes the list, which is where you reach for it. */}
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="w-full justify-center rounded-t-none border-t border-hairline"
+      >
+        <Link href={seeAllHref}>{seeAllLabel}</Link>
+      </Button>
     </Panel>
   );
 }

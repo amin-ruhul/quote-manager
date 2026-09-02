@@ -50,10 +50,10 @@ export default async function DashboardPage() {
       </header>
 
       {/*
-       * Twelve columns from lg up. The money and the month's numbers share the
-       * top row; below it the quote list takes the wide column and the two
-       * reference sections stack in the rail, because that is the order the
-       * owner actually reads in.
+       * Twelve columns from lg up, every row a wide card beside a rail card:
+       * money | this month's numbers, then the trend | customers, then quotes |
+       * prices. Nothing spans the full width — six months strung across 1200px
+       * was mostly gap, and a lone card leaves the row half empty.
        */}
       <div className="grid gap-4 lg:grid-cols-12">
         {/* Won is the number that matters, so it gets the accent card — and
@@ -90,7 +90,9 @@ export default async function DashboardPage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-2 lg:col-span-5 lg:content-start">
+        {/* No content-start: the four cards stretch to the money card's height,
+            so the row ends level instead of trailing empty canvas. */}
+        <div className="grid grid-cols-2 gap-2 lg:col-span-5">
           <Stat label="Quotes sent" value={String(stats.sent)} />
           <Stat label="Accepted" value={String(stats.accepted)} />
           <Stat
@@ -105,7 +107,42 @@ export default async function DashboardPage() {
 
         <PushNudge className="lg:col-span-12" />
 
-        <ActivityCard months={months} className="lg:col-span-12" />
+        <ActivityCard months={months} className="lg:col-span-7" />
+
+        <SectionCard
+          className="lg:col-span-5"
+          title="Recent customers"
+          seeAllHref="/customers"
+          isEmpty={recentCustomers.length === 0}
+          emptyMessage="Nobody yet. Add the people you quote for."
+          action={
+            <Button asChild variant="soft" size="sm">
+              <Link href="/customers?new=1">
+                <Plus />
+                Add customer
+              </Link>
+            </Button>
+          }
+        >
+          <ul className="divide-y divide-hairline">
+            {recentCustomers.map((customer) => (
+              <li key={customer.id}>
+                <Link
+                  href={`/customers/${customer.id}`}
+                  className="block px-4 py-3 hover:bg-surface-2 sm:px-5"
+                >
+                  <p className="font-medium">{customerName(customer)}</p>
+                  <p className="mt-0.5 truncate text-sm text-ink-60">
+                    {customer.company ??
+                      customer.email ??
+                      customer.phone ??
+                      "No contact details"}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </SectionCard>
 
         <SectionCard
           className="lg:col-span-7"
@@ -113,15 +150,12 @@ export default async function DashboardPage() {
           seeAllHref="/quotes"
           isEmpty={recent.length === 0}
           emptyMessage="No quotes yet. Start one and send it before you leave the driveway."
-          /*
-           * Ghost, like the other two. Making this the screen's filled primary
-           * was the obvious move and it was wrong: at the foot of the longest
-           * card it sits below the fold, so the loudest thing on the page was
-           * also the thing you had to scroll to find. The dashboard's primary
-           * action is the rail's "New quote", which is visible the moment the
-           * screen loads.
-           */
-          action={<NewQuoteButton size="default" variant="soft" />}
+          // Ghost, like the other two headers: the rail's "New quote" is the
+          // action the dashboard leads with, and three filled buttons across
+          // three cards would compete with it and each other.
+          action={
+            <NewQuoteButton size="sm" variant="soft" className="w-auto" />
+          }
         >
           <ul className="divide-y divide-hairline">
             {recent.map((quote) => (
@@ -155,75 +189,40 @@ export default async function DashboardPage() {
           </ul>
         </SectionCard>
 
-        <div className="grid gap-4 lg:col-span-5 lg:content-start">
-          <SectionCard
-            title="Recent customers"
-            seeAllHref="/customers"
-            isEmpty={recentCustomers.length === 0}
-            emptyMessage="Nobody yet. Add the people you quote for."
-            action={
-              <Button asChild variant="soft" size="default" className="w-full">
-                <Link href="/customers?new=1">
-                  <Plus />
-                  Add customer
-                </Link>
-              </Button>
-            }
-          >
-            <ul className="divide-y divide-hairline">
-              {recentCustomers.map((customer) => (
-                <li key={customer.id}>
-                  <Link
-                    href={`/customers/${customer.id}`}
-                    className="block px-4 py-3 hover:bg-surface-2 sm:px-5"
-                  >
-                    <p className="font-medium">{customerName(customer)}</p>
-                    <p className="mt-0.5 truncate text-sm text-ink-60">
-                      {customer.company ??
-                        customer.email ??
-                        customer.phone ??
-                        "No contact details"}
-                    </p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </SectionCard>
-
-          <SectionCard
-            title="Pricebook"
-            seeAllHref="/pricebook"
-            isEmpty={prices.length === 0}
-            emptyMessage="No prices yet. Add the jobs you quote most often."
-            action={
-              <Button asChild variant="soft" size="default" className="w-full">
-                <Link href="/pricebook?new=1">
-                  <Plus />
-                  Add item
-                </Link>
-              </Button>
-            }
-          >
-            <ul className="divide-y divide-hairline">
-              {prices.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex items-baseline gap-3 px-4 py-3 sm:px-5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{item.name}</p>
-                    <p className="mt-0.5 text-sm text-ink-60">
-                      {item.category ?? "Uncategorized"} · per {item.unit}
-                    </p>
-                  </div>
-                  <span className="tabular shrink-0 font-medium">
-                    {formatCents(item.price, currency)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </SectionCard>
-        </div>
+        <SectionCard
+          className="lg:col-span-5"
+          title="Pricebook"
+          seeAllHref="/pricebook"
+          isEmpty={prices.length === 0}
+          emptyMessage="No prices yet. Add the jobs you quote most often."
+          action={
+            <Button asChild variant="soft" size="sm">
+              <Link href="/pricebook?new=1">
+                <Plus />
+                Add item
+              </Link>
+            </Button>
+          }
+        >
+          <ul className="divide-y divide-hairline">
+            {prices.map((item) => (
+              <li
+                key={item.id}
+                className="flex items-baseline gap-3 px-4 py-3 sm:px-5"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{item.name}</p>
+                  <p className="mt-0.5 text-sm text-ink-60">
+                    {item.category ?? "Uncategorized"} · per {item.unit}
+                  </p>
+                </div>
+                <span className="tabular shrink-0 font-medium">
+                  {formatCents(item.price, currency)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </SectionCard>
       </div>
 
       {/* Renders nothing unless the app can actually be installed. */}
