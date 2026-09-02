@@ -1,6 +1,7 @@
 import type { Viewport } from "next";
 
-import { MobileNav } from "@/components/app-shell/mobile-nav";
+import { BottomTabs } from "@/components/app-shell/bottom-tabs";
+import { MobileHeader } from "@/components/app-shell/mobile-header";
 import { Sidebar } from "@/components/app-shell/sidebar";
 import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
 import { requireUser } from "@/lib/auth";
@@ -35,12 +36,19 @@ export default async function AppLayout({
       <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <MobileNav />
+        <MobileHeader />
 
-        <main className="mx-auto w-full max-w-[1200px] px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-8">
+        {/*
+         * The bottom padding clears the tab bar on a phone, so the last row of
+         * a list is reachable rather than sitting under it. From lg the tabs
+         * are gone and the rail takes over, so it drops back to normal.
+         */}
+        <main className="mx-auto w-full max-w-[1200px] px-4 pt-6 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-8 lg:pb-8">
           {children}
         </main>
       </div>
+
+      <BottomTabs />
     </div>
   );
 }
