@@ -8,7 +8,7 @@ import { LandingNav } from "@/components/landing/landing-nav";
 import { Pricing } from "@/components/landing/pricing";
 import { FounderNote, Proof } from "@/components/landing/proof";
 import { SectionHeading } from "@/components/landing/section-heading";
-import { Wordmark } from "@/components/landing/wordmark";
+import { Wordmark } from "@/components/wordmark";
 import { Button } from "@/components/ui/button";
 
 /*

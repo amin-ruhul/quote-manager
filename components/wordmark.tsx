@@ -1,8 +1,17 @@
 /**
  * The mark: a bolt cut from a rounded blue tile. Drawn rather than an image
  * file so it stays crisp, weighs nothing, and inherits the brand blue.
+ *
+ * `labelClassName` lets a caller hide the wordtext where space is tight — the
+ * app's phone nav drops it so the sections themselves get the width.
  */
-export function Wordmark({ className }: { className?: string }) {
+export function Wordmark({
+  className,
+  labelClassName,
+}: {
+  className?: string;
+  labelClassName?: string;
+}) {
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
       <span
@@ -16,7 +25,9 @@ export function Wordmark({ className }: { className?: string }) {
           />
         </svg>
       </span>
-      <span className="text-[17px] font-semibold tracking-[-0.01em]">
+      <span
+        className={`text-[17px] font-semibold tracking-[-0.01em] ${labelClassName ?? ""}`}
+      >
         QuotePilot
       </span>
     </span>

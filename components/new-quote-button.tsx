@@ -8,15 +8,32 @@ import { toast } from "sonner";
 import { createQuote } from "@/app/(app)/quotes/actions";
 import { Button } from "@/components/ui/button";
 
-/** Creating a draft round-trips before navigating, so it needs a pending state. */
-export function NewQuoteButton() {
+/**
+ * The app's primary action, used in the sidebar and on the Quotes page.
+ * Creating a draft round-trips before navigating, so it needs a pending state.
+ *
+ * Size is a prop because the same button is a full-width call to action on the
+ * Quotes page and a normal one in the rail — but it stays one component, so
+ * "New quote" always behaves the same wherever it is pressed.
+ */
+export function NewQuoteButton({
+  size = "lg",
+  className = "w-full",
+  variant = "default",
+}: {
+  size?: "default" | "lg";
+  className?: string;
+  /** `soft` in the sidebar, so the chrome never becomes a page's second blue. */
+  variant?: "default" | "soft";
+}) {
   const router = useRouter();
   const [isCreating, startCreating] = useTransition();
 
   return (
     <Button
-      size="lg"
-      className="w-full"
+      size={size}
+      variant={variant}
+      className={className}
       disabled={isCreating}
       onClick={() =>
         startCreating(async () => {

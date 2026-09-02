@@ -51,7 +51,12 @@ export function PricebookList({
 
   return (
     <div className="space-y-6">
-      <Button size="lg" className="w-full" onClick={() => setIsAdding(true)}>
+      <Button
+        variant="soft"
+        size="lg"
+        className="w-full sm:w-auto"
+        onClick={() => setIsAdding(true)}
+      >
         <Plus />
         Add item
       </Button>

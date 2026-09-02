@@ -1,0 +1,108 @@
+"use client";
+
+import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { signOut } from "@/app/login/actions";
+import {
+  isNavItemActive,
+  NAV_ACTIVE_CLASS,
+  NAV_IDLE_CLASS,
+  type NavItem,
+  PRIMARY_NAV,
+  SECONDARY_NAV,
+} from "@/components/app-shell/nav-items";
+import { NewQuoteButton } from "@/components/new-quote-button";
+import { Wordmark } from "@/components/wordmark";
+import { cn } from "@/lib/utils";
+
+/*
+ * Desktop navigation (lg and up).
+ *
+ * A persistent left rail is what every tool in this category does — Jobber and
+ * Housecall Pro both put the sections down the left and reserve the top for
+ * account chrome — so it is the shape an electrician switching from one of them
+ * already knows. It also gives the wordmark somewhere to sit and makes "where
+ * am I" unmissable, which a row of identical buttons never did.
+ *
+ * "New quote" lives up here rather than on each page: it is the one thing the
+ * app is for, and the rail is the one place that is on every screen.
+ *
+ * It is the ghost variant, not a filled blue, and that is deliberate. A
+ * persistent filled button in the chrome would be a second blue on every page
+ * that has a real primary action of its own — "Save changes", "Send quote" —
+ * which DESIGN.md forbids outright. Reserving the filled blue for the action
+ * you came to the page to take, and giving navigation the wash, keeps the rule
+ * literally true on every screen instead of carving an exception for the frame.
+ */
+export function Sidebar() {
+  const pathname = usePathname();
+
+  return (
+    <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-hairline px-3 py-4 lg:flex">
+      <Link
+        href="/dashboard"
+        className="rounded-md px-2 py-1 focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+      >
+        <Wordmark />
+      </Link>
+
+      {/* A hairline splits the action from the navigation. The wash is doing
+          double duty otherwise — this button and the current section would
+          read as the same kind of thing. */}
+      <div className="mt-5 border-b border-hairline px-1 pb-4">
+        <NewQuoteButton className="w-full" size="default" variant="soft" />
+      </div>
+
+      <nav className="mt-4 flex flex-1 flex-col">
+        <ul className="flex flex-col gap-0.5">
+          {PRIMARY_NAV.map((item) => (
+            <li key={item.href}>
+              <SidebarLink item={item} pathname={pathname} />
+            </li>
+          ))}
+        </ul>
+
+        {/* Settings and the way out, held at the bottom and visually demoted. */}
+        <div className="mt-auto flex flex-col gap-0.5 border-t border-hairline pt-3">
+          {SECONDARY_NAV.map((item) => (
+            <SidebarLink key={item.href} item={item} pathname={pathname} />
+          ))}
+
+          <form action={signOut}>
+            <button
+              type="submit"
+              className={cn(
+                "flex h-10 w-full items-center gap-2.5 rounded-md px-3 text-sm font-medium transition-colors",
+                NAV_IDLE_CLASS,
+              )}
+            >
+              <LogOut className="size-4 shrink-0" aria-hidden />
+              Sign out
+            </button>
+          </form>
+        </div>
+      </nav>
+    </aside>
+  );
+}
+
+function SidebarLink({ item, pathname }: { item: NavItem; pathname: string }) {
+  const active = isNavItemActive(pathname, item.href);
+  const Icon = item.icon;
+
+  return (
+    <Link
+      href={item.href}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex h-10 items-center gap-2.5 rounded-md px-3 text-sm font-medium transition-colors",
+        active ? NAV_ACTIVE_CLASS : NAV_IDLE_CLASS,
+      )}
+    >
+      <Icon className="size-4 shrink-0" aria-hidden />
+      {item.label}
+    </Link>
+  );
+}

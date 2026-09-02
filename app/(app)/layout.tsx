@@ -1,9 +1,8 @@
 import type { Viewport } from "next";
-import Link from "next/link";
 
-import { signOut } from "@/app/login/actions";
+import { MobileNav } from "@/components/app-shell/mobile-nav";
+import { Sidebar } from "@/components/app-shell/sidebar";
 import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
-import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth";
 
 /*
@@ -14,8 +13,12 @@ import { requireUser } from "@/lib/auth";
 export const viewport: Viewport = { viewportFit: "cover" };
 
 /*
- * Shell for every signed-in screen. Mobile-first: the nav is a single sticky
- * bar with large tap targets, since the owner is on a phone at a job site.
+ * Shell for every signed-in screen.
+ *
+ * Two navigations, one definition (components/app-shell/nav-items.ts): a sticky
+ * top bar on a phone, where the owner works, and a persistent left rail from lg
+ * up, where a row of identical buttons left the screen with no anchor and no
+ * sense of place.
  */
 export default async function AppLayout({
   children,
@@ -26,41 +29,18 @@ export default async function AppLayout({
 
   return (
     // The side insets are set once here so every inner padding stacks on top.
-    <div className="min-h-dvh pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
+    <div className="min-h-dvh pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] lg:flex">
       <RegisterServiceWorker />
 
-      <header className="sticky top-0 z-10 bg-canvas/85 pt-[env(safe-area-inset-top)] shadow-nav backdrop-blur">
-        {/* Scrolls sideways on a phone rather than wrapping onto a second row. */}
-        <nav className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-4 py-2 whitespace-nowrap">
-          <Link href="/dashboard" className="mr-auto font-semibold">
-            QuotePilot
-          </Link>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/dashboard">Dashboard</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/quotes">Quotes</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/customers">Customers</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/pricebook">Pricebook</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/onboarding">Business</Link>
-          </Button>
-          <form action={signOut}>
-            <Button type="submit" variant="ghost" size="sm">
-              Sign out
-            </Button>
-          </form>
-        </nav>
-      </header>
+      <Sidebar />
 
-      <main className="mx-auto max-w-3xl px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6">
-        {children}
-      </main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <MobileNav />
+
+        <main className="mx-auto w-full max-w-3xl px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

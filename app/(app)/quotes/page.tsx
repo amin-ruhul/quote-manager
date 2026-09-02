@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import Link from "next/link";
 
-import { NewQuoteButton } from "@/app/(app)/quotes/new-quote-button";
+import { NewQuoteButton } from "@/components/new-quote-button";
 import { Panel } from "@/components/panel";
 import { QuoteStatusPill } from "@/components/quote-status-pill";
 import { customers, quotes } from "@/db/schema";
@@ -44,7 +44,11 @@ export default async function QuotesPage() {
         </p>
       </header>
 
-      <NewQuoteButton />
+      {/* The sidebar owns this action from lg up; on a phone there is no
+          rail, so the page carries it. */}
+      <div className="lg:hidden">
+        <NewQuoteButton />
+      </div>
 
       {rows.length === 0 ? (
         <div className="rounded-lg bg-marigold p-6">

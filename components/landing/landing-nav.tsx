@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Wordmark } from "@/components/landing/wordmark";
+import { Wordmark } from "@/components/wordmark";
 
 /**
  * One CTA, everywhere, with the same words. The nav is one of only two places
