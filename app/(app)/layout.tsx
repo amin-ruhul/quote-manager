@@ -45,35 +45,42 @@ export default async function AppLayout({
 
   return (
     // The side insets are set once here so every inner padding stacks on top.
-    <div className="min-h-dvh pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] lg:flex">
+    <div className="flex min-h-dvh flex-col pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
       <RegisterServiceWorker />
 
-      <Sidebar />
+      {/*
+        The bar spans the full window and the rail hangs beneath it. Running the
+        rail full height instead left a step where its top edge met the bar's,
+        in the corner the eye lands on first.
+      */}
+      <MobileHeader
+        email={user.email}
+        businessName={businessName}
+        planStatus={planStatus}
+      />
+      <AppHeader
+        email={user.email}
+        businessName={businessName}
+        planStatus={planStatus}
+      />
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <MobileHeader
-          email={user.email}
-          businessName={businessName}
-          planStatus={planStatus}
-        />
-        <AppHeader
-          email={user.email}
-          businessName={businessName}
-          planStatus={planStatus}
-        />
+      <div className="flex flex-1 lg:min-h-0">
+        <Sidebar />
 
-        {/*
-         * The bottom padding clears the tab bar on a phone, so the last row of
-         * a list is reachable rather than sitting under it. From lg the tabs
-         * are gone and the rail takes over, so it drops back to normal.
-         *
-         * From lg the top bar supplies part of the space above the page, so
-         * this is smaller than the old `pt-8` — but not so small that the h1
-         * collides with the bar's edge.
-         */}
-        <main className="mx-auto w-full max-w-[1200px] px-4 pt-6 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-6 lg:pb-8">
-          {children}
-        </main>
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/*
+           * The bottom padding clears the tab bar on a phone, so the last row of
+           * a list is reachable rather than sitting under it. From lg the tabs
+           * are gone and the rail takes over, so it drops back to normal.
+           *
+           * From lg the top bar supplies part of the space above the page, so
+           * this is smaller than the old `pt-8` — but not so small that the h1
+           * collides with the bar's edge.
+           */}
+          <main className="mx-auto w-full max-w-[1200px] px-4 pt-6 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-6 lg:pb-8">
+            {children}
+          </main>
+        </div>
       </div>
 
       <BottomTabs />

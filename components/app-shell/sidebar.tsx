@@ -12,7 +12,6 @@ import {
   SECONDARY_NAV,
 } from "@/components/app-shell/nav-items";
 import { NewQuoteButton } from "@/components/new-quote-button";
-import { Wordmark } from "@/components/wordmark";
 import { cn } from "@/lib/utils";
 
 /*
@@ -22,7 +21,9 @@ import { cn } from "@/lib/utils";
  * Housecall Pro both put the sections down the left and reserve the top for
  * account chrome — so it is the shape an electrician switching from one of them
  * already knows. It also gives the wordmark somewhere to sit and makes "where
- * am I" unmissable, which a row of identical buttons never did.
+ * am I" unmissable, which a row of identical buttons never did. The wordmark
+ * lives in the top bar above rather than here — it is about the whole app, not
+ * about which section you are in.
  *
  * "New quote" lives up here rather than on each page: it is the one thing the
  * app is for, and the rail is the one place that is on every screen.
@@ -38,18 +39,13 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-hairline bg-surface px-3 py-4 lg:flex">
-      <Link
-        href="/dashboard"
-        className="rounded-md px-2 py-1 focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
-      >
-        <Wordmark />
-      </Link>
-
+    // top-16 / 4rem is the bar's height: the rail starts where the bar ends
+    // and scrolls independently beneath it.
+    <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-60 shrink-0 flex-col border-r border-hairline bg-surface px-3 py-4 lg:flex">
       {/* A hairline splits the action from the navigation. The wash is doing
           double duty otherwise — this button and the current section would
           read as the same kind of thing. */}
-      <div className="mt-5 border-b border-hairline px-1 pb-4">
+      <div className="border-b border-hairline px-1 pb-4">
         <NewQuoteButton className="w-full" size="default" variant="soft" />
       </div>
 
