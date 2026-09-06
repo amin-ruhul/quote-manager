@@ -103,8 +103,11 @@ on it. The chrome is simply a different plane. Canvas chrome on a canvas page ha
 to separate it from the content — a sticky bar in the same colour as the thing scrolling
 under it reads as absent, which is exactly what happened to the first top bar.
 
-The top bar also takes `--shadow-nav`. It is a sticky nav, which is one of the two places
-elevation is allowed.
+**No shadow on any of it.** A sticky nav is allowed elevation, but the app chrome does not
+need it once it is a different surface from the page — the hairline already lands the edge.
+The rail has never had one, so a shadow on the bar made two sides of the same frame behave
+differently. `--shadow-nav` stays for the marketing nav, which sits on the canvas it scrolls
+over and has nothing else to separate it.
 
 ## Elevation (used almost nowhere — this is the point)
 

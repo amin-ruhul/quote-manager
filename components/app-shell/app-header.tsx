@@ -32,7 +32,7 @@ export function AppHeader({
   planStatus: PlanStatus;
 }) {
   return (
-    <header className="sticky top-0 z-30 hidden h-16 border-b border-hairline bg-surface/95 shadow-nav backdrop-blur lg:block">
+    <header className="sticky top-0 z-30 hidden h-16 border-b border-hairline bg-surface/95 backdrop-blur lg:block">
       <div className="flex h-full items-center pr-6 pl-3">
         {/* w-60 matches the rail, so the mark and the sections below it share
             an edge instead of nearly sharing one. */}
