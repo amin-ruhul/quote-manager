@@ -1,10 +1,8 @@
 "use client";
 
-import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { signOut } from "@/app/login/actions";
 import {
   isNavItemActive,
   NAV_ACTIVE_CLASS,
@@ -64,24 +62,17 @@ export function Sidebar() {
           ))}
         </ul>
 
-        {/* Settings and the way out, held at the bottom and visually demoted. */}
+        {/*
+          Settings, held at the bottom and visually demoted.
+
+          Sign out used to live here too. It moved to the account menu in the
+          top bar, because account, billing and the way out belong together in
+          one place — a second copy in the rail just teaches people to hunt.
+        */}
         <div className="mt-auto flex flex-col gap-0.5 border-t border-hairline pt-3">
           {SECONDARY_NAV.map((item) => (
             <SidebarLink key={item.href} item={item} pathname={pathname} />
           ))}
-
-          <form action={signOut}>
-            <button
-              type="submit"
-              className={cn(
-                "flex h-10 w-full items-center gap-2.5 rounded-md px-3 text-sm font-medium transition-colors",
-                NAV_IDLE_CLASS,
-              )}
-            >
-              <LogOut className="size-4 shrink-0" aria-hidden />
-              Sign out
-            </button>
-          </form>
         </div>
       </nav>
     </aside>

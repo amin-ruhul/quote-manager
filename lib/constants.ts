@@ -7,6 +7,28 @@ export const PLANS = ["free", "pro", "business"] as const;
 export type Plan = (typeof PLANS)[number];
 export const DEFAULT_PLAN: Plan = "free";
 
+/** Display names for the plan chip and the billing page. */
+export const PLAN_LABELS: Record<Plan, string> = {
+  free: "Free",
+  pro: "Pro",
+  business: "Business",
+};
+
+/**
+ * The freemium cap (SPEC §16). Displayed today; enforcement lands with the rest
+ * of billing in Phase 6 (`lib/quota.ts`), which is the only thing that should
+ * ever block a create.
+ */
+export const FREE_QUOTES_PER_MONTH = 5;
+
+/**
+ * When the usage meter starts warning rather than just informing. Research on
+ * freemium conversion is consistent that surfacing the running count *before*
+ * the wall converts better than interrupting at it — the owner can plan the
+ * upgrade instead of being stopped mid-quote.
+ */
+export const QUOTA_WARN_AT = 0.8;
+
 /** The quote engine is generic; a trade is just an industry_config row (SPEC §8). */
 export const INDUSTRIES = ["electrician"] as const;
 export type Industry = (typeof INDUSTRIES)[number];
