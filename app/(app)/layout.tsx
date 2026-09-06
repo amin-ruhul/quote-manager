@@ -67,10 +67,11 @@ export default async function AppLayout({
          * a list is reachable rather than sitting under it. From lg the tabs
          * are gone and the rail takes over, so it drops back to normal.
          *
-         * `lg:pt-2` rather than `lg:pt-8`: the top bar now supplies the space
-         * above the page that this padding used to.
+         * From lg the top bar supplies part of the space above the page, so
+         * this is smaller than the old `pt-8` — but not so small that the h1
+         * collides with the bar's edge.
          */}
-        <main className="mx-auto w-full max-w-[1200px] px-4 pt-6 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-2 lg:pb-8">
+        <main className="mx-auto w-full max-w-[1200px] px-4 pt-6 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-6 lg:pb-8">
           {children}
         </main>
       </div>

@@ -38,7 +38,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-hairline px-3 py-4 lg:flex">
+    <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-hairline bg-surface px-3 py-4 lg:flex">
       <Link
         href="/dashboard"
         className="rounded-md px-2 py-1 focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"

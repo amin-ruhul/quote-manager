@@ -92,6 +92,20 @@ base unit: 4px   ·   element gap: 8px   ·   card padding: 24px (16–20px on p
 section gap: 80px (marketing) / 24–32px (in-app)   ·   content max-width: ~1200px
 ```
 
+## App shell: white chrome, warm page
+
+The signed-in app has three pieces of chrome — the left rail, the top bar, the phone
+tab bar — and all three are `--surface` with a hairline on the edge that meets content.
+The page behind them stays `--canvas`.
+
+This is not an inversion: the page is still warm paper, and cards are still white islands
+on it. The chrome is simply a different plane. Canvas chrome on a canvas page has nothing
+to separate it from the content — a sticky bar in the same colour as the thing scrolling
+under it reads as absent, which is exactly what happened to the first top bar.
+
+The top bar also takes `--shadow-nav`. It is a sticky nav, which is one of the two places
+elevation is allowed.
+
 ## Elevation (used almost nowhere — this is the point)
 
 - **Cards: NO shadow.** Separate them from the canvas with the 1px `--border` hairline only.

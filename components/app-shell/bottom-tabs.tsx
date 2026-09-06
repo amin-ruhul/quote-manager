@@ -33,7 +33,7 @@ export function BottomTabs() {
       aria-label="Sections"
       // Hairline rather than a shadow: DESIGN.md spends its two shadows
       // elsewhere, and a bar this size doesn't need to lift off the page.
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-hairline bg-canvas/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-20 border-t border-hairline bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
     >
       <ul className="flex">
         {TABS.map((item) => {

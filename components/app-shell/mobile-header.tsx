@@ -26,7 +26,8 @@ export function MobileHeader({
   planStatus: PlanStatus;
 }) {
   return (
-    <header className="sticky top-0 z-20 flex items-center gap-2 bg-canvas/85 px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))] shadow-nav backdrop-blur lg:hidden">
+    // Same surface as the desktop bar, so the chrome reads the same on both.
+    <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-hairline bg-surface/95 px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))] shadow-nav backdrop-blur lg:hidden">
       <Link href="/dashboard" className="shrink-0">
         <Wordmark />
       </Link>
