@@ -140,7 +140,7 @@ export function CustomerDetail({
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="tabular text-sm text-ink-40">
+                        <span className="tabular text-sm text-ink-60">
                           {quote.quoteNumber}
                         </span>
                         <QuoteStatusPill status={quote.status as QuoteStatus} />
@@ -221,7 +221,7 @@ function ContactRow({
 }) {
   return (
     <div className="flex items-start gap-2.5 text-sm text-ink-60">
-      <span className="mt-0.5 shrink-0 text-ink-40">{icon}</span>
+      <span className="mt-0.5 shrink-0 text-ink-60">{icon}</span>
       {children}
     </div>
   );

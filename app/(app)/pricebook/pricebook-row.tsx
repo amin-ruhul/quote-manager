@@ -58,7 +58,7 @@ export function PricebookRow({
           <Skeleton className="hidden h-4 w-12 lg:block" />
           <Skeleton className="h-4 w-24 lg:ml-auto" />
         </div>
-        <Loader2 className="size-4 animate-spin text-ink-40" />
+        <Loader2 className="size-4 animate-spin text-ink-60" />
         <span className="sr-only">Deleting {item.name}</span>
       </li>
     );
@@ -83,7 +83,7 @@ export function PricebookRow({
           ) : null}
           <p className="tabular mt-2 font-medium lg:hidden">
             {formatCents(item.price, currency)}
-            <span className="font-normal text-ink-40">
+            <span className="font-normal text-ink-60">
               {" / "}
               {item.unit}
             </span>

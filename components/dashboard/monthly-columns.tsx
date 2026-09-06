@@ -107,7 +107,7 @@ export function MonthlyColumns({
                     : "text-ink-90"
                   : onAccent
                     ? "text-black/50"
-                    : "text-ink-40",
+                    : "text-ink-60",
               )}
             >
               {label}

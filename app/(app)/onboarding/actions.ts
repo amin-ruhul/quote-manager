@@ -69,6 +69,38 @@ async function uploadLogo(
   return { url: publicUrl };
 }
 
+/**
+ * Recovers the storage path from a public logo URL, so removing a logo can also
+ * delete the file rather than orphaning it in the bucket forever.
+ *
+ * Returns null if the URL isn't one of ours — an unparseable URL means we skip
+ * the cleanup, never that we guess at a path and delete the wrong object.
+ */
+function logoStoragePath(publicUrl: string): string | null {
+  const marker = `/${LOGO_BUCKET}/`;
+  const index = publicUrl.indexOf(marker);
+  if (index === -1) return null;
+
+  const path = publicUrl.slice(index + marker.length).split("?")[0] ?? "";
+  return path.length > 0 ? decodeURIComponent(path) : null;
+}
+
+/**
+ * Best effort: the row is the source of truth, so a failed delete must not fail
+ * the save. Worst case is a stray file the owner can no longer see.
+ */
+async function deleteLogo(publicUrl: string) {
+  const path = logoStoragePath(publicUrl);
+  if (!path) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.storage.from(LOGO_BUCKET).remove([path]);
+
+  if (error) {
+    console.error("Logo delete failed", { path, message: error.message });
+  }
+}
+
 /** Copies the trade's default pricebook into the new business (SPEC §10). */
 async function seedPricebook(
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
@@ -126,6 +158,8 @@ export async function saveBusinessProfile(
   const { followUpDays, ...profile } = parsed.data;
   const settings = { followUpDays };
 
+  // A new file always wins over the remove flag: if the owner picked a
+  // replacement after hitting Remove, they meant the replacement.
   let logoUrl: string | null = null;
   const logo = formData.get("logo");
   if (logo instanceof File && logo.size > 0) {
@@ -135,10 +169,11 @@ export async function saveBusinessProfile(
     }
     logoUrl = result.url;
   }
+  const clearLogo = logoUrl === null && formData.get("removeLogo") === "1";
 
   // business_id is never taken from the client; ownership comes from the session.
   const [existing] = await db
-    .select({ id: businesses.id })
+    .select({ id: businesses.id, logoUrl: businesses.logoUrl })
     .from(businesses)
     .where(eq(businesses.ownerId, user.id))
     .limit(1);
@@ -147,7 +182,13 @@ export async function saveBusinessProfile(
     if (existing) {
       await db
         .update(businesses)
-        .set({ ...profile, settings, ...(logoUrl ? { logoUrl } : {}) })
+        .set({
+          ...profile,
+          settings,
+          // Three cases, and the difference matters: a new logo, an explicit
+          // removal, or leave the column alone.
+          ...(logoUrl ? { logoUrl } : clearLogo ? { logoUrl: null } : {}),
+        })
         .where(eq(businesses.ownerId, user.id));
     } else {
       await db.transaction(async (tx) => {
@@ -176,6 +217,12 @@ export async function saveBusinessProfile(
       error: "We couldn't save your business. Try again.",
       fieldErrors: {},
     };
+  }
+
+  // Only after the row is safely updated — if the write failed above we have
+  // already returned, and the file is still the one the row points at.
+  if (existing?.logoUrl && (clearLogo || logoUrl)) {
+    await deleteLogo(existing.logoUrl);
   }
 
   revalidatePath("/onboarding");

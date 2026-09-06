@@ -116,7 +116,7 @@ export default async function PublicQuotePage({
       */}
       <article className="mt-6 rounded-lg border border-hairline bg-surface p-5 shadow-quote sm:p-8">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="tabular text-sm text-ink-40">
+          <span className="tabular text-sm text-ink-60">
             {quote.quoteNumber}
           </span>
           {quote.validUntil ? (
@@ -158,7 +158,7 @@ export default async function PublicQuotePage({
           {sharedLines.length > 0 ? (
             <LineTable lines={sharedLines} currency={currency} />
           ) : hasOptions ? null : (
-            <p className="mt-2 text-sm text-ink-40">
+            <p className="mt-2 text-sm text-ink-60">
               No line items on this quote yet.
             </p>
           )}
@@ -305,7 +305,7 @@ export default async function PublicQuotePage({
 
       {/* The growth loop (SPEC §16) — Business plans remove it. */}
       {quote.ownerPlan !== "business" ? (
-        <footer className="mt-10 text-center text-sm text-ink-40">
+        <footer className="mt-10 text-center text-sm text-ink-60">
           Made with{" "}
           <a
             href="https://quotepilot.app"

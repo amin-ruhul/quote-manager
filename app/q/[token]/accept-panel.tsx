@@ -140,7 +140,7 @@ export function AcceptPanel({
           autoComplete="name"
           placeholder="Type your full name to sign"
         />
-        <p className="text-sm text-ink-40">
+        <p className="text-sm text-ink-60">
           Typing your name here counts as your signature. Optional.
         </p>
       </div>
@@ -153,7 +153,7 @@ export function AcceptPanel({
 
       <AcceptButton label={`Accept · ${formatCents(payable, currency)}`} />
 
-      <p className="text-center text-sm text-ink-40">
+      <p className="text-center text-sm text-ink-60">
         Accepting tells {businessName} to go ahead with this work.
       </p>
     </form>

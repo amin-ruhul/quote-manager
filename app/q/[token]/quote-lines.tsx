@@ -31,7 +31,7 @@ export function LineTable({
               <p className="mt-1 text-sm text-ink-60">{line.description}</p>
             ) : null}
             {line.quantity !== 100 || line.unit !== "job" ? (
-              <p className="tabular mt-1 text-sm text-ink-40">
+              <p className="tabular mt-1 text-sm text-ink-60">
                 {formatQuantity(line.quantity)} {line.unit} ×{" "}
                 {formatCents(line.unitPrice, currency)}
               </p>

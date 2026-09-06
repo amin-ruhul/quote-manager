@@ -54,7 +54,7 @@ export function BottomTabs() {
                 <span
                   className={cn(
                     "flex h-6 w-10 items-center justify-center rounded-pill transition-colors",
-                    active ? "bg-brand-wash text-brand" : "text-ink-40",
+                    active ? "bg-brand-wash text-brand" : "text-ink-60",
                   )}
                 >
                   <Icon className="size-[18px]" aria-hidden />

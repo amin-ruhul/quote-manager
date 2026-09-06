@@ -19,7 +19,7 @@ export function QuoteCardPreview() {
           </span>
           <div className="min-w-0">
             <p className="text-sm font-semibold">Bright Spark Electric</p>
-            <p className="text-xs text-ink-40">License EC-124589</p>
+            <p className="text-xs text-ink-60">License EC-124589</p>
           </div>
           <span className="ml-auto rounded-pill bg-status-accepted-bg px-2 py-0.5 text-xs font-medium text-status-accepted">
             Accepted
@@ -27,7 +27,7 @@ export function QuoteCardPreview() {
         </div>
 
         <div className="mt-4 border-t border-hairline pt-4">
-          <p className="tabular text-xs text-ink-40">Q-0007</p>
+          <p className="tabular text-xs text-ink-60">Q-0007</p>
           <p className="mt-1 text-lg font-semibold text-balance">
             Kitchen lighting &amp; panel upgrade
           </p>
@@ -53,7 +53,7 @@ export function QuoteCardPreview() {
         </div>
       </div>
 
-      <figcaption className="mt-3 text-center text-sm text-ink-40">
+      <figcaption className="mt-3 text-center text-sm text-ink-60">
         This is what your customer sees. No app, no login.
       </figcaption>
     </figure>
@@ -74,7 +74,7 @@ function Line({
       <span className="min-w-0">
         <span className="block truncate">{name}</span>
         {detail ? (
-          <span className="tabular text-xs text-ink-40">{detail}</span>
+          <span className="tabular text-xs text-ink-60">{detail}</span>
         ) : null}
       </span>
       <span className="tabular shrink-0 font-medium">{price}</span>

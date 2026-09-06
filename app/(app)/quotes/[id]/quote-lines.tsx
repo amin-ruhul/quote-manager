@@ -44,7 +44,7 @@ function LineRow({
           <Skeleton className="h-5 w-2/3" />
           <Skeleton className="h-4 w-24" />
         </div>
-        <Loader2 className="size-4 animate-spin text-ink-40" />
+        <Loader2 className="size-4 animate-spin text-ink-60" />
         <span className="sr-only">Removing {item.name}</span>
       </li>
     );

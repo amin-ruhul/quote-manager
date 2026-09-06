@@ -55,12 +55,13 @@ export function Pricing() {
   return (
     <section
       id="pricing"
-      className="mx-auto max-w-5xl scroll-mt-20 px-5 py-16 sm:px-8 sm:py-24"
+      className="mx-auto max-w-5xl scroll-mt-24 px-5 py-16 sm:px-8 sm:py-24"
     >
       <SectionHeading
         eyebrow="Pricing"
         title="One won job pays for the year."
         body="Start free. No card, no trial countdown. Upgrade when quoting is making you money."
+        align="center"
       />
 
       <div className="mt-10 grid gap-4 lg:grid-cols-3">
@@ -84,7 +85,7 @@ export function Pricing() {
               <span className="tabular text-4xl font-semibold">
                 {plan.price}
               </span>
-              <span className="text-sm text-ink-40">{plan.cadence}</span>
+              <span className="text-sm text-ink-60">{plan.cadence}</span>
             </p>
             <p className="mt-2 text-sm text-ink-60">{plan.line}</p>
 
@@ -124,7 +125,7 @@ export function Pricing() {
         ))}
       </div>
 
-      <p className="mt-6 text-sm text-ink-40">
+      <p className="mt-6 text-sm text-ink-60">
         Prices in USD. Cancel any time — your quotes and pricebook stay yours.
       </p>
     </section>

@@ -38,10 +38,14 @@ const QUESTIONS = [
 
 export function Faq() {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
+    <section
+      id="faq"
+      className="mx-auto max-w-3xl scroll-mt-24 px-5 py-16 sm:px-8 sm:py-24"
+    >
       <SectionHeading
         eyebrow="Questions"
         title="The things people ask first."
+        align="center"
       />
 
       <div className="mt-8 divide-y divide-hairline border-t border-b border-hairline">
@@ -51,7 +55,7 @@ export function Faq() {
               {item.q}
               <svg
                 viewBox="0 0 16 16"
-                className="size-4 shrink-0 text-ink-40 transition-transform duration-200 group-open:rotate-45"
+                className="size-4 shrink-0 text-ink-60 transition-transform duration-200 group-open:rotate-45"
                 aria-hidden
               >
                 <path

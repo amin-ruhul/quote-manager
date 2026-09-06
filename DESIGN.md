@@ -38,13 +38,24 @@ hairlines not shadows.
 
 --ink:         #000000   /* text — used at alpha 100/95/60/40, NOT always full */
 --ink-90:      rgba(0,0,0,0.90)
---ink-60:      rgba(0,0,0,0.60)   /* = Stone #757575, secondary text */
---ink-40:      rgba(0,0,0,0.40)   /* faint / placeholder */
+--ink-60:      rgba(0,0,0,0.60)   /* = Stone #757575, secondary text. THE FLOOR for text. */
+--ink-40:      rgba(0,0,0,0.40)   /* NOT FOR TEXT — see below */
 --body:        #615D59   /* Graphite — warm body text that harmonizes with the canvas */
 
 --brand:       #0075DE   /* Notion Blue — the ONE chromatic filled button, links, active nav */
 --brand-wash:  #E6F3FE   /* Sky Tint — ghost button bg, soft hover, "sent" status */
 ```
+
+> **`--ink-40` is not a text colour.** It resolves to `#999999`: **2.85:1** on white and
+> **2.65:1** on the canvas. WCAG AA needs **4.5:1** for normal text and **3:1** for meaningful
+> icons, so it fails everywhere it is read. `--ink-60` (`#666666`) is **5.74:1** and passes.
+>
+> **`--ink-60` is the floor for anything a user has to read** — hints, captions, table headers,
+> timestamps, units, chart labels, inactive nav icons. Hierarchy below that comes from **size and
+> weight, not more transparency.**
+>
+> `--ink-40` survives only for marks that carry no information on their own: the `—` standing in
+> for an empty cell, and input `placeholder` text (which must never be the only label).
 
 ### Accent cast (for colored cards & pills only — never for body text)
 
@@ -112,7 +123,8 @@ section gap: 80px (marketing) / 24–32px (in-app)   ·   content max-width: ~12
 
 - Warm `#F6F5F4` canvas, white cards. Never invert (never a warm card on a white page).
 - One blue primary action per screen; everything else ghost/text.
-- Build text hierarchy with black **alpha** (100/95/60/40), not new grays.
+- Build text hierarchy with black **alpha** (100/90/60), not new grays. 60 is the floor — below it,
+  use size and weight instead of more transparency.
 - Separate cards with **1px hairlines, not shadows**.
 - Put color in **card backgrounds and pills**, not in multiple buttons.
 - 12px cards, 8px buttons, 9999px pills, 4px small. Nothing more rounded than 12px except pills.
@@ -124,6 +136,7 @@ section gap: 80px (marketing) / 24–32px (in-app)   ·   content max-width: ~12
 - No pure-white page background. No gradients. No shadows on content cards.
 - No two chromatic filled buttons in one view. No Source Serif for UI/nav.
 - No full-black wall of text — use alpha. No radius bigger than 12px on rectangles.
+- **Never `text-ink-40`.** It fails contrast at every size. Placeholders and empty-cell dashes only.
 
 ## Tailwind config (extend theme — back with CSS vars so values stay in one place)
 

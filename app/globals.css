@@ -203,3 +203,29 @@
     display: none;
   }
 }
+
+/*
+ * The landing marquee. The track holds the same list twice, so translating it
+ * by exactly half its width loops with no visible seam. CSS rather than JS
+ * because it runs forever — this should not keep a React render loop warm.
+ */
+@keyframes marquee-track {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@layer components {
+  .marquee-track {
+    animation: marquee-track 40s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+}

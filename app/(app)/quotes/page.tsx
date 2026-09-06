@@ -77,7 +77,7 @@ export default async function QuotesPage() {
            */}
           <div
             aria-hidden
-            className={`hidden border-b border-hairline px-5 py-2 text-xs text-ink-40 lg:grid ${QUOTE_COLUMNS}`}
+            className={`hidden border-b border-hairline px-5 py-2 text-xs text-ink-60 lg:grid ${QUOTE_COLUMNS}`}
           >
             <span>Quote</span>
             <span>Job</span>
@@ -104,7 +104,7 @@ export default async function QuotesPage() {
                   >
                     <div className="min-w-0 lg:contents">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="tabular text-sm text-ink-40">
+                        <span className="tabular text-sm text-ink-60">
                           {quote.quoteNumber}
                         </span>
                         {/* The pill rides beside the number on a phone and has

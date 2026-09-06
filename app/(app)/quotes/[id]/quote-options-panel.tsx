@@ -116,7 +116,7 @@ export function QuoteOptionsPanel({
                 </div>
 
                 {pendingId === option.id ? (
-                  <Loader2 className="size-4 animate-spin text-ink-40" />
+                  <Loader2 className="size-4 animate-spin text-ink-60" />
                 ) : (
                   <div className="flex shrink-0 gap-1">
                     {!option.isRecommended ? (

@@ -95,7 +95,7 @@ export function AiDraftPanel({
               rows={3}
               placeholder="Swap the old 100A panel for a 200A, add six recessed lights in the kitchen on a new circuit with a dimmer."
             />
-            <p className="text-sm text-ink-40">
+            <p className="text-sm text-ink-60">
               We&apos;ll match it against your pricebook. Anything we can&apos;t
               match comes back without a price for you to set.
             </p>
@@ -119,7 +119,7 @@ export function AiDraftPanel({
     <Panel className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold">Review this draft</h2>
-        <span className="text-sm text-ink-40">
+        <span className="text-sm text-ink-60">
           {chosenItems().length} of {draft.lineItems.length}
         </span>
       </div>
@@ -169,7 +169,7 @@ export function AiDraftPanel({
                     {item.description}
                   </span>
                 ) : null}
-                <span className="tabular mt-1 block text-sm text-ink-40">
+                <span className="tabular mt-1 block text-sm text-ink-60">
                   {item.quantity} {item.unit}
                 </span>
               </span>
@@ -200,7 +200,7 @@ export function AiDraftPanel({
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-sm text-ink-40">
+          <p className="mt-2 text-sm text-ink-60">
             Not priced and not added. Add them yourself if the job needs them.
           </p>
         </div>

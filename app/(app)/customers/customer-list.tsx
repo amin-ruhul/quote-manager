@@ -83,7 +83,7 @@ export function CustomerList({
               `display: contents` and the same cells become columns. */}
           <div
             aria-hidden
-            className={`hidden border-b border-hairline px-5 py-2 text-xs text-ink-40 lg:grid ${CUSTOMER_COLUMNS}`}
+            className={`hidden border-b border-hairline px-5 py-2 text-xs text-ink-60 lg:grid ${CUSTOMER_COLUMNS}`}
           >
             <span>Name</span>
             <span>Company</span>
@@ -163,7 +163,7 @@ export function CustomerList({
                   </div>
 
                   <ChevronRight
-                    className="size-4 shrink-0 text-ink-40"
+                    className="size-4 shrink-0 text-ink-60"
                     aria-hidden
                   />
                 </Link>
