@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Sparkles, TriangleAlert } from "lucide-react";
+import { Sparkles, TriangleAlert } from "lucide-react";
 import { useActionState, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
@@ -28,9 +28,9 @@ function GenerateButton() {
       type="submit"
       size="lg"
       className="w-full sm:w-auto"
-      disabled={pending}
+      loading={pending}
     >
-      {pending ? <Loader2 className="animate-spin" /> : <Sparkles />}
+      {pending ? null : <Sparkles />}
       {pending ? "Drafting…" : "Draft with AI"}
     </Button>
   );
@@ -210,7 +210,8 @@ export function AiDraftPanel({
         <Button
           size="lg"
           className="w-full sm:w-auto"
-          disabled={isImporting || chosenItems().length === 0}
+          loading={isImporting}
+          disabled={chosenItems().length === 0}
           onClick={() =>
             startImporting(async () => {
               const { error } = await importDraftItems({

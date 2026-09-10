@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   pushSubscriptionSchema,
   pushUnsubscribeSchema,
-} from "@/lib/validation";
+} from "@/lib/schemas/push";
 
 /*
  * The endpoint is the one field here that turns into a server-side request, so

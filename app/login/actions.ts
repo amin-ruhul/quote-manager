@@ -2,39 +2,31 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 
-import { ensureProfile } from "@/lib/auth";
+import { ensureProfile, fullNameFromMetadata } from "@/lib/auth";
+import { type ActionState, toFieldErrors } from "@/lib/form-state";
+import { signInSchema } from "@/lib/schemas/auth";
 import { createClient } from "@/lib/supabase/server";
 
 /*
- * Minimal email/password auth so Phase 1 has a real owner to hang a business
- * off. Google sign-in and the rest of the auth polish land in Phase 6.
+ * Signing in and signing out. Creating an account lives in app/register —
+ * they ask for different things and deserve their own screens.
+ *
+ * Google sign-in and the rest of the auth polish land in Phase 6.
  */
 
-export type AuthState = { error: string | null };
-
-const credentialsSchema = z.object({
-  email: z.email("Enter a valid email address."),
-  password: z.string().min(8, "Use at least 8 characters."),
-  next: z.string().startsWith("/").catch("/pricebook"),
-});
-
-function parseCredentials(formData: FormData) {
-  return credentialsSchema.safeParse({
+export async function signIn(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
     next: formData.get("next") ?? "/pricebook",
   });
-}
 
-export async function signIn(
-  _prevState: AuthState,
-  formData: FormData,
-): Promise<AuthState> {
-  const parsed = parseCredentials(formData);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Check your details." };
+    return { error: null, fieldErrors: toFieldErrors(parsed.error.issues) };
   }
 
   const supabase = await createClient();
@@ -43,46 +35,25 @@ export async function signIn(
     password: parsed.data.password,
   });
 
+  // Deliberately not a field error: which half was wrong is not something we
+  // tell an attacker, and the owner can only fix it by retrying both.
   if (error || !data.user) {
-    return { error: "That email and password don't match. Try again." };
-  }
-
-  await ensureProfile(data.user.id, data.user.email ?? parsed.data.email);
-
-  revalidatePath("/", "layout");
-  redirect(parsed.data.next);
-}
-
-export async function signUp(
-  _prevState: AuthState,
-  formData: FormData,
-): Promise<AuthState> {
-  const parsed = parseCredentials(formData);
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Check your details." };
-  }
-
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email: parsed.data.email,
-    password: parsed.data.password,
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  // With email confirmation switched on, there is no session yet.
-  if (!data.session || !data.user) {
     return {
-      error: "Check your email to confirm your account, then sign in.",
+      error: "That email and password don't match. Try again.",
+      fieldErrors: {},
     };
   }
 
-  await ensureProfile(data.user.id, data.user.email ?? parsed.data.email);
+  // First sign-in after confirming the email is where the name typed at
+  // registration finally reaches the profile row.
+  await ensureProfile(
+    data.user.id,
+    data.user.email ?? parsed.data.email,
+    fullNameFromMetadata(data.user.user_metadata),
+  );
 
   revalidatePath("/", "layout");
-  redirect("/onboarding");
+  redirect(parsed.data.next);
 }
 
 export async function signOut() {

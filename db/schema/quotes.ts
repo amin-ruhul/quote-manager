@@ -12,7 +12,12 @@ import {
 } from "drizzle-orm/pg-core";
 import { authenticatedRole } from "drizzle-orm/supabase";
 
-import { DEFAULT_QUOTE_ITEM_TYPE, DEFAULT_QUOTE_STATUS } from "@/lib/constants";
+import {
+  DEFAULT_QUOTE_ITEM_TYPE,
+  DEFAULT_QUOTE_STATUS,
+  type PricebookUnit,
+  type QuoteItemType,
+} from "@/lib/constants";
 import { businesses } from "./core";
 import { customers } from "./customers";
 import { ownedBusinessIds, ownedQuoteIds } from "./rls";
@@ -115,12 +120,15 @@ export const quoteItems = pgTable(
     description: text("description"),
     /** Integer, scaled by QUANTITY_SCALE: 2.5 is stored as 250. */
     quantity: integer("quantity").notNull().default(100),
-    unit: text("unit").notNull(),
+    unit: text("unit").$type<PricebookUnit>().notNull(),
     /** Integer cents. */
     unitPrice: integer("unit_price").notNull(),
     /** Integer cents, derived: quantity x unitPrice, negative for discounts. */
     total: integer("total").notNull().default(0),
-    type: text("type").notNull().default(DEFAULT_QUOTE_ITEM_TYPE),
+    type: text("type")
+      .$type<QuoteItemType>()
+      .notNull()
+      .default(DEFAULT_QUOTE_ITEM_TYPE),
     position: integer("position").notNull().default(0),
   },
   (table) => [

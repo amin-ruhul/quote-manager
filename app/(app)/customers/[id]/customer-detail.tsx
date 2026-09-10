@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Mail, MapPin, Phone, Trash2 } from "lucide-react";
+import { Mail, MapPin, Phone, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -169,9 +169,9 @@ export function CustomerDetail({
               variant="ghost"
               size="lg"
               className="w-full text-destructive sm:w-auto"
-              disabled={isDeleting}
+              loading={isDeleting}
             >
-              {isDeleting ? <Loader2 className="animate-spin" /> : <Trash2 />}
+              {isDeleting ? null : <Trash2 />}
               Delete customer
             </Button>
           </AlertDialogTrigger>

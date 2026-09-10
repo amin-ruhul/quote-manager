@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -160,9 +160,9 @@ export function QuoteBuilder({
               variant="ghost"
               size="lg"
               className="w-full text-destructive sm:w-auto"
-              disabled={isDeleting}
+              loading={isDeleting}
             >
-              {isDeleting ? <Loader2 className="animate-spin" /> : <Trash2 />}
+              {isDeleting ? null : <Trash2 />}
               Delete quote
             </Button>
           </AlertDialogTrigger>

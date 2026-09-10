@@ -34,7 +34,7 @@ export function NewQuoteButton({
       size={size}
       variant={variant}
       className={className}
-      disabled={isCreating}
+      loading={isCreating}
       onClick={() =>
         startCreating(async () => {
           // No try/catch around the action: it reports failure as a value, and
@@ -45,7 +45,7 @@ export function NewQuoteButton({
         })
       }
     >
-      <Plus />
+      {isCreating ? null : <Plus />}
       {isCreating ? "Starting…" : "New quote"}
     </Button>
   );

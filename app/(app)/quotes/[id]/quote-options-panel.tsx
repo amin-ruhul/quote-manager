@@ -1,8 +1,7 @@
 "use client";
 
 import { Check, Loader2, Plus, Trash2 } from "lucide-react";
-import { useActionState, useState, useTransition } from "react";
-import { useFormStatus } from "react-dom";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import type { QuoteFormState } from "@/app/(app)/quotes/actions";
@@ -12,12 +11,22 @@ import {
   setRecommendedOption,
 } from "@/app/(app)/quotes/item-actions";
 import { Panel } from "@/components/panel";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import type { QuoteOption } from "@/db/schema";
 import type { Currency } from "@/lib/constants";
 import { formatCents } from "@/lib/money";
+import { quoteOptionSchema } from "@/lib/schemas/quote";
+import { useActionForm } from "@/lib/use-action-form";
 
 const initialState: QuoteFormState = {
   error: null,
@@ -25,18 +34,96 @@ const initialState: QuoteFormState = {
   savedAt: null,
 };
 
-function AddButton() {
-  const { pending } = useFormStatus();
+/**
+ * Its own component so the form's hooks are scoped to the form, and so it is
+ * mounted fresh — and therefore blank — each time the owner opens it.
+ */
+function AddOptionForm({
+  quoteId,
+  onAdded,
+  onCancel,
+}: {
+  quoteId: string;
+  onAdded: () => void;
+  onCancel: () => void;
+}) {
+  const { form, onSubmit, state, isPending } = useActionForm({
+    schema: quoteOptionSchema,
+    defaultValues: { name: "", description: "" },
+    initialState,
+    action: async (prevState, formData) => {
+      const result = await addQuoteOption(prevState, formData);
+      if (result.savedAt) {
+        toast.success("Option added.");
+        onAdded();
+      }
+      return result;
+    },
+  });
+
   return (
-    <Button
-      type="submit"
-      variant="ghost"
-      size="lg"
-      className="w-full sm:w-auto"
-      disabled={pending}
-    >
-      {pending ? "Adding…" : "Add option"}
-    </Button>
+    <Form {...form}>
+      <Panel asChild>
+        <form onSubmit={onSubmit} className="space-y-3" noValidate>
+          <input type="hidden" name="quoteId" value={quoteId} />
+
+          {state.error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
+          ) : null}
+
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Option name</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Standard" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="What this option includes" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex flex-col gap-2 sm:flex-row-reverse sm:justify-start">
+            <Button
+              type="submit"
+              variant="ghost"
+              size="lg"
+              className="w-full sm:w-auto"
+              loading={isPending}
+            >
+              {isPending ? "Adding…" : "Add option"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Panel>
+    </Form>
   );
 }
 
@@ -56,18 +143,6 @@ export function QuoteOptionsPanel({
   const [isAdding, setIsAdding] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [, startAction] = useTransition();
-
-  const [state, formAction] = useActionState<QuoteFormState, FormData>(
-    async (prevState, formData) => {
-      const result = await addQuoteOption(prevState, formData);
-      if (result.savedAt) {
-        toast.success("Option added.");
-        setIsAdding(false);
-      }
-      return result;
-    },
-    initialState,
-  );
 
   function run(id: string, work: () => Promise<{ error: string | null }>) {
     setPendingId(id);
@@ -155,45 +230,11 @@ export function QuoteOptionsPanel({
       ) : null}
 
       {isAdding ? (
-        <Panel asChild>
-          <form action={formAction} className="space-y-3" noValidate>
-            <input type="hidden" name="quoteId" value={quoteId} />
-            <div className="space-y-2">
-              <Label htmlFor="option-name">Option name</Label>
-              <Input
-                id="option-name"
-                name="name"
-                required
-                placeholder="Standard"
-              />
-              {state.fieldErrors.name ? (
-                <p className="text-sm text-destructive" role="alert">
-                  {state.fieldErrors.name}
-                </p>
-              ) : null}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="option-description">Description</Label>
-              <Input
-                id="option-description"
-                name="description"
-                placeholder="What this option includes"
-              />
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row-reverse sm:justify-start">
-              <AddButton />
-              <Button
-                type="button"
-                variant="ghost"
-                size="lg"
-                className="w-full sm:w-auto"
-                onClick={() => setIsAdding(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        </Panel>
+        <AddOptionForm
+          quoteId={quoteId}
+          onAdded={() => setIsAdding(false)}
+          onCancel={() => setIsAdding(false)}
+        />
       ) : null}
     </section>
   );

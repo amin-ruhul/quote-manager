@@ -67,7 +67,8 @@ export function SharePanel({
       <Button
         size="lg"
         className="w-full"
-        disabled={isSending || email.trim() === ""}
+        loading={isSending}
+        disabled={email.trim() === ""}
         onClick={() =>
           startSending(async () => {
             const result = await sendQuoteEmail(quoteId, email.trim());
@@ -76,7 +77,7 @@ export function SharePanel({
           })
         }
       >
-        <Mail />
+        {isSending ? null : <Mail />}
         {isSending ? "Sending…" : "Email this quote"}
       </Button>
 
@@ -121,7 +122,7 @@ export function SharePanel({
             variant="ghost"
             size="lg"
             className="w-full sm:w-auto"
-            disabled={isLinking}
+            loading={isLinking}
             onClick={() =>
               startLinking(async () => {
                 const result = await shareQuote(quoteId);

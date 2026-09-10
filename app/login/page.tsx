@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
-import { LoginForm } from "@/app/login/login-form";
-import { Panel } from "@/components/panel";
+import { LoginFooter, LoginForm } from "@/app/login/login-form";
+import { AuthShell } from "@/components/auth-shell";
 import { getUser } from "@/lib/auth";
 
 export const metadata = { title: "Sign in · QuotePilot" };
@@ -15,18 +15,16 @@ export default async function LoginPage({
 
   const { next } = await searchParams;
   // Only same-site paths, so a crafted ?next= can't bounce the owner off-site.
-  const safeNext = next?.startsWith("/") ? next : "/pricebook";
+  const safeNext =
+    next?.startsWith("/") && !next.startsWith("//") ? next : "/pricebook";
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-12">
-      <h1 className="text-3xl font-semibold">QuotePilot</h1>
-      <p className="mt-2 text-body">
-        Sign in to set up your business and pricebook.
-      </p>
-
-      <Panel className="mt-8">
-        <LoginForm next={safeNext} />
-      </Panel>
-    </main>
+    <AuthShell
+      title="Sign in"
+      tagline="Welcome back. Pick up where you left off."
+      footer={<LoginFooter />}
+    >
+      <LoginForm next={safeNext} />
+    </AuthShell>
   );
 }

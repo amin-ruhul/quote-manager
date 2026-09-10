@@ -14,7 +14,7 @@ import {
   recalculateQuote,
   requireOwnedQuote,
 } from "@/lib/quotes";
-import { quoteDetailsSchema } from "@/lib/validation";
+import { quoteDetailsSchema } from "@/lib/schemas/quote";
 
 export type QuoteFormState = {
   error: string | null;

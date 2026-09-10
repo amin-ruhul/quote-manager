@@ -33,7 +33,7 @@ function AcceptButton({ label }: { label: string }) {
     <Button
       type="submit"
       size="lg"
-      disabled={pending}
+      loading={pending}
       className="h-14 w-full bg-status-accepted text-base text-white hover:bg-[#0c6230]"
     >
       {pending ? "Accepting…" : label}

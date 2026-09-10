@@ -1,6 +1,6 @@
 "use client";
 
-import { ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { ImagePlus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -66,7 +66,7 @@ export function QuotePhotos({
                 size="icon-sm"
                 aria-label="Remove photo"
                 className="absolute top-1 right-1 bg-surface/90 backdrop-blur"
-                disabled={removingId === attachment.id}
+                loading={removingId === attachment.id}
                 onClick={() => {
                   setRemovingId(attachment.id);
                   startRemoving(async () => {
@@ -79,9 +79,7 @@ export function QuotePhotos({
                   });
                 }}
               >
-                {removingId === attachment.id ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
+                {removingId === attachment.id ? null : (
                   <Trash2 className="text-destructive" />
                 )}
               </Button>
@@ -105,10 +103,11 @@ export function QuotePhotos({
         variant="ghost"
         size="lg"
         className="w-full sm:w-auto"
-        disabled={isUploading || isFull}
+        loading={isUploading}
+        disabled={isFull}
         onClick={() => inputRef.current?.click()}
       >
-        {isUploading ? <Loader2 className="animate-spin" /> : <ImagePlus />}
+        {isUploading ? null : <ImagePlus />}
         {isUploading
           ? "Uploading…"
           : isFull

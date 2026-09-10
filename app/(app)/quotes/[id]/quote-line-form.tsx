@@ -1,7 +1,5 @@
 "use client";
 
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 
 import type { QuoteFormState } from "@/app/(app)/quotes/actions";
@@ -9,8 +7,15 @@ import { saveQuoteItem } from "@/app/(app)/quotes/item-actions";
 import { Panel } from "@/components/panel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -20,9 +25,16 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { QuoteItem, QuoteOption } from "@/db/schema";
-import { PRICEBOOK_UNITS, QUOTE_ITEM_TYPES } from "@/lib/constants";
+import {
+  DEFAULT_PRICEBOOK_UNIT,
+  DEFAULT_QUOTE_ITEM_TYPE,
+  PRICEBOOK_UNITS,
+  QUOTE_ITEM_TYPES,
+} from "@/lib/constants";
 import { centsToInputValue } from "@/lib/money";
 import { formatQuantity } from "@/lib/quote-math";
+import { type QuoteItemFields, quoteItemSchema } from "@/lib/schemas/quote";
+import { useActionForm } from "@/lib/use-action-form";
 
 const initialState: QuoteFormState = {
   error: null,
@@ -30,18 +42,19 @@ const initialState: QuoteFormState = {
   savedAt: null,
 };
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button
-      type="submit"
-      size="lg"
-      className="w-full sm:w-auto"
-      disabled={pending}
-    >
-      {pending ? "Saving…" : "Save line"}
-    </Button>
-  );
+function defaultsFor(
+  item: QuoteItem | null,
+  defaultOptionId: string | null,
+): QuoteItemFields {
+  return {
+    name: item?.name ?? "",
+    description: item?.description ?? "",
+    quantity: item ? formatQuantity(item.quantity) : "1",
+    unit: item?.unit ?? DEFAULT_PRICEBOOK_UNIT,
+    unitPrice: item ? centsToInputValue(item.unitPrice) : "",
+    type: item?.type ?? DEFAULT_QUOTE_ITEM_TYPE,
+    optionId: item?.optionId ?? defaultOptionId ?? "none",
+  };
 }
 
 export function QuoteLineForm({
@@ -57,8 +70,11 @@ export function QuoteLineForm({
   defaultOptionId: string | null;
   onClose: () => void;
 }) {
-  const [state, formAction] = useActionState<QuoteFormState, FormData>(
-    async (prevState, formData) => {
+  const { form, onSubmit, state, isPending } = useActionForm({
+    schema: quoteItemSchema,
+    defaultValues: defaultsFor(item, defaultOptionId),
+    initialState,
+    action: async (prevState, formData) => {
       const result = await saveQuoteItem(prevState, formData);
       if (result.savedAt) {
         toast.success(item ? "Line updated." : "Line added.");
@@ -66,158 +82,207 @@ export function QuoteLineForm({
       }
       return result;
     },
-    initialState,
-  );
+  });
 
   return (
-    <Panel asChild>
-      <form action={formAction} className="space-y-4" noValidate>
-        <h3 className="font-semibold">{item ? "Edit line" : "Add a line"}</h3>
+    <Form {...form}>
+      <Panel asChild>
+        <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <h3 className="font-semibold">{item ? "Edit line" : "Add a line"}</h3>
 
-        <input type="hidden" name="quoteId" value={quoteId} />
-        {item ? <input type="hidden" name="itemId" value={item.id} /> : null}
+          <input type="hidden" name="quoteId" value={quoteId} />
+          {item ? <input type="hidden" name="itemId" value={item.id} /> : null}
 
-        {state.error ? (
-          <Alert variant="destructive">
-            <AlertDescription>{state.error}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        <div className="space-y-2">
-          <Label htmlFor="line-name">Description</Label>
-          <Input
-            id="line-name"
-            name="name"
-            defaultValue={item?.name ?? ""}
-            required
-            placeholder="Recessed light"
-          />
-          {state.fieldErrors.name ? (
-            <p className="text-sm text-destructive" role="alert">
-              {state.fieldErrors.name}
-            </p>
+          {state.error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
           ) : null}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="line-description">Detail</Label>
-          <Textarea
-            id="line-description"
-            name="description"
-            rows={2}
-            defaultValue={item?.description ?? ""}
-            placeholder="What the customer gets for this line."
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Recessed light" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="line-quantity">Quantity</Label>
-            <Input
-              id="line-quantity"
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Detail</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={2}
+                    placeholder="What the customer gets for this line."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <FormField
+              control={form.control}
               name="quantity"
-              inputMode="decimal"
-              className="tabular"
-              defaultValue={item ? formatQuantity(item.quantity) : "1"}
-              required
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantity</FormLabel>
+                  <FormControl>
+                    <Input {...field} inputMode="decimal" className="tabular" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {state.fieldErrors.quantity ? (
-              <p className="text-sm text-destructive" role="alert">
-                {state.fieldErrors.quantity}
-              </p>
-            ) : null}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="line-unit">Unit</Label>
-            <Select name="unit" defaultValue={item?.unit ?? "each"}>
-              <SelectTrigger id="line-unit" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PRICEBOOK_UNITS.map((unit) => (
-                  <SelectItem key={unit} value={unit}>
-                    {unit}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <FormField
+              control={form.control}
+              name="unit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Unit</FormLabel>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {PRICEBOOK_UNITS.map((unit) => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div className="space-y-2">
-            <Label htmlFor="line-price">Unit price</Label>
-            <Input
-              id="line-price"
+            <FormField
+              control={form.control}
               name="unitPrice"
-              inputMode="decimal"
-              className="tabular"
-              defaultValue={item ? centsToInputValue(item.unitPrice) : ""}
-              required
-              placeholder="185.00"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Unit price</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      inputMode="decimal"
+                      className="tabular"
+                      placeholder="185.00"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {state.fieldErrors.unitPrice ? (
-              <p className="text-sm text-destructive" role="alert">
-                {state.fieldErrors.unitPrice}
-              </p>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="line-type">Type</Label>
-            <Select name="type" defaultValue={item?.type ?? "qty"}>
-              <SelectTrigger id="line-type" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {QUOTE_ITEM_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type === "discount" ? "discount (subtracts)" : type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
-          {options.length > 0 ? (
-            <div className="space-y-2">
-              <Label htmlFor="line-option">Applies to</Label>
-              <Select
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {QUOTE_ITEM_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type === "discount" ? "discount (subtracts)" : type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {options.length > 0 ? (
+              <FormField
+                control={form.control}
                 name="optionId"
-                defaultValue={item?.optionId ?? defaultOptionId ?? "none"}
-              >
-                <SelectTrigger id="line-option" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">All options</SelectItem>
-                  {options.map((option) => (
-                    <SelectItem key={option.id} value={option.id}>
-                      {option.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <input type="hidden" name="optionId" value="none" />
-          )}
-        </div>
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Applies to</FormLabel>
+                    <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">All options</SelectItem>
+                        {options.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              // No options to choose between, but the field still has to reach
+              // the action — the schema requires it.
+              <input type="hidden" name="optionId" value="none" />
+            )}
+          </div>
 
-        <div className="flex flex-col gap-2 pt-2 sm:flex-row-reverse sm:justify-start">
-          <SubmitButton />
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            className="w-full sm:w-auto"
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </Panel>
+          <div className="flex flex-col gap-2 pt-2 sm:flex-row-reverse sm:justify-start">
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full sm:w-auto"
+              loading={isPending}
+            >
+              {isPending ? "Saving…" : "Save line"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Panel>
+    </Form>
   );
 }

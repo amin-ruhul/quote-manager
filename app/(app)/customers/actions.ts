@@ -7,7 +7,8 @@ import { customers } from "@/db/schema";
 import { requireBusiness } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { toFieldErrors } from "@/lib/form-state";
-import { customerSchema, idSchema } from "@/lib/validation";
+import { customerSchema } from "@/lib/schemas/customer";
+import { idSchema } from "@/lib/schemas/shared";
 
 export type CustomerFormState = {
   error: string | null;

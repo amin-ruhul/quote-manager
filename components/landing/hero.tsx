@@ -81,7 +81,7 @@ export function Hero() {
         <RevealItem>
           <div className="mt-8">
             <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link href="/login">Start free — no card</Link>
+              <Link href="/register">Start free — no card</Link>
             </Button>
           </div>
         </RevealItem>

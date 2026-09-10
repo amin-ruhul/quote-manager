@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
 import { deletePushSubscription } from "@/lib/push";
 import { rateLimit } from "@/lib/rate-limit";
-import { pushUnsubscribeSchema } from "@/lib/validation";
+import { pushUnsubscribeSchema } from "@/lib/schemas/push";
 
 /*
  * Turns alerts off for one device (SPEC §15). The delete is scoped to the

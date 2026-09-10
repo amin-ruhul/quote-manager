@@ -85,7 +85,7 @@ export default function HomePage() {
               Set up your pricebook once. Quote in minutes after that.
             </p>
             <Button asChild size="lg" className="mt-8 w-full sm:w-auto">
-              <Link href="/login">Start free — no card</Link>
+              <Link href="/register">Start free — no card</Link>
             </Button>
             <p className="mt-4 text-sm text-ink-60">
               5 quotes a month, free forever. No card to start.

@@ -1,10 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 
-import { customerName } from "@/lib/customers";
 import {
   type QuoteFormState,
   saveQuoteDetails,
@@ -12,8 +9,15 @@ import {
 import { Panel } from "@/components/panel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -23,7 +27,13 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { Customer, Quote } from "@/db/schema";
+import { customerName } from "@/lib/customers";
 import { centsToInputValue } from "@/lib/money";
+import {
+  type QuoteDetailsFields,
+  quoteDetailsSchema,
+} from "@/lib/schemas/quote";
+import { useActionForm } from "@/lib/use-action-form";
 
 const initialState: QuoteFormState = {
   error: null,
@@ -31,19 +41,22 @@ const initialState: QuoteFormState = {
   savedAt: null,
 };
 
-function SaveButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" size="lg" className="w-full" disabled={pending}>
-      {pending ? "Saving…" : "Save draft"}
-    </Button>
-  );
-}
-
 /** yyyy-mm-dd for <input type="date">. */
 function toDateInput(value: Date | null): string {
   if (!value) return "";
   return new Date(value).toISOString().slice(0, 10);
+}
+
+function defaultsFor(quote: Quote): QuoteDetailsFields {
+  return {
+    title: quote.title,
+    // "none" is the sentinel the Select needs; Radix cannot hold "".
+    customerId: quote.customerId ?? "none",
+    scopeOfWork: quote.scopeOfWork ?? "",
+    discount: quote.discount > 0 ? centsToInputValue(quote.discount) : "",
+    validUntil: toDateInput(quote.validUntil),
+    terms: quote.terms ?? "",
+  };
 }
 
 export function QuoteDetailsForm({
@@ -55,131 +68,165 @@ export function QuoteDetailsForm({
   customers: Customer[];
   onAddCustomer: () => void;
 }) {
-  const [state, formAction] = useActionState<QuoteFormState, FormData>(
-    async (prevState, formData) => {
+  const { form, onSubmit, state, isPending } = useActionForm({
+    schema: quoteDetailsSchema,
+    defaultValues: defaultsFor(quote),
+    initialState,
+    action: async (prevState, formData) => {
       const result = await saveQuoteDetails(prevState, formData);
       if (result.savedAt) toast.success("Draft saved.");
       return result;
     },
-    initialState,
-  );
+  });
 
   return (
-    <Panel asChild>
-      <form action={formAction} className="space-y-4" noValidate>
-        <input type="hidden" name="quoteId" value={quote.id} />
+    <Form {...form}>
+      <Panel asChild>
+        <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <input type="hidden" name="quoteId" value={quote.id} />
 
-        {state.error ? (
-          <Alert variant="destructive">
-            <AlertDescription>{state.error}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        <div className="space-y-2">
-          <Label htmlFor="title">Job title</Label>
-          <Input
-            id="title"
-            name="title"
-            defaultValue={quote.title}
-            required
-            placeholder="Panel replacement"
-          />
-          {state.fieldErrors.title ? (
-            <p className="text-sm text-destructive" role="alert">
-              {state.fieldErrors.title}
-            </p>
+          {state.error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
           ) : null}
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="customerId">Customer</Label>
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={onAddCustomer}
-            >
-              New customer
-            </Button>
-          </div>
-          <Select name="customerId" defaultValue={quote.customerId ?? "none"}>
-            <SelectTrigger id="customerId" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">No customer yet</SelectItem>
-              {customers.map((customer) => (
-                <SelectItem key={customer.id} value={customer.id}>
-                  {customerName(customer)}
-                  {customer.company ? ` · ${customer.company}` : ""}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Job title</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Panel replacement" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="space-y-2">
-          <Label htmlFor="scopeOfWork">Scope of work</Label>
-          <Textarea
-            id="scopeOfWork"
+          <FormField
+            control={form.control}
+            name="customerId"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center justify-between">
+                  <FormLabel>Customer</FormLabel>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    onClick={onAddCustomer}
+                  >
+                    New customer
+                  </Button>
+                </div>
+                <Select
+                  name={field.name}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="none">No customer yet</SelectItem>
+                    {customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {customerName(customer)}
+                        {customer.company ? ` · ${customer.company}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="scopeOfWork"
-            rows={4}
-            defaultValue={quote.scopeOfWork ?? ""}
-            placeholder="What you'll do, in plain English."
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Scope of work</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={4}
+                    placeholder="What you'll do, in plain English."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="discount">Discount</Label>
-            <Input
-              id="discount"
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
               name="discount"
-              inputMode="decimal"
-              className="tabular"
-              defaultValue={
-                quote.discount > 0 ? centsToInputValue(quote.discount) : ""
-              }
-              placeholder="0.00"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Discount</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      inputMode="decimal"
+                      className="tabular"
+                      placeholder="0.00"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {state.fieldErrors.discount ? (
-              <p className="text-sm text-destructive" role="alert">
-                {state.fieldErrors.discount}
-              </p>
-            ) : null}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="validUntil">Valid until</Label>
-            <Input
-              id="validUntil"
+            <FormField
+              control={form.control}
               name="validUntil"
-              type="date"
-              className="tabular"
-              defaultValue={toDateInput(quote.validUntil)}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valid until</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="date" className="tabular" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {state.fieldErrors.validUntil ? (
-              <p className="text-sm text-destructive" role="alert">
-                {state.fieldErrors.validUntil}
-              </p>
-            ) : null}
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="terms">Terms &amp; warranty</Label>
-          <Textarea
-            id="terms"
+          <FormField
+            control={form.control}
             name="terms"
-            rows={4}
-            defaultValue={quote.terms ?? ""}
-            placeholder="Payment terms, warranty, permit responsibility…"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Terms &amp; warranty</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={4}
+                    placeholder="Payment terms, warranty, permit responsibility…"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <SaveButton />
-      </form>
-    </Panel>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full"
+            loading={isPending}
+          >
+            {isPending ? "Saving…" : "Save draft"}
+          </Button>
+        </form>
+      </Panel>
+    </Form>
   );
 }

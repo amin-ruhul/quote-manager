@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
 import { savePushSubscription } from "@/lib/push";
 import { rateLimit } from "@/lib/rate-limit";
-import { pushSubscriptionSchema } from "@/lib/validation";
+import { pushSubscriptionSchema } from "@/lib/schemas/push";
 
 /*
  * Registers a device for push alerts (SPEC §15).

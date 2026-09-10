@@ -24,6 +24,20 @@ import type { Business } from "@/db/schema";
 export type SessionUser = { id: string; email: string | null };
 
 /**
+ * The name typed at registration, which lives on the auth user's metadata until
+ * a session exists to copy it into `profiles`. Metadata is untyped by
+ * definition, so it is read defensively rather than trusted.
+ */
+export function fullNameFromMetadata(
+  metadata: Record<string, unknown> | undefined,
+): string | null {
+  const value = metadata?.full_name;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed === "" ? null : trimmed;
+}
+
+/**
  * The signed-in user, or null.
  *
  * Uses getClaims() rather than getUser(): this project signs JWTs with ES256
@@ -63,11 +77,19 @@ export async function requireUser(): Promise<SessionUser> {
 /**
  * Every auth user gets exactly one profile row. Created on first authenticated
  * request rather than by a database trigger, so the logic stays in the repo.
+ *
+ * The name is typed at registration, but with email confirmation switched on
+ * there is no session then — so it is parked on the auth user's metadata and
+ * copied down here, on the first request that actually has a session.
  */
-export async function ensureProfile(userId: string, email: string) {
+export async function ensureProfile(
+  userId: string,
+  email: string,
+  fullName?: string | null,
+) {
   await db
     .insert(profiles)
-    .values({ id: userId, email })
+    .values({ id: userId, email, fullName: fullName ?? null })
     .onConflictDoNothing({ target: profiles.id });
 }
 

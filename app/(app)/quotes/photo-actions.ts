@@ -13,7 +13,7 @@ import {
 import { db } from "@/lib/db";
 import { requireOwnedQuote } from "@/lib/quotes";
 import { createClient } from "@/lib/supabase/server";
-import { idSchema } from "@/lib/validation";
+import { idSchema } from "@/lib/schemas/shared";
 
 export async function uploadQuotePhoto(
   formData: FormData,

@@ -1,78 +1,105 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { useFormStatus } from "react-dom";
+import Link from "next/link";
 
-import { type AuthState, signIn, signUp } from "@/app/login/actions";
+import { signIn } from "@/app/login/actions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import type { ActionState } from "@/lib/form-state";
+import { signInSchema } from "@/lib/schemas/auth";
+import { useActionForm } from "@/lib/use-action-form";
 
-const initialState: AuthState = { error: null };
+const initialState: ActionState = { error: null, fieldErrors: {} };
 
-function SubmitButton({ label }: { label: string }) {
-  const { pending } = useFormStatus();
+export function LoginForm({ next }: { next: string }) {
+  const { form, onSubmit, state, isPending } = useActionForm({
+    schema: signInSchema,
+    defaultValues: { email: "", password: "", next },
+    initialState,
+    action: signIn,
+  });
+
   return (
-    <Button type="submit" size="lg" className="w-full" disabled={pending}>
-      {pending ? "Working…" : label}
-    </Button>
+    <Form {...form}>
+      <form onSubmit={onSubmit} className="space-y-4" noValidate>
+        <input type="hidden" name="next" value={next} />
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  placeholder="you@yourcompany.com"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Your password"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {state.error ? (
+          <Alert variant="destructive">
+            <AlertDescription>{state.error}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <Button type="submit" size="lg" className="w-full" loading={isPending}>
+          {isPending ? "Signing in…" : "Sign in"}
+        </Button>
+      </form>
+    </Form>
   );
 }
 
-export function LoginForm({ next }: { next: string }) {
-  const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
-  const action = mode === "signIn" ? signIn : signUp;
-  const [state, formAction] = useActionState(action, initialState);
-
+/**
+ * Outside the form so it is not swallowed by the card's rhythm — the way off
+ * this page needs to be obvious to someone who came here by mistake.
+ */
+export function LoginFooter() {
   return (
-    <form action={formAction} className="space-y-4" noValidate>
-      <input type="hidden" name="next" value={next} />
-
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          inputMode="email"
-          required
-          placeholder="you@yourcompany.com"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete={mode === "signIn" ? "current-password" : "new-password"}
-          required
-          minLength={8}
-          placeholder="At least 8 characters"
-        />
-      </div>
-
-      {state.error ? (
-        <Alert variant="destructive">
-          <AlertDescription>{state.error}</AlertDescription>
-        </Alert>
-      ) : null}
-
-      <SubmitButton label={mode === "signIn" ? "Sign in" : "Create account"} />
-
-      <p className="text-center text-sm text-ink-60">
-        {mode === "signIn" ? "New to QuotePilot?" : "Already have an account?"}{" "}
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signIn" ? "signUp" : "signIn")}
-          className="font-medium text-brand underline-offset-4 hover:underline"
-        >
-          {mode === "signIn" ? "Create an account" : "Sign in"}
-        </button>
-      </p>
-    </form>
+    <p className="mt-6 text-center text-sm text-ink-60">
+      New to QuotePilot?{" "}
+      <Link
+        href="/register"
+        className="font-medium text-brand underline-offset-4 hover:underline"
+      >
+        Create an account
+      </Link>
+    </p>
   );
 }

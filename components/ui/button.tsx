@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
+import { Loader2 } from "lucide-react";
 import { Slot } from "radix-ui";
 
 import { cn } from "@/lib/utils";
@@ -55,12 +56,29 @@ function Button({
   variant = "default",
   size = "default",
   asChild = false,
+  loading = false,
+  disabled,
+  children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
+    /**
+     * Shows a spinner inline, before the label, and blocks further presses.
+     * Every button that starts async work should set this — on a phone with one
+     * bar, a button that looks idle while it works gets pressed twice.
+     */
+    loading?: boolean;
   }) {
   const Comp = asChild ? Slot.Root : "button";
+
+  /*
+   * A Slot takes exactly one child — and counts a null sibling as a second one,
+   * which fails the render. So asChild passes `children` straight through and
+   * never gets a spinner. That costs nothing: everything using asChild is a
+   * link or a menu trigger, something that navigates rather than waits.
+   */
+  const isLoading = loading && !asChild;
 
   return (
     <Comp
@@ -68,8 +86,22 @@ function Button({
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
+      // Not just visual: this is what stops a second submit mid-flight.
+      disabled={disabled || isLoading}
+      aria-busy={isLoading || undefined}
       {...props}
-    />
+    >
+      {asChild ? (
+        children
+      ) : (
+        <>
+          {isLoading ? (
+            <Loader2 data-slot="button-spinner" className="animate-spin" />
+          ) : null}
+          {children}
+        </>
+      )}
+    </Comp>
   );
 }
 

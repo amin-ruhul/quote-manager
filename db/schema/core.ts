@@ -16,6 +16,8 @@ import {
   DEFAULT_INDUSTRY,
   DEFAULT_PLAN,
   DEFAULT_PRICEBOOK_UNIT,
+  type Currency,
+  type PricebookUnit,
 } from "@/lib/constants";
 
 /*
@@ -39,6 +41,8 @@ export const profiles = pgTable(
       .primaryKey()
       .references(() => authUsers.id, { onDelete: "cascade" }),
     email: text("email").notNull(),
+    /** Typed at registration. Nullable: accounts created before it existed. */
+    fullName: text("full_name"),
     plan: text("plan").notNull().default(DEFAULT_PLAN),
     paddleCustomerId: text("paddle_customer_id"),
     quotesUsedThisMonth: integer("quotes_used_this_month").notNull().default(0),
@@ -82,7 +86,10 @@ export const businesses = pgTable(
     address: text("address"),
     licenseNumber: text("license_number"),
     industry: text("industry").notNull().default(DEFAULT_INDUSTRY),
-    currency: text("currency").notNull().default(DEFAULT_CURRENCY),
+    currency: text("currency")
+      .$type<Currency>()
+      .notNull()
+      .default(DEFAULT_CURRENCY),
     /** Integer basis points: 8.25% is 825. */
     defaultTaxRate: integer("default_tax_rate").notNull().default(0),
     settings: jsonb("settings").notNull().default({}),
@@ -111,7 +118,12 @@ export const pricebookItems = pgTable(
     name: text("name").notNull(),
     description: text("description"),
     category: text("category"),
-    unit: text("unit").notNull().default(DEFAULT_PRICEBOOK_UNIT),
+    // Stored as text so adding a unit needs no migration; narrowed here so the
+    // union in lib/constants stays the one source of truth (no SQL change).
+    unit: text("unit")
+      .$type<PricebookUnit>()
+      .notNull()
+      .default(DEFAULT_PRICEBOOK_UNIT),
     /** Integer cents. */
     price: integer("price").notNull(),
     /** Integer cents. Optional — what the item costs the business. */

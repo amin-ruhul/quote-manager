@@ -96,7 +96,7 @@ export function LandingNav() {
             view, which DESIGN.md rules out.
           */}
           <Button asChild size="sm" variant="soft">
-            <Link href="/login">Start free</Link>
+            <Link href="/register">Start free</Link>
           </Button>
 
           <button

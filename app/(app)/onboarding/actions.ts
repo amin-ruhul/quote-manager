@@ -17,7 +17,7 @@ import {
 import { db } from "@/lib/db";
 import { toFieldErrors } from "@/lib/form-state";
 import { createClient } from "@/lib/supabase/server";
-import { businessProfileSchema } from "@/lib/validation";
+import { businessProfileSchema } from "@/lib/schemas/business";
 
 export type BusinessFormState = {
   error: string | null;
@@ -142,7 +142,8 @@ export async function saveBusinessProfile(
     address: formData.get("address") ?? "",
     licenseNumber: formData.get("licenseNumber") ?? "",
     currency: formData.get("currency") ?? "USD",
-    followUpDays: formData.get("followUpDays") ?? DEFAULT_FOLLOW_UP_DAYS,
+    followUpDays:
+      formData.get("followUpDays") ?? String(DEFAULT_FOLLOW_UP_DAYS),
     defaultTaxRate: formData.get("defaultTaxRate") ?? "",
   });
 

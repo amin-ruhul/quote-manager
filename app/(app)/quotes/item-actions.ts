@@ -9,7 +9,8 @@ import { db } from "@/lib/db";
 import { toFieldErrors } from "@/lib/form-state";
 import { lineTotal } from "@/lib/quote-math";
 import { recalculateQuote, requireOwnedQuote } from "@/lib/quotes";
-import { idSchema, quoteItemSchema, quoteOptionSchema } from "@/lib/validation";
+import { quoteItemSchema, quoteOptionSchema } from "@/lib/schemas/quote";
+import { idSchema } from "@/lib/schemas/shared";
 import type { QuoteFormState } from "@/app/(app)/quotes/actions";
 
 /** Next position for a child row, so new lines land at the bottom. */

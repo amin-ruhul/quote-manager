@@ -7,7 +7,8 @@ import { pricebookItems } from "@/db/schema";
 import { requireBusiness } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { toFieldErrors } from "@/lib/form-state";
-import { idSchema, pricebookItemSchema } from "@/lib/validation";
+import { pricebookItemSchema } from "@/lib/schemas/pricebook";
+import { idSchema } from "@/lib/schemas/shared";
 
 export type PricebookFormState = {
   error: string | null;

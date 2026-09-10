@@ -119,7 +119,7 @@ export function Pricing() {
               variant={plan.highlighted ? "default" : "soft"}
               className="mt-6 w-full"
             >
-              <Link href="/login">{plan.cta}</Link>
+              <Link href="/register">{plan.cta}</Link>
             </Button>
           </div>
         ))}

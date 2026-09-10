@@ -1,7 +1,5 @@
 "use client";
 
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 
 import {
@@ -11,10 +9,19 @@ import {
 import { Panel } from "@/components/panel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Customer } from "@/db/schema";
+import { type CustomerFields, customerSchema } from "@/lib/schemas/customer";
+import { useActionForm } from "@/lib/use-action-form";
 
 const initialState: CustomerFormState = {
   error: null,
@@ -23,42 +30,16 @@ const initialState: CustomerFormState = {
   savedId: null,
 };
 
-function SubmitButton({ isNew }: { isNew: boolean }) {
-  const { pending } = useFormStatus();
-  return (
-    <Button
-      type="submit"
-      size="lg"
-      className="w-full sm:w-auto"
-      disabled={pending}
-    >
-      {pending ? "Saving…" : isNew ? "Add customer" : "Save changes"}
-    </Button>
-  );
-}
-
-function Field({
-  id,
-  label,
-  error,
-  children,
-}: {
-  id: string;
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      {children}
-      {error ? (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      ) : null}
-    </div>
-  );
+function defaultsFor(customer: Customer | null): CustomerFields {
+  return {
+    firstName: customer?.firstName ?? "",
+    lastName: customer?.lastName ?? "",
+    company: customer?.company ?? "",
+    phone: customer?.phone ?? "",
+    email: customer?.email ?? "",
+    address: customer?.address ?? "",
+    notes: customer?.notes ?? "",
+  };
 }
 
 export function CustomerForm({
@@ -70,8 +51,11 @@ export function CustomerForm({
   onClose: () => void;
   onSaved?: (customerId: string) => void;
 }) {
-  const [state, formAction] = useActionState<CustomerFormState, FormData>(
-    async (prevState, formData) => {
+  const { form, onSubmit, state, isPending } = useActionForm({
+    schema: customerSchema,
+    defaultValues: defaultsFor(customer),
+    initialState,
+    action: async (prevState, formData) => {
       const result = await saveCustomer(prevState, formData);
       if (result.savedAt) {
         toast.success(customer ? "Customer updated." : "Customer added.");
@@ -80,117 +64,179 @@ export function CustomerForm({
       }
       return result;
     },
-    initialState,
-  );
+  });
 
   return (
-    <Panel asChild>
-      <form action={formAction} className="space-y-4" noValidate>
-        <h2 className="font-semibold">
-          {customer ? "Edit customer" : "New customer"}
-        </h2>
+    // FormProvider renders no DOM of its own, so it sits outside the Panel —
+    // Panel's asChild needs a real element (the <form>) to merge into.
+    <Form {...form}>
+      <Panel asChild>
+        <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <h2 className="font-semibold">
+            {customer ? "Edit customer" : "New customer"}
+          </h2>
 
-        {customer ? (
-          <input type="hidden" name="id" value={customer.id} />
-        ) : null}
+          {customer ? (
+            <input type="hidden" name="id" value={customer.id} />
+          ) : null}
 
-        {state.error ? (
-          <Alert variant="destructive">
-            <AlertDescription>{state.error}</AlertDescription>
-          </Alert>
-        ) : null}
+          {state.error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
+          ) : null}
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="firstName"
-            label="First name"
-            error={state.fieldErrors.firstName}
-          >
-            <Input
-              id="firstName"
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
               name="firstName"
-              defaultValue={customer?.firstName ?? ""}
-              required
-              autoComplete="given-name"
-              placeholder="John"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First name</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      autoComplete="given-name"
+                      placeholder="John"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </Field>
-          <Field id="lastName" label="Last name">
-            <Input
-              id="lastName"
+            <FormField
+              control={form.control}
               name="lastName"
-              defaultValue={customer?.lastName ?? ""}
-              autoComplete="family-name"
-              placeholder="Doe"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last name</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      autoComplete="family-name"
+                      placeholder="Doe"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </Field>
-        </div>
+          </div>
 
-        <Field id="company" label="Company">
-          <Input
-            id="company"
+          <FormField
+            control={form.control}
             name="company"
-            defaultValue={customer?.company ?? ""}
-            placeholder="Optional"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Company</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Optional" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </Field>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="phone" label="Phone">
-            <Input
-              id="phone"
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
               name="phone"
-              type="tel"
-              inputMode="tel"
-              defaultValue={customer?.phone ?? ""}
-              placeholder="(555) 123-4567"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="tel"
+                      inputMode="tel"
+                      placeholder="(555) 123-4567"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </Field>
-          <Field id="email" label="Email" error={state.fieldErrors.email}>
-            <Input
-              id="email"
+            <FormField
+              control={form.control}
               name="email"
-              type="email"
-              inputMode="email"
-              defaultValue={customer?.email ?? ""}
-              placeholder="john@example.com"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="email"
+                      inputMode="email"
+                      placeholder="john@example.com"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </Field>
-        </div>
+          </div>
 
-        <Field id="address" label="Job address">
-          <Textarea
-            id="address"
+          <FormField
+            control={form.control}
             name="address"
-            rows={2}
-            defaultValue={customer?.address ?? ""}
-            placeholder="12 Anywhere St, Springfield"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Job address</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={2}
+                    placeholder="12 Anywhere St, Springfield"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </Field>
 
-        <Field id="notes" label="Notes">
-          <Textarea
-            id="notes"
+          <FormField
+            control={form.control}
             name="notes"
-            rows={2}
-            defaultValue={customer?.notes ?? ""}
-            placeholder="Gate code, dog, best time to call…"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Notes</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={2}
+                    placeholder="Gate code, dog, best time to call…"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </Field>
 
-        <div className="flex flex-col gap-2 pt-2 sm:flex-row-reverse sm:justify-start">
-          <SubmitButton isNew={customer === null} />
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            className="w-full sm:w-auto"
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </Panel>
+          <div className="flex flex-col gap-2 pt-2 sm:flex-row-reverse sm:justify-start">
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full sm:w-auto"
+              loading={isPending}
+            >
+              {isPending
+                ? "Saving…"
+                : customer
+                  ? "Save changes"
+                  : "Add customer"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Panel>
+    </Form>
   );
 }

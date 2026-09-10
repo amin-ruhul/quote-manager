@@ -32,7 +32,7 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
     {
       heading: "Get started",
       links: [
-        { label: "Start free", href: "/login" },
+        { label: "Start free", href: "/register" },
         { label: "Log in", href: "/login" },
         { label: "Guides", href: "/guides" },
       ],

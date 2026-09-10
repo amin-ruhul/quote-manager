@@ -16,7 +16,11 @@ import {
   draftQuote,
   toScaledQuantity,
 } from "@/lib/ai";
-import { MAX_DESCRIPTION_LENGTH } from "@/lib/constants";
+import {
+  MAX_DESCRIPTION_LENGTH,
+  PRICEBOOK_UNITS,
+  QUOTE_ITEM_TYPES,
+} from "@/lib/constants";
 import { db } from "@/lib/db";
 import { lineTotal } from "@/lib/quote-math";
 import { recalculateQuote, requireOwnedQuote } from "@/lib/quotes";
@@ -122,8 +126,11 @@ const importSchema = z.object({
         name: z.string().trim().min(1).max(200),
         description: z.string().trim().max(MAX_DESCRIPTION_LENGTH),
         quantity: z.number().positive().max(100_000),
-        unit: z.string(),
-        type: z.string(),
+        // These reach the row unchanged, so they are pinned to the unions
+        // rather than accepted as free text — the browser is picking from a
+        // list it was given, and anything else is a tampered payload.
+        unit: z.enum(PRICEBOOK_UNITS),
+        type: z.enum(QUOTE_ITEM_TYPES),
         pricebookItemId: z.uuid().nullable(),
       }),
     )

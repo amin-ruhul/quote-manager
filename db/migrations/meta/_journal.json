@@ -36,6 +36,13 @@
       "when": 1788357489414,
       "tag": "0004_push_subscriptions",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788951427603,
+      "tag": "0005_profile_full_name",
+      "breakpoints": true
     }
   ]
 }

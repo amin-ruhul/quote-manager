@@ -45,7 +45,7 @@ export function PromiseBand() {
                 size="lg"
                 className="mt-8 w-full bg-white text-black hover:bg-white/90 sm:w-auto"
               >
-                <Link href="/login">Start free — no card</Link>
+                <Link href="/register">Start free — no card</Link>
               </Button>
             </div>
 
