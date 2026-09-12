@@ -45,8 +45,17 @@ jobs:
           EVENT: ${{ github.event_name }}
           ISSUE: ${{ github.event.issue.number || inputs.issue }}
           ADDED_LABEL: ${{ github.event.label.name }}
+          # Presence only — never the value.
+          HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
         run: |
           set -euo pipefail
+
+          # Skip rather than fail before the repository is configured, so the
+          # automation does not paint every PR red while it is being set up.
+          if [ "$HAS_KEY" != "true" ]; then
+            echo "::warning::ANTHROPIC_API_KEY is not set — skipping. See .github/AUTOMATION.md."
+            echo "go=false" >>"$GITHUB_OUTPUT"; exit 0
+          fi
 
           labels=$(gh issue view "$ISSUE" --repo "$REPO" --json labels --jq '[.labels[].name] | join(",")')
           state=$(gh issue view "$ISSUE" --repo "$REPO" --json state --jq '.state')

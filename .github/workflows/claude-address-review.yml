@@ -57,12 +57,21 @@ jobs:
           REPO: ${{ github.repository }}
           # `pull_request` and `pull_request_review` both carry .pull_request.
           PR: ${{ github.event.pull_request.number || inputs.pr }}
+          # Presence only — never the value.
+          HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
         run: |
           set -euo pipefail
 
           pr="$PR"
           [ -n "$pr" ] || { echo "::error::Could not determine the PR number."; exit 1; }
           echo "pr=$pr" >>"$GITHUB_OUTPUT"
+
+          # Skip rather than fail before the repository is configured, so the
+          # automation does not paint every PR red while it is being set up.
+          if [ "$HAS_KEY" != "true" ]; then
+            echo "::warning::ANTHROPIC_API_KEY is not set — skipping. See .github/AUTOMATION.md."
+            echo "go=false" >>"$GITHUB_OUTPUT"; exit 0
+          fi
 
           view=$(gh pr view "$pr" --repo "$REPO" --json headRefName,isDraft,state,labels)
           head=$(jq -r '.headRefName' <<<"$view")

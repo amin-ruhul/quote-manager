@@ -164,6 +164,11 @@ opening an issue cannot start a run.
 
 ## When it does not work
 
+**Every Claude workflow says "skipping" with a warning.** `ANTHROPIC_API_KEY`
+is not set. All three stages check for it up front and skip cleanly rather than
+failing, so an unconfigured repository does not show a red check on every PR.
+Add the secret and the next event runs for real.
+
 **Claude opened a PR and nothing reviewed it.** `CLAUDE_GH_TOKEN` is missing or
 expired. Add `claude:review` to the PR to run Stage 2 by hand, then fix the
 token.
