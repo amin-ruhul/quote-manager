@@ -42,9 +42,8 @@ export function QuotePhotos({
   }
 
   return (
+    /* The heading lives on the <CollapsibleSection> that wraps this. */
     <section className="space-y-2">
-      <h2 className="font-semibold">Photos</h2>
-
       {attachments.length === 0 ? (
         <Panel className="text-sm text-ink-60">
           No photos yet. Pictures of the job help a homeowner trust the price.

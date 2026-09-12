@@ -13,8 +13,10 @@ import { QuoteDetailsForm } from "@/app/(app)/quotes/[id]/quote-details-form";
 import { QuoteLines } from "@/app/(app)/quotes/[id]/quote-lines";
 import { QuoteOptionsPanel } from "@/app/(app)/quotes/[id]/quote-options-panel";
 import { QuotePhotos } from "@/app/(app)/quotes/[id]/quote-photos";
+import { QuoteTotalBar } from "@/app/(app)/quotes/[id]/quote-total-bar";
 import { QuoteTotals } from "@/app/(app)/quotes/[id]/quote-totals";
 import { SharePanel } from "@/app/(app)/quotes/[id]/share-panel";
+import { CollapsibleSection } from "@/components/collapsible-section";
 import { QuoteStatusPill } from "@/components/quote-status-pill";
 import {
   AlertDialog,
@@ -36,6 +38,7 @@ import type {
   QuoteOption,
 } from "@/db/schema";
 import type { Currency, QuoteStatus } from "@/lib/constants";
+import { customerName } from "@/lib/customers";
 
 export function QuoteBuilder({
   quote,
@@ -59,6 +62,8 @@ export function QuoteBuilder({
   const [isDeleting, startDeleting] = useTransition();
 
   const sharedItems = items.filter((item) => item.optionId === null);
+  const selectedCustomer =
+    customers.find((c) => c.id === quote.customerId) ?? null;
 
   if (isAddingCustomer) {
     return (
@@ -82,26 +87,42 @@ export function QuoteBuilder({
         <h1 className="text-3xl font-semibold">{quote.title}</h1>
       </header>
 
-      <QuoteDetailsForm
-        quote={quote}
-        customers={customers}
-        onAddCustomer={() => setIsAddingCustomer(true)}
-      />
+      {/*
+       * Order follows the job, not the data model: describe it, price it, see
+       * the number, send it. The details form used to come first and the totals
+       * came last — below the send button — so the owner met a page of optional
+       * metadata before any line item and could send a quote without ever
+       * seeing its price.
+       *
+       * Secondary sections collapse, and their headers carry the answer, so a
+       * quote reads as five decisions rather than fifteen fields.
+       */}
+      <CollapsibleSection
+        title="Details"
+        summary={
+          selectedCustomer ? customerName(selectedCustomer) : "No customer yet"
+        }
+        defaultOpen={!quote.customerId}
+      >
+        <QuoteDetailsForm
+          quote={quote}
+          customers={customers}
+          onAddCustomer={() => setIsAddingCustomer(true)}
+        />
+      </CollapsibleSection>
 
-      <QuoteOptionsPanel
-        quoteId={quote.id}
-        options={options}
-        currency={currency}
-      />
-
-      <section className="space-y-2">
-        <h2 className="font-semibold">Draft from a description</h2>
+      {/* The product's whole point, so it comes before the manual list. */}
+      <CollapsibleSection
+        title="Describe the job"
+        summary={items.length > 0 ? "Drafted" : "Let AI draft the lines"}
+        defaultOpen={items.length === 0}
+      >
         <AiDraftPanel
           quoteId={quote.id}
           currency={currency}
           hasScope={Boolean(quote.scopeOfWork)}
         />
-      </section>
+      </CollapsibleSection>
 
       <div className="space-y-6">
         <h2 className="font-semibold">Line items</h2>
@@ -130,16 +151,35 @@ export function QuoteBuilder({
         ))}
       </div>
 
-      <QuotePhotos quoteId={quote.id} attachments={attachments} />
-
-      <SharePanel
-        quoteId={quote.id}
-        isDraft={quote.status === "draft"}
-        customerEmail={
-          customers.find((c) => c.id === quote.customerId)?.email ?? null
+      <CollapsibleSection
+        title="Options"
+        summary={
+          options.length > 0
+            ? `${options.length} to choose from`
+            : "One price — no Good/Better/Best"
         }
-      />
+        defaultOpen={options.length > 0}
+      >
+        <QuoteOptionsPanel
+          quoteId={quote.id}
+          options={options}
+          currency={currency}
+        />
+      </CollapsibleSection>
 
+      <CollapsibleSection
+        title="Photos"
+        summary={
+          attachments.length > 0
+            ? `${attachments.length} attached`
+            : "None attached"
+        }
+        defaultOpen={attachments.length > 0}
+      >
+        <QuotePhotos quoteId={quote.id} attachments={attachments} />
+      </CollapsibleSection>
+
+      {/* The number, then the send. Never the other way round. */}
       <QuoteTotals
         subtotal={quote.subtotal}
         discount={quote.discount}
@@ -147,6 +187,12 @@ export function QuoteBuilder({
         taxRate={quote.taxRate}
         total={quote.total}
         currency={currency}
+      />
+
+      <SharePanel
+        quoteId={quote.id}
+        isDraft={quote.status === "draft"}
+        customerEmail={selectedCustomer?.email ?? null}
       />
 
       <div className="flex flex-col gap-2 border-t border-hairline pt-6 sm:flex-row-reverse sm:justify-start">
@@ -198,6 +244,17 @@ export function QuoteBuilder({
           </AlertDialogContent>
         </AlertDialog>
       </div>
+
+      {/*
+       * Last in the flow so that, being sticky, it stays pinned to the bottom
+       * of the viewport for the whole scroll rather than only appearing once
+       * you reach it.
+       */}
+      <QuoteTotalBar
+        total={quote.total}
+        currency={currency}
+        itemCount={items.length}
+      />
     </div>
   );
 }

@@ -154,16 +154,16 @@ export function QuoteOptionsPanel({
   }
 
   return (
+    /* The heading lives on the <CollapsibleSection> that wraps this. */
     <section className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold">Options</h2>
-        {!isAdding ? (
+      {!isAdding ? (
+        <div className="flex justify-end">
           <Button variant="ghost" size="sm" onClick={() => setIsAdding(true)}>
             <Plus />
             Add
           </Button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       {options.length === 0 && !isAdding ? (
         <Panel className="text-sm text-ink-60">
