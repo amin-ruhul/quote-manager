@@ -2,10 +2,14 @@ import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { QuoteBuilder } from "@/app/(app)/quotes/[id]/quote-builder";
+import { QuoteWorkspace } from "@/app/(app)/quotes/[id]/quote-workspace";
+import { QuoteDocument } from "@/components/quote/quote-document";
+import { QuotePreview } from "@/components/quote/quote-preview";
 import { customers, pricebookItems } from "@/db/schema";
 import { requireBusiness } from "@/lib/auth";
 import type { Currency } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { getQuoteByPublicToken } from "@/lib/public-quote";
 import { getQuoteForBusiness } from "@/lib/quotes";
 
 export const metadata = { title: "Edit quote · QuotePilot" };
@@ -41,19 +45,37 @@ export default async function QuoteBuilderPage({
 
   if (!quote) notFound();
 
+  /*
+   * The preview is read through the customer's own loader rather than rebuilt
+   * from the rows above. It costs one query the owner's page can afford, and it
+   * buys the guarantee the preview exists for: identical data, identical shape,
+   * identical component — so it cannot quietly disagree with what is sent.
+   *
+   * This is a read. It does not record a view; only /q/[token] does that.
+   */
+  const publicQuote = await getQuoteByPublicToken(quote.quote.publicToken);
+  const printUrl = `/q/${quote.quote.publicToken}/print`;
+
   return (
-    // A quote builder is a form: it keeps the reading column even though
-    // the shell now allows 1200px.
-    <div className="mx-auto max-w-3xl">
-      <QuoteBuilder
-        quote={quote.quote}
-        items={quote.items}
-        options={quote.options}
-        attachments={quote.attachments}
-        customers={customerRows}
-        pricebook={pricebookRows}
-        currency={business.currency as Currency}
-      />
-    </div>
+    <QuoteWorkspace
+      editor={
+        <QuoteBuilder
+          quote={quote.quote}
+          items={quote.items}
+          options={quote.options}
+          attachments={quote.attachments}
+          customers={customerRows}
+          pricebook={pricebookRows}
+          currency={business.currency as Currency}
+        />
+      }
+      preview={
+        publicQuote ? (
+          <QuotePreview printUrl={printUrl}>
+            <QuoteDocument quote={publicQuote} />
+          </QuotePreview>
+        ) : null
+      }
+    />
   );
 }
