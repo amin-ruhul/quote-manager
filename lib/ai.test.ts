@@ -171,6 +171,69 @@ describe("normalizeDraft — tolerating bad output", () => {
     expect(draft.lineItems[0]?.type).toBe("qty");
   });
 
+  it("keeps a unit the business added to its own pricebook", () => {
+    const withCustomUnit: PricebookEntry[] = [
+      ...pricebook,
+      {
+        id: "33333333-3333-4333-8333-333333333333",
+        name: "Baseboard heat run",
+        description: null,
+        category: "Heating",
+        // Not one of SUGGESTED_PRICEBOOK_UNITS — this owner typed it.
+        unit: "run",
+        price: 42000,
+      },
+    ];
+
+    const draft = normalizeDraft(
+      {
+        scope_of_work: "",
+        line_items: [
+          {
+            name: "Baseboard heat run",
+            description: "",
+            quantity: 2,
+            unit: "run",
+            type: "qty",
+            pricebook_item_id: withCustomUnit[2]!.id,
+            unit_price: 1,
+            needs_price: false,
+          },
+        ],
+        suggested_additions: [],
+      },
+      withCustomUnit,
+    );
+
+    expect(draft.lineItems[0]?.unit).toBe("run");
+    // And the price is still the pricebook's, not the model's.
+    expect(draft.lineItems[0]?.unitPrice).toBe(42000);
+  });
+
+  it("falls back to the matched item's unit when the model invents one", () => {
+    const draft = normalizeDraft(
+      {
+        scope_of_work: "",
+        line_items: [
+          {
+            name: "Standard Labor",
+            description: "",
+            quantity: 3,
+            unit: "fortnight",
+            type: "hourly",
+            pricebook_item_id: pricebook[1]!.id,
+            unit_price: null,
+            needs_price: false,
+          },
+        ],
+        suggested_additions: [],
+      },
+      pricebook,
+    );
+
+    expect(draft.lineItems[0]?.unit).toBe("hour");
+  });
+
   it("never produces a zero or negative quantity", () => {
     const draft = normalizeDraft(
       {

@@ -7,6 +7,7 @@ import {
   savePricebookItem,
 } from "@/app/(app)/pricebook/actions";
 import { Panel } from "@/components/panel";
+import { SelectOrAdd } from "@/components/select-or-add";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,16 +19,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { PricebookItem } from "@/db/schema";
-import { DEFAULT_PRICEBOOK_UNIT, PRICEBOOK_UNITS } from "@/lib/constants";
+import {
+  DEFAULT_PRICEBOOK_UNIT,
+  SUGGESTED_PRICEBOOK_CATEGORIES,
+  SUGGESTED_PRICEBOOK_UNITS,
+} from "@/lib/constants";
 import { centsToInputValue } from "@/lib/money";
 import {
   type PricebookItemFields,
@@ -58,10 +56,14 @@ function defaultsFor(item: PricebookItem | null): PricebookItemFields {
 export function PricebookItemDialog({
   item,
   categories,
+  units,
   onClose,
 }: {
   item: PricebookItem | null;
+  /** Categories this business already uses, on top of the suggested ones. */
   categories: string[];
+  /** Units this business has added, on top of the suggested ones. */
+  units: string[];
   onClose: () => void;
 }) {
   const { form, onSubmit, state, isPending } = useActionForm({
@@ -115,7 +117,7 @@ export function PricebookItemDialog({
                 <FormControl>
                   <Textarea
                     {...field}
-                    rows={2}
+                    rows={4}
                     placeholder="What the customer gets for this price."
                   />
                 </FormControl>
@@ -150,26 +152,17 @@ export function PricebookItemDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Unit</FormLabel>
-                  {/* Radix renders its own hidden native select for `name`, so
-                      the value reaches FormData as well as React Hook Form. */}
-                  <Select
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {PRICEBOOK_UNITS.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <SelectOrAdd
+                      name={field.name}
+                      value={field.value}
+                      onChange={field.onChange}
+                      suggestions={SUGGESTED_PRICEBOOK_UNITS}
+                      used={units}
+                      addLabel="Add your own unit…"
+                      inputPlaceholder="e.g. run"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -183,17 +176,22 @@ export function PricebookItemDialog({
               <FormItem>
                 <FormLabel>Category</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    list="pricebook-categories"
-                    placeholder="Lighting"
+                  <SelectOrAdd
+                    name={field.name}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    suggestions={SUGGESTED_PRICEBOOK_CATEGORIES}
+                    used={categories}
+                    placeholder="Pick a category"
+                    emptyLabel="No category"
+                    addLabel="Add your own category…"
+                    inputPlaceholder="e.g. Pool & Spa"
                   />
                 </FormControl>
-                <datalist id="pricebook-categories">
-                  {categories.map((category) => (
-                    <option key={category} value={category} />
-                  ))}
-                </datalist>
+                {/* No hint here: the list's own last row says "Add your own
+                    category…", which shows the affordance instead of
+                    describing it — and Unit has no hint, so one under Category
+                    only read as an asymmetry. */}
                 <FormMessage />
               </FormItem>
             )}

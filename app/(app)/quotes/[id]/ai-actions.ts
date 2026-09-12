@@ -18,13 +18,14 @@ import {
 } from "@/lib/ai";
 import {
   MAX_DESCRIPTION_LENGTH,
-  PRICEBOOK_UNITS,
+  MAX_QUANTITY,
   QUOTE_ITEM_TYPES,
 } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { lineTotal } from "@/lib/quote-math";
 import { recalculateQuote, requireOwnedQuote } from "@/lib/quotes";
 import { rateLimit } from "@/lib/rate-limit";
+import { pricebookUnit } from "@/lib/schemas/shared";
 
 export type DraftState = {
   error: string | null;
@@ -125,11 +126,16 @@ const importSchema = z.object({
       z.object({
         name: z.string().trim().min(1).max(200),
         description: z.string().trim().max(MAX_DESCRIPTION_LENGTH),
-        quantity: z.number().positive().max(100_000),
-        // These reach the row unchanged, so they are pinned to the unions
-        // rather than accepted as free text — the browser is picking from a
-        // list it was given, and anything else is a tampered payload.
-        unit: z.enum(PRICEBOOK_UNITS),
+        // The same ceiling the line form enforces — this path writes the same
+        // column, so a looser cap here would just be the overflow's back door.
+        quantity: z.number().positive().max(MAX_QUANTITY),
+        /*
+         * `type` reaches the row unchanged and drives the money math, so it
+         * stays pinned to its union — anything else is a tampered payload.
+         * `unit` is a label the owner may have invented, so it can only be
+         * length-capped, not enumerated.
+         */
+        unit: pricebookUnit,
         type: z.enum(QUOTE_ITEM_TYPES),
         pricebookItemId: z.uuid().nullable(),
       }),

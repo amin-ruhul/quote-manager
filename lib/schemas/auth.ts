@@ -1,27 +1,31 @@
 import { z } from "zod";
 
-import { MAX_NAME_LENGTH } from "@/lib/constants";
+import {
+  MAX_EMAIL_LENGTH,
+  MAX_NAME_LENGTH,
+  MAX_PASSWORD_LENGTH,
+} from "@/lib/constants";
+import { safeRedirectPath } from "@/lib/schemas/shared";
 
-/**
- * Where the owner lands after signing in. It must be a path on this site, or
- * the login page becomes an open redirect. "/" alone is not enough —
- * "//evil.com" is protocol-relative and the browser treats it as absolute. An
- * unusable value falls back rather than failing the sign-in: it is not
- * something the owner typed or can fix.
- */
-const nextPath = z
-  .string()
-  .refine((value) => value.startsWith("/") && !value.startsWith("//"))
-  .catch("/pricebook");
+/** Where the owner lands after signing in. See safeRedirectPath for the why. */
+const nextPath = safeRedirectPath("/pricebook");
 
-const email = z.email("Enter a valid email address.");
+const email = z
+  .email("Enter a valid email address.")
+  .max(MAX_EMAIL_LENGTH, "That email address is too long.");
 
 /*
  * Eight characters is Supabase's own floor. Deliberately not demanding a
  * symbol and a digit: length rules that fight the owner produce "Passw0rd!"
  * written on the van dashboard, not a safer account.
+ *
+ * The ceiling is bcrypt's: it hashes the first 72 bytes and ignores the rest,
+ * so accepting more would quietly mean less than it looks like.
  */
-const password = z.string().min(8, "Use at least 8 characters.");
+const password = z
+  .string()
+  .min(8, "Use at least 8 characters.")
+  .max(MAX_PASSWORD_LENGTH, `Use at most ${MAX_PASSWORD_LENGTH} characters.`);
 
 export const signInSchema = z.object({
   email,
@@ -40,7 +44,9 @@ export const registerSchema = z
       .max(MAX_NAME_LENGTH, "That name is too long."),
     email,
     password,
-    confirmPassword: z.string(),
+    // Bounded like the password it has to equal, so an oversized paste is
+    // rejected here rather than compared character by character first.
+    confirmPassword: z.string().max(MAX_PASSWORD_LENGTH),
     next: nextPath,
   })
   // Reported on confirmPassword, not on the object, so the message lands under

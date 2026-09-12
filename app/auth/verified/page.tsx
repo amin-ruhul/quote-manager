@@ -4,12 +4,19 @@ import { z } from "zod";
 import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/auth";
+import { safeRedirectPath } from "@/lib/schemas/shared";
 
 export const metadata = { title: "Email confirmation · QuotePilot" };
 
 const searchSchema = z.object({
   status: z.enum(["success", "expired", "error"]).catch("error"),
-  next: z.string().startsWith("/").catch("/onboarding"),
+  /*
+   * This lands in an href, and anyone can craft the query string — the sanitised
+   * `next` the confirm route produces is not the only one that reaches here. A
+   * bare startsWith("/") let "//evil.com" through, which the browser resolves as
+   * absolute, so a real-looking "Email confirmed" page linked off-site.
+   */
+  next: safeRedirectPath("/onboarding"),
 });
 
 /** DESIGN.md status pill — same colour pairs as the quote lifecycle. */

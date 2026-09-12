@@ -21,8 +21,21 @@ import type { PricebookItem } from "@/db/schema";
 import type { Currency } from "@/lib/constants";
 import { formatCents } from "@/lib/money";
 
-/** Shared with the deleting skeleton so a row doesn't jump while it goes. */
-const PRICEBOOK_COLUMNS = "lg:grid-cols-[minmax(0,1fr)_7rem_9rem_auto]";
+/**
+ * Shared with the deleting skeleton so a row doesn't jump while it goes.
+ *
+ * Two content columns, not three: the price and its unit are one phrase
+ * ("$135.00 per each") and reading them apart — with a column of whitespace
+ * between — is harder than reading them together.
+ */
+const PRICEBOOK_COLUMNS = "lg:grid-cols-[minmax(0,1fr)_10rem_auto]";
+
+/**
+ * Every row is the same height whether or not it has a description, so the list
+ * has a steady rhythm instead of a ragged one. Both text lines truncate, so a
+ * row can never need more than this.
+ */
+const PRICEBOOK_ROW_HEIGHT = "lg:min-h-[72px]";
 
 export function PricebookRow({
   item,
@@ -50,12 +63,11 @@ export function PricebookRow({
   if (isDeleting) {
     return (
       <li
-        className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 lg:gap-4 lg:px-5 lg:py-3 ${PRICEBOOK_COLUMNS}`}
+        className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 lg:gap-4 lg:px-5 lg:py-3 ${PRICEBOOK_COLUMNS} ${PRICEBOOK_ROW_HEIGHT}`}
         aria-busy="true"
       >
         <div className="min-w-0 space-y-2 lg:contents">
           <Skeleton className="h-5 w-2/3" />
-          <Skeleton className="hidden h-4 w-12 lg:block" />
           <Skeleton className="h-4 w-24 lg:ml-auto" />
         </div>
         <Loader2 className="size-4 animate-spin text-ink-60" />
@@ -71,7 +83,7 @@ export function PricebookRow({
      * which is the whole point of a pricebook on a wide screen.
      */
     <li
-      className={`grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 p-4 lg:items-center lg:gap-4 lg:px-5 lg:py-3 ${PRICEBOOK_COLUMNS}`}
+      className={`grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 p-4 lg:items-center lg:gap-4 lg:px-5 lg:py-3 ${PRICEBOOK_COLUMNS} ${PRICEBOOK_ROW_HEIGHT}`}
     >
       <div className="min-w-0 lg:contents">
         <div className="min-w-0">
@@ -90,13 +102,18 @@ export function PricebookRow({
           </p>
         </div>
 
-        <span className="hidden text-sm text-ink-60 lg:block">
-          per {item.unit}
-        </span>
-
-        <span className="tabular hidden font-medium lg:block lg:text-right">
-          {formatCents(item.price, currency)}
-        </span>
+        {/*
+         * From lg the money gets its own fixed, right-aligned column, so the
+         * prices line up down the page — the thing a pricebook is for on a wide
+         * screen. The unit rides with its price rather than sitting in a column
+         * of its own halfway across the row.
+         */}
+        <div className="hidden lg:block lg:text-right">
+          <p className="tabular font-medium">
+            {formatCents(item.price, currency)}
+          </p>
+          <p className="mt-0.5 text-xs text-ink-60">per {item.unit}</p>
+        </div>
       </div>
 
       <div className="flex shrink-0 gap-1">
@@ -115,7 +132,10 @@ export function PricebookRow({
               variant="ghost"
               size="icon-sm"
               aria-label={`Delete ${item.name}`}
-              className="text-destructive"
+              // Quiet until you reach for it. A red icon on every row put the
+              // loudest colour on the page against the one thing you rarely
+              // want, and DESIGN.md builds hierarchy from alpha, not hue.
+              className="text-ink-60 hover:text-destructive focus-visible:text-destructive"
             >
               <Trash2 />
             </Button>

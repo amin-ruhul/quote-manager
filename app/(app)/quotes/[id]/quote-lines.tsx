@@ -122,6 +122,8 @@ export function QuoteLines({
         quoteId={quoteId}
         item={editing}
         options={options}
+        // The owner's own units, taken from the pricebook this page already has.
+        units={[...new Set(pricebook.map((entry) => entry.unit))].sort()}
         defaultOptionId={optionId}
         onClose={() => {
           setEditing(null);

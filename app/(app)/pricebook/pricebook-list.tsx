@@ -35,15 +35,18 @@ export function PricebookList({
   const openOnArrival = useSearchParams().get("new") === "1";
   const [isAdding, setIsAdding] = useState(openOnArrival);
 
+  // The owner's own vocabulary, so anything they've added once comes back.
   const categories = [
     ...new Set(items.map((item) => item.category).filter((c) => c !== null)),
   ].sort();
+  const units = [...new Set(items.map((item) => item.unit))].sort();
 
   if (isAdding || editing) {
     return (
       <PricebookItemDialog
         item={editing}
         categories={categories}
+        units={units}
         onClose={() => {
           setEditing(null);
           setIsAdding(false);

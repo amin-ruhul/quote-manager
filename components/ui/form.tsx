@@ -107,7 +107,14 @@ function FormLabel({
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      // ink-60 per DESIGN.md's input rule, not the inherited ink-90. A label
+      // names the field; the value and the panel's own heading are what you
+      // read. At ink-90 all three sat at the same weight of black and the
+      // heading stopped reading as a heading.
+      className={cn(
+        "text-ink-60 data-[error=true]:text-destructive",
+        className,
+      )}
       htmlFor={formItemId}
       {...props}
     />

@@ -31,32 +31,38 @@ export const businessProfileSchema = z.object({
    * z.coerce.number() so the browser and the server agree on the field's type —
    * React Hook Form needs the input type to be what the DOM actually holds.
    */
-  followUpDays: z.string().transform((value, ctx) => {
-    const days = Number(value);
-    if (
-      value.trim() === "" ||
-      !FOLLOW_UP_DAY_OPTIONS.includes(days as FollowUpDays)
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Choose one of the follow-up options.",
-      });
-      return z.NEVER;
-    }
-    return days as FollowUpDays;
-  }),
-  defaultTaxRate: z.string().transform((value, ctx) => {
-    if (value.trim() === "") return 0;
-    const basisPoints = parsePercentToBasisPoints(value);
-    if (basisPoints === null) {
-      ctx.addIssue({
-        code: "custom",
-        message: `Enter a tax rate between 0 and ${MAX_TAX_RATE_PERCENT}.`,
-      });
-      return z.NEVER;
-    }
-    return basisPoints;
-  }),
+  followUpDays: z
+    .string()
+    .max(4)
+    .transform((value, ctx) => {
+      const days = Number(value);
+      if (
+        value.trim() === "" ||
+        !FOLLOW_UP_DAY_OPTIONS.includes(days as FollowUpDays)
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Choose one of the follow-up options.",
+        });
+        return z.NEVER;
+      }
+      return days as FollowUpDays;
+    }),
+  defaultTaxRate: z
+    .string()
+    .max(10)
+    .transform((value, ctx) => {
+      if (value.trim() === "") return 0;
+      const basisPoints = parsePercentToBasisPoints(value);
+      if (basisPoints === null) {
+        ctx.addIssue({
+          code: "custom",
+          message: `Enter a tax rate between 0 and ${MAX_TAX_RATE_PERCENT}.`,
+        });
+        return z.NEVER;
+      }
+      return basisPoints;
+    }),
 });
 
 export type BusinessProfileInput = z.infer<typeof businessProfileSchema>;

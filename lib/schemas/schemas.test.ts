@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import {
+  MAX_EMAIL_LENGTH,
+  MAX_PASSWORD_LENGTH,
+  MAX_PHONE_DIGITS,
+  MAX_PRICE_CENTS,
+} from "@/lib/constants";
+import { phoneDigits } from "@/lib/customers";
+import { registerSchema } from "@/lib/schemas/auth";
 import { businessProfileSchema } from "@/lib/schemas/business";
 import { customerSchema } from "@/lib/schemas/customer";
 import { pricebookItemSchema } from "@/lib/schemas/pricebook";
@@ -154,13 +162,142 @@ describe("tax rate crosses as integer basis points", () => {
   });
 });
 
+/*
+ * Every money and quantity column is an int4. A value that parses cleanly but
+ * doesn't fit reaches the INSERT and dies there, where the owner can only see
+ * "try again" — so the ceiling has to be caught on the field.
+ */
+describe("bounds that keep a value inside its column", () => {
+  it("rejects a price above the cap", () => {
+    const result = pricebookItemSchema.safeParse({
+      ...pricebookItem,
+      price: "1000000.01",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["price"]);
+  });
+
+  it("accepts a price exactly at the cap", () => {
+    expect(
+      pricebookItemSchema.parse({ ...pricebookItem, price: "1000000" }).price,
+    ).toBe(MAX_PRICE_CENTS);
+  });
+
+  it("rejects a quantity above the cap", () => {
+    const result = quoteItemSchema.safeParse({
+      ...quoteItem,
+      quantity: "10001",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["quantity"]);
+  });
+
+  it("rejects a line whose total overflows, though both fields are in range", () => {
+    const result = quoteItemSchema.safeParse({
+      ...quoteItem,
+      quantity: "10000",
+      unitPrice: "1000000",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["unitPrice"]);
+  });
+
+  it("still accepts an ordinary line", () => {
+    const parsed = quoteItemSchema.parse({
+      ...quoteItem,
+      quantity: "6",
+      unitPrice: "185",
+    });
+    expect(parsed.quantity).toBe(600);
+    expect(parsed.unitPrice).toBe(18500);
+  });
+
+  it("caps a discount too, not just a price", () => {
+    const result = quoteDetailsSchema.safeParse({
+      ...quoteDetails,
+      discount: "2000000",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["discount"]);
+  });
+});
+
+describe("credentials are bounded at both ends", () => {
+  const account = {
+    fullName: "Jo Sparks",
+    email: "jo@brightspark.com",
+    password: "electric-avenue",
+    confirmPassword: "electric-avenue",
+    next: "/onboarding",
+  };
+
+  it("rejects a password past bcrypt's 72-byte limit", () => {
+    const long = "a".repeat(MAX_PASSWORD_LENGTH + 1);
+    const result = registerSchema.safeParse({
+      ...account,
+      password: long,
+      confirmPassword: long,
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.some((i) => i.path[0] === "password")).toBe(
+      true,
+    );
+  });
+
+  it("accepts a password exactly at the limit", () => {
+    const exact = "a".repeat(MAX_PASSWORD_LENGTH);
+    expect(
+      registerSchema.safeParse({
+        ...account,
+        password: exact,
+        confirmPassword: exact,
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects an over-long email rather than passing it to Supabase", () => {
+    const result = registerSchema.safeParse({
+      ...account,
+      email: `${"a".repeat(MAX_EMAIL_LENGTH)}@example.com`,
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.some((i) => i.path[0] === "email")).toBe(true);
+  });
+});
+
+/*
+ * The duplicate check matches on these two normalisations, and the SQL side
+ * mirrors them exactly (lower(), and regexp_replace to digits). If this drifts,
+ * the same customer gets added twice under different punctuation.
+ */
+describe("phoneDigits — what makes two numbers the same number", () => {
+  it.each([
+    "(555) 123-4567",
+    "555.123.4567",
+    "555 123 4567",
+    "+1 (555) 123-4567 ",
+  ])("reduces %o to its digits", (phone) => {
+    expect(phoneDigits(phone)).toMatch(/^1?5551234567$/);
+  });
+
+  it("agrees that two punctuations of one number are equal", () => {
+    expect(phoneDigits("(555) 123-4567")).toBe(phoneDigits("555.123.4567"));
+  });
+
+  it("returns nothing for a string with no digits", () => {
+    expect(phoneDigits("call the office")).toBe("");
+  });
+});
+
 describe("empty optional boxes become NULL, not empty strings", () => {
+  // A customer you can't reach can't be sent a quote, so the contact fields are
+  // required; only the three that nothing downstream depends on are optional.
   const customer = {
     firstName: "Jo",
-    lastName: "",
+    lastName: "Sparks",
     company: "",
-    phone: "",
-    email: "",
+    phone: "(555) 123-4567",
+    email: "jo@brightspark.com",
     address: "",
     notes: "",
   };
@@ -169,10 +306,8 @@ describe("empty optional boxes become NULL, not empty strings", () => {
     const parsed = customerSchema.parse(customer);
     expect(parsed).toMatchObject({
       firstName: "Jo",
-      lastName: null,
+      lastName: "Sparks",
       company: null,
-      phone: null,
-      email: null,
       address: null,
       notes: null,
     });
@@ -188,17 +323,64 @@ describe("empty optional boxes become NULL, not empty strings", () => {
     expect(parsed.company).toBe("Bright Spark");
   });
 
-  it("requires a first name", () => {
-    const result = customerSchema.safeParse({ ...customer, firstName: "  " });
+  it.each([
+    ["firstName", "Enter a first name."],
+    ["lastName", "Enter a last name."],
+    ["phone", "Enter a phone number."],
+    ["email", "Enter an email address."],
+  ])("requires %s", (field, message) => {
+    const result = customerSchema.safeParse({ ...customer, [field]: "  " });
     expect(result.success).toBe(false);
-    expect(result.error?.issues[0]?.message).toBe("Enter a first name.");
+    expect(result.error?.issues[0]?.path).toEqual([field]);
+    expect(result.error?.issues[0]?.message).toBe(message);
   });
 
-  it("allows an empty email but not a malformed one", () => {
-    expect(customerSchema.parse(customer).email).toBeNull();
-    const result = customerSchema.safeParse({ ...customer, email: "jo@" });
+  it.each([
+    "(555) 123-4567",
+    "555.123.4567",
+    "+1 555 123 4567",
+    "5551234567",
+    "555-1234",
+  ])("accepts %o, however it is punctuated", (phone) => {
+    expect(customerSchema.safeParse({ ...customer, phone }).success).toBe(true);
+  });
+
+  it.each(["x", "123", "call the office", "555-123"])(
+    "rejects %o as a phone number",
+    (phone) => {
+      const result = customerSchema.safeParse({ ...customer, phone });
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.path).toEqual(["phone"]);
+      expect(result.error?.issues[0]?.message).toBe(
+        "That doesn't look like a full phone number.",
+      );
+    },
+  );
+
+  it("rejects a number with more digits than any real one", () => {
+    const result = customerSchema.safeParse({
+      ...customer,
+      phone: "1".repeat(MAX_PHONE_DIGITS + 1),
+    });
     expect(result.success).toBe(false);
-    expect(result.error?.issues[0]?.path).toEqual(["email"]);
+    expect(result.error?.issues[0]?.path).toEqual(["phone"]);
+  });
+
+  it("stores the email lowercased, so case can't make two customers", () => {
+    const parsed = customerSchema.parse({
+      ...customer,
+      email: "  Jo@BrightSpark.com  ",
+    });
+    expect(parsed.email).toBe("jo@brightspark.com");
+  });
+
+  it("separates a missing email from a malformed one", () => {
+    const malformed = customerSchema.safeParse({ ...customer, email: "jo@" });
+    expect(malformed.success).toBe(false);
+    expect(malformed.error?.issues[0]?.path).toEqual(["email"]);
+    expect(malformed.error?.issues[0]?.message).toBe(
+      "Enter a valid email address.",
+    );
   });
 
   it("turns the select's 'none' sentinel into NULL", () => {

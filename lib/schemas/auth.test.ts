@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { MAX_REDIRECT_PATH_LENGTH } from "@/lib/constants";
 import { registerSchema, signInSchema } from "@/lib/schemas/auth";
+import { safeRedirectPath } from "@/lib/schemas/shared";
 
 const account = {
   fullName: "Jo Sparks",
@@ -67,4 +69,34 @@ describe("the next path can't leave the site", () => {
       );
     },
   );
+});
+
+/*
+ * Every page that renders a `next` out of the query string shares this, because
+ * /auth/verified had its own copy that checked startsWith("/") and nothing
+ * else — so "//evil.com" reached an href and the browser read it as absolute.
+ */
+describe("safeRedirectPath", () => {
+  const schema = safeRedirectPath("/onboarding");
+
+  it("keeps a same-site path", () => {
+    expect(schema.parse("/quotes?new=1")).toBe("/quotes?new=1");
+  });
+
+  it.each([
+    "//evil.com",
+    "///evil.com",
+    "https://evil.com",
+    "evil.com",
+    "",
+    " /quotes",
+  ])("falls back rather than leaving the site for %o", (next) => {
+    expect(schema.parse(next)).toBe("/onboarding");
+  });
+
+  it("falls back on a path longer than the cap instead of inspecting it", () => {
+    expect(schema.parse(`/${"a".repeat(MAX_REDIRECT_PATH_LENGTH)}`)).toBe(
+      "/onboarding",
+    );
+  });
 });

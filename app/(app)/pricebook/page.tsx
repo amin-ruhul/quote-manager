@@ -19,11 +19,16 @@ export default async function PricebookPage() {
     .orderBy(asc(pricebookItems.category), asc(pricebookItems.name));
 
   return (
-    <div className="space-y-6">
+    /*
+     * A list of short names against right-aligned prices, so it keeps its own
+     * measure rather than taking the shell's full 1200px — at that width the
+     * middle of every row was empty and the eye had to travel to connect a name
+     * to its price. Same call the quote builder makes for the same reason.
+     */
+    <div className="mx-auto max-w-4xl space-y-6">
       <header>
-        <h1 className="text-3xl font-semibold">Pricebook</h1>
-        <p className="mt-2 text-body">
-          Your prices, your source of truth. {business.name} ·{" "}
+        <h1 className="text-2xl font-semibold sm:text-3xl">Pricebook</h1>
+        <p className="mt-1 text-body">
           <span className="tabular">{items.length}</span>{" "}
           {items.length === 1 ? "item" : "items"}
         </p>

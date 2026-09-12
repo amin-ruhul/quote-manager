@@ -4,8 +4,8 @@ import OpenAI from "openai";
 
 import {
   DEFAULT_PRICEBOOK_UNIT,
-  PRICEBOOK_UNITS,
   QUANTITY_SCALE,
+  SUGGESTED_PRICEBOOK_UNITS,
   type PricebookUnit,
   type QuoteItemType,
 } from "@/lib/constants";
@@ -76,54 +76,73 @@ STRICT RULES:
 - Quantities are counts of the unit: "six recessed lights" is quantity 6.
 - Return ONLY the structured tool output.`;
 
+/**
+ * Units the model may choose from, for one business.
+ *
+ * Owners can add their own units, so this can't be a constant: a shop that
+ * prices by the "run" needs the model to be able to say "run". The suggested
+ * units stay in regardless, so the model can still label an item the owner has
+ * no pricebook entry for.
+ */
+function allowedUnits(pricebook: PricebookEntry[]): string[] {
+  return [
+    ...new Set([
+      ...SUGGESTED_PRICEBOOK_UNITS,
+      ...pricebook.map((entry) => entry.unit).filter(Boolean),
+    ]),
+  ];
+}
+
 /** JSON Schema for Structured Outputs. Mirrors SPEC §9 exactly. */
-const QUOTE_DRAFT_SCHEMA = {
-  type: "object",
-  additionalProperties: false,
-  required: ["scope_of_work", "line_items", "suggested_additions"],
-  properties: {
-    scope_of_work: { type: "string" },
-    line_items: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: [
-          "name",
-          "description",
-          "quantity",
-          "unit",
-          "type",
-          "pricebook_item_id",
-          "unit_price",
-          "needs_price",
-        ],
-        properties: {
-          name: { type: "string" },
-          description: { type: "string" },
-          quantity: { type: "number" },
-          unit: { type: "string", enum: [...PRICEBOOK_UNITS] },
-          type: { type: "string", enum: [...AI_ITEM_TYPES] },
-          pricebook_item_id: { type: ["string", "null"] },
-          unit_price: { type: ["integer", "null"] },
-          needs_price: { type: "boolean" },
+function quoteDraftSchema(units: string[]) {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: ["scope_of_work", "line_items", "suggested_additions"],
+    properties: {
+      scope_of_work: { type: "string" },
+      line_items: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: [
+            "name",
+            "description",
+            "quantity",
+            "unit",
+            "type",
+            "pricebook_item_id",
+            "unit_price",
+            "needs_price",
+          ],
+          properties: {
+            name: { type: "string" },
+            description: { type: "string" },
+            quantity: { type: "number" },
+            unit: { type: "string", enum: units },
+            type: { type: "string", enum: [...AI_ITEM_TYPES] },
+            pricebook_item_id: { type: ["string", "null"] },
+            unit_price: { type: ["integer", "null"] },
+            needs_price: { type: "boolean" },
+          },
+        },
+      },
+      suggested_additions: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["name", "reason"],
+          properties: {
+            name: { type: "string" },
+            reason: { type: "string" },
+          },
         },
       },
     },
-    suggested_additions: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["name", "reason"],
-        properties: {
-          name: { type: "string" },
-          reason: { type: "string" },
-        },
-      },
-    },
-  },
-} as const;
+  };
+}
 
 /* Shape of the raw reply, before we re-derive prices from the pricebook. */
 type RawDraft = {
@@ -153,6 +172,7 @@ export function normalizeDraft(
 
   const draft = raw as RawDraft;
   const byId = new Map(pricebook.map((entry) => [entry.id, entry]));
+  const units = new Set(allowedUnits(pricebook));
 
   const rawItems = Array.isArray(draft.line_items) ? draft.line_items : [];
 
@@ -168,9 +188,15 @@ export function normalizeDraft(
         ? Math.max(item.quantity, 0)
         : 1;
 
-    const unit = PRICEBOOK_UNITS.includes(item.unit as PricebookUnit)
-      ? (item.unit as PricebookUnit)
-      : ((matched?.unit as PricebookUnit) ?? DEFAULT_PRICEBOOK_UNIT);
+    /*
+     * Units are free text, but not free-for-all: the model only gets to use one
+     * it was offered. Anything else is an invention, and the matched item's own
+     * unit is a better answer than printing it.
+     */
+    const unit =
+      typeof item.unit === "string" && units.has(item.unit)
+        ? item.unit
+        : (matched?.unit ?? DEFAULT_PRICEBOOK_UNIT);
 
     const type = AI_ITEM_TYPES.includes(
       item.type as (typeof AI_ITEM_TYPES)[number],
@@ -272,7 +298,7 @@ async function requestDraft(
       json_schema: {
         name: "quote_draft",
         strict: true,
-        schema: QUOTE_DRAFT_SCHEMA,
+        schema: quoteDraftSchema(allowedUnits(pricebook)),
       },
     },
   });

@@ -1,9 +1,10 @@
 import { z } from "zod";
 
 import {
+  MAX_DATE_INPUT_LENGTH,
   MAX_DESCRIPTION_LENGTH,
+  MAX_INT4,
   MAX_NAME_LENGTH,
-  PRICEBOOK_UNITS,
   QUOTE_ITEM_TYPES,
 } from "@/lib/constants";
 import {
@@ -11,6 +12,7 @@ import {
   optionalText,
   optionalUuid,
   priceInCents,
+  pricebookUnit,
   scaledQuantity,
 } from "@/lib/schemas/shared";
 
@@ -26,6 +28,7 @@ export const quoteDetailsSchema = z.object({
   discount: optionalCents("Enter a discount, like 150."),
   validUntil: z
     .string()
+    .max(MAX_DATE_INPUT_LENGTH, "Enter a valid date.")
     .transform((value) => (value.trim() === "" ? null : value))
     .refine(
       (value) => value === null || !Number.isNaN(Date.parse(value)),
@@ -36,19 +39,36 @@ export const quoteDetailsSchema = z.object({
 export type QuoteDetailsInput = z.infer<typeof quoteDetailsSchema>;
 export type QuoteDetailsFields = z.input<typeof quoteDetailsSchema>;
 
-export const quoteItemSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, "Enter an item name.")
-    .max(MAX_NAME_LENGTH, "That name is too long."),
-  description: optionalText(MAX_DESCRIPTION_LENGTH),
-  quantity: scaledQuantity,
-  unit: z.enum(PRICEBOOK_UNITS),
-  unitPrice: priceInCents,
-  type: z.enum(QUOTE_ITEM_TYPES),
-  optionId: optionalUuid("Pick a valid option."),
-});
+export const quoteItemSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, "Enter an item name.")
+      .max(MAX_NAME_LENGTH, "That name is too long."),
+    description: optionalText(MAX_DESCRIPTION_LENGTH),
+    quantity: scaledQuantity,
+    unit: pricebookUnit,
+    unitPrice: priceInCents,
+    type: z.enum(QUOTE_ITEM_TYPES),
+    optionId: optionalUuid("Pick a valid option."),
+  })
+  /*
+   * Both fields can be in range and still multiply out past the int4 ceiling —
+   * 10,000 × $1,000,000 is the same "integer out of range" the individual caps
+   * were added to prevent. lineTotal() is the sum's building block, so it is
+   * the thing that actually has to fit.
+   */
+  .superRefine((values, ctx) => {
+    const total = Math.round((values.quantity * values.unitPrice) / 100);
+    if (total > MAX_INT4) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["unitPrice"],
+        message: "This line's total is too large. Lower the price or quantity.",
+      });
+    }
+  });
 
 export type QuoteItemInput = z.infer<typeof quoteItemSchema>;
 export type QuoteItemFields = z.input<typeof quoteItemSchema>;
