@@ -3,6 +3,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { ensureProfile } from "@/lib/auth";
+import { MAX_TOKEN_LENGTH } from "@/lib/constants";
+import { safeRedirectPath } from "@/lib/schemas/shared";
 import { createClient } from "@/lib/supabase/server";
 
 /*
@@ -26,15 +28,13 @@ const OTP_TYPES = [
 ] as const satisfies readonly EmailOtpType[];
 
 const paramsSchema = z.object({
-  token_hash: z.string().min(1).nullable(),
-  code: z.string().min(1).nullable(),
+  // Supabase's own tokens are well under this; the cap just means an absurd
+  // query string is rejected before it is looked at.
+  token_hash: z.string().min(1).max(MAX_TOKEN_LENGTH).nullable(),
+  code: z.string().min(1).max(MAX_TOKEN_LENGTH).nullable(),
   type: z.enum(OTP_TYPES).catch("email"),
   // Only same-site paths, so a crafted link can't bounce the owner off-site.
-  next: z
-    .string()
-    .startsWith("/")
-    .catch("/onboarding")
-    .transform((value) => (value.startsWith("//") ? "/onboarding" : value)),
+  next: safeRedirectPath("/onboarding"),
 });
 
 function resultUrl(

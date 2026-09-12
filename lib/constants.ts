@@ -34,10 +34,59 @@ export const INDUSTRIES = ["electrician"] as const;
 export type Industry = (typeof INDUSTRIES)[number];
 export const DEFAULT_INDUSTRY: Industry = "electrician";
 
-/** Units a pricebook item can be sold in. */
-export const PRICEBOOK_UNITS = ["each", "hour", "ft", "job"] as const;
-export type PricebookUnit = (typeof PRICEBOOK_UNITS)[number];
-export const DEFAULT_PRICEBOOK_UNIT: PricebookUnit = "each";
+/*
+ * Units and categories are SUGGESTIONS, not closed sets. Both are stored as
+ * plain text so an owner can add one we never thought of (a solar installer's
+ * "panel", a rural sparky's "trip") without waiting on a release. The lists
+ * below are the starting vocabulary the picker offers; `pricebookUnit` in
+ * lib/schemas/shared.ts is what actually validates a stored value.
+ *
+ * Drawn from how residential flat-rate price books are actually organised:
+ * per-device ("each"/"point"), per-assembly ("circuit"), per bundled task
+ * ("job"), time-and-materials ("hour"/"day"), the trip fee ("visit"), and the
+ * takeoff units wire and rewires are measured in ("ft"/"sq ft").
+ */
+
+/** Units we offer in the picker, commonest-first for a phone. */
+export const SUGGESTED_PRICEBOOK_UNITS = [
+  "each",
+  "job",
+  "hour",
+  "visit",
+  "day",
+  "point",
+  "circuit",
+  "ft",
+  "sq ft",
+] as const;
+
+/**
+ * Stored as free text, deliberately. Narrowing this to the union above would
+ * make every owner-added unit a type error for no safety gain — a unit is a
+ * label printed next to a quantity, never something we compute with.
+ */
+export type PricebookUnit = string;
+export const DEFAULT_PRICEBOOK_UNIT = "each";
+
+/** Categories we offer in the picker. Same deal: a starting point, not a fence. */
+export const SUGGESTED_PRICEBOOK_CATEGORIES = [
+  "Service & Panels",
+  "Outlets & Switches",
+  "Lighting",
+  "Ceiling Fans & Ventilation",
+  "EV Charging",
+  "Generators & Backup Power",
+  "Appliance & HVAC Hookups",
+  "Smart Home & Low Voltage",
+  "Outdoor & Landscape",
+  "Troubleshooting & Repair",
+  "Rewiring & Remodels",
+  "Safety & Compliance",
+  "Labor & Fees",
+] as const;
+
+/** A unit is a short label ("sq ft"), never a sentence. */
+export const MAX_UNIT_LENGTH = 24;
 
 /** V1 is US-first (SPEC §2); the column is still generic. */
 export const CURRENCIES = ["USD", "CAD", "GBP", "AUD"] as const;
@@ -159,6 +208,59 @@ export function pushTagForQuote(quoteId: string): string {
 /** Guardrails on free-text fields, mirrored by the Zod schemas at the boundaries. */
 export const MAX_NAME_LENGTH = 120;
 export const MAX_DESCRIPTION_LENGTH = 500;
+
+/** The longest address RFC 5321 allows, so a valid one is never rejected. */
+export const MAX_EMAIL_LENGTH = 254;
+
+/** Room for an international number with spaces, brackets and an extension. */
+export const MAX_PHONE_LENGTH = 40;
+
+/*
+ * Phone numbers are counted by their digits, not their characters, so the same
+ * number passes however it is punctuated: "(555) 123-4567", "555.123.4567" and
+ * "+1 555 123 4567" are all the same ten digits.
+ *
+ * Seven is the shortest real subscriber number (a local US number without an
+ * area code). Twenty is E.164's fifteen plus room for an extension — enough
+ * that nothing legitimate is refused, short enough that a typed sentence is.
+ */
+export const MIN_PHONE_DIGITS = 7;
+export const MAX_PHONE_DIGITS = 20;
+
+/**
+ * bcrypt hashes at most 72 bytes and silently ignores the rest, so a longer
+ * password is not a stronger one — it just hides where the strength stops.
+ */
+export const MAX_PASSWORD_LENGTH = 72;
+
+/** The post-sign-in redirect path. Long enough for any route this app has. */
+export const MAX_REDIRECT_PATH_LENGTH = 512;
+
+/** Auth tokens out of a confirmation link, and the public quote page's token. */
+export const MAX_TOKEN_LENGTH = 512;
+
+/**
+ * Every money and quantity column is a Postgres `integer` — int4, ceiling
+ * 2,147,483,647. This is a hard limit, not a preference: one over and the
+ * INSERT fails with "integer out of range", which the owner sees as a generic
+ * "we couldn't save that, try again" that retrying can never fix. The schemas
+ * below catch it on the field instead, while it is still fixable.
+ */
+export const MAX_INT4 = 2_147_483_647;
+
+/** $1,000,000.00 in cents — far above any residential job, far below int4. */
+export const MAX_PRICE_CENTS = 100_000_000;
+
+/** Whole units on one line. 10,000 ft of wire is already an unusual day. */
+export const MAX_QUANTITY = 10_000;
+
+/**
+ * Caps on the raw typed string, before it is parsed. "$1,000,000.00" is 13
+ * characters, so these only ever stop a paste no one meant to make.
+ */
+export const MAX_MONEY_INPUT_LENGTH = 20;
+export const MAX_QUANTITY_INPUT_LENGTH = 12;
+export const MAX_DATE_INPUT_LENGTH = 40;
 
 /** Logo upload limits (Supabase Storage bucket `logos`). */
 export const LOGO_BUCKET = "logos";

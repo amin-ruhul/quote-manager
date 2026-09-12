@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { toast } from "sonner";
 
 import {
@@ -28,7 +29,32 @@ const initialState: CustomerFormState = {
   fieldErrors: {},
   savedAt: null,
   savedId: null,
+  duplicate: null,
 };
+
+/**
+ * The way out of a duplicate. The field's own message says only that a customer
+ * with this email or phone exists; this is how the owner goes and looks at
+ * them, which is nearly always what they wanted instead of a second record.
+ */
+function DuplicateLink({
+  duplicate,
+  field,
+}: {
+  duplicate: CustomerFormState["duplicate"];
+  field: "email" | "phone";
+}) {
+  if (duplicate?.field !== field) return null;
+
+  return (
+    <Link
+      href={`/customers/${duplicate.id}`}
+      className="inline-block text-sm font-medium text-brand underline underline-offset-2"
+    >
+      Open that customer
+    </Link>
+  );
+}
 
 function defaultsFor(customer: Customer | null): CustomerFields {
   return {
@@ -153,6 +179,7 @@ export function CustomerForm({
                     />
                   </FormControl>
                   <FormMessage />
+                  <DuplicateLink duplicate={state.duplicate} field="phone" />
                 </FormItem>
               )}
             />
@@ -171,6 +198,7 @@ export function CustomerForm({
                     />
                   </FormControl>
                   <FormMessage />
+                  <DuplicateLink duplicate={state.duplicate} field="email" />
                 </FormItem>
               )}
             />

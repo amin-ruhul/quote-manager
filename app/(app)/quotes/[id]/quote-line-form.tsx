@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { QuoteFormState } from "@/app/(app)/quotes/actions";
 import { saveQuoteItem } from "@/app/(app)/quotes/item-actions";
 import { Panel } from "@/components/panel";
+import { SelectOrAdd } from "@/components/select-or-add";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,8 +29,8 @@ import type { QuoteItem, QuoteOption } from "@/db/schema";
 import {
   DEFAULT_PRICEBOOK_UNIT,
   DEFAULT_QUOTE_ITEM_TYPE,
-  PRICEBOOK_UNITS,
   QUOTE_ITEM_TYPES,
+  SUGGESTED_PRICEBOOK_UNITS,
 } from "@/lib/constants";
 import { centsToInputValue } from "@/lib/money";
 import { formatQuantity } from "@/lib/quote-math";
@@ -61,12 +62,15 @@ export function QuoteLineForm({
   quoteId,
   item,
   options,
+  units,
   defaultOptionId,
   onClose,
 }: {
   quoteId: string;
   item: QuoteItem | null;
   options: QuoteOption[];
+  /** Units already in this business's pricebook, on top of the suggested ones. */
+  units: string[];
   defaultOptionId: string | null;
   onClose: () => void;
 }) {
@@ -152,24 +156,17 @@ export function QuoteLineForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Unit</FormLabel>
-                  <Select
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {PRICEBOOK_UNITS.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <SelectOrAdd
+                      name={field.name}
+                      value={field.value}
+                      onChange={field.onChange}
+                      suggestions={SUGGESTED_PRICEBOOK_UNITS}
+                      used={units}
+                      addLabel="Add your own unit…"
+                      inputPlaceholder="e.g. run"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

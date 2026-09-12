@@ -118,7 +118,13 @@ export function CustomerDetail({
 
       <div className="grid grid-cols-2 gap-2">
         <Stat label="Quoted" value={formatCents(quotedCents, currency)} />
-        <Stat label="Won" value={formatCents(wonCents, currency)} accent />
+        {/* The marigold card is DESIGN.md's celebration; $0.00 is not one, so
+            it stays a plain tile until this customer has actually won work. */}
+        <Stat
+          label="Won"
+          value={formatCents(wonCents, currency)}
+          accent={wonCents > 0}
+        />
       </div>
 
       <section className="space-y-2">

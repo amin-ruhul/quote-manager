@@ -1,4 +1,8 @@
-import { DEFAULT_INDUSTRY } from "@/lib/constants";
+import {
+  DEFAULT_INDUSTRY,
+  SUGGESTED_PRICEBOOK_CATEGORIES,
+  type PricebookUnit,
+} from "@/lib/constants";
 
 /*
  * The one industry_config row for V1 (SPEC §8, §10). Everything trade-specific
@@ -12,18 +16,15 @@ export type DefaultPricebookItem = {
   name: string;
   description: string;
   category: string;
-  unit: "each" | "hour" | "ft" | "job";
+  unit: PricebookUnit;
   price: number;
 };
 
-export const ELECTRICIAN_CATEGORIES = [
-  "Service & Panels",
-  "EV Charging",
-  "Lighting",
-  "Outlets & Switches",
-  "Safety & Compliance",
-  "Labor & Fees",
-] as const;
+/**
+ * The categories the picker offers. Re-exported rather than redefined, so the
+ * industry_config row and the pricebook form can never drift apart.
+ */
+export const ELECTRICIAN_CATEGORIES = SUGGESTED_PRICEBOOK_CATEGORIES;
 
 export const ELECTRICIAN_PRICEBOOK: DefaultPricebookItem[] = [
   {

@@ -62,10 +62,20 @@ export default async function CustomerDetailPage({
   const customer = customerRows[0];
   if (!customer) notFound();
 
-  // Summed here rather than in a third query — the rows are already loaded,
-  // and these are integer cents so the addition is exact.
-  const quotedCents = quoteRows.reduce((running, q) => running + q.total, 0);
-  const wonCents = quoteRows
+  /*
+   * Summed here rather than in a third query — the rows are already loaded, and
+   * these are integer cents so the addition is exact.
+   *
+   * Drafts are excluded, the same rule the customer list counts by: a draft is
+   * money you have not put in front of anyone yet, so counting it here made one
+   * unsent quote read as $135.00 quoted on this page while the list showed no
+   * quotes at all. They still appear in the history below — finding a draft you
+   * left half-finished is the point of that list.
+   */
+  const sentQuotes = quoteRows.filter((q) => q.status !== "draft");
+
+  const quotedCents = sentQuotes.reduce((running, q) => running + q.total, 0);
+  const wonCents = sentQuotes
     .filter((q) => q.status === "accepted")
     .reduce((running, q) => running + q.total, 0);
 

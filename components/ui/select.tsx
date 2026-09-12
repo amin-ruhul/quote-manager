@@ -19,7 +19,9 @@ function SelectGroup({
   return (
     <SelectPrimitive.Group
       data-slot="select-group"
-      className={cn("scroll-my-1 p-1", className)}
+      // No padding of its own — SelectContent already pads the panel, and two
+      // layers of it made a grouped list look gappier than an ungrouped one.
+      className={cn("scroll-my-1", className)}
       {...props}
     />
   );
@@ -57,36 +59,46 @@ function SelectTrigger({
   );
 }
 
+/*
+ * `popper` — a panel that hangs off the trigger — rather than Radix's
+ * `item-aligned` default, which centres the chosen item over the trigger and so
+ * grows to the full height of the viewport. On a 13-item category list that
+ * covered the entire form behind it.
+ *
+ * The height is capped at 18rem so the menu stays a menu: short lists size to
+ * their content, long ones scroll inside a panel you can still see the form
+ * around. Everything else here matches dropdown-menu.tsx — one floating-menu
+ * look in the app, not two.
+ */
 function SelectContent({
   className,
   children,
-  position = "item-aligned",
-  align = "center",
+  position = "popper",
+  align = "start",
+  sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         data-slot="select-content"
-        data-align-trigger={position === "item-aligned"}
         className={cn(
-          "relative z-50 max-h-(--radix-select-content-available-height) min-w-36 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
-          position === "popper" &&
-            "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+          "relative z-50 max-h-[min(18rem,var(--radix-select-content-available-height))] min-w-36 origin-(--radix-select-content-transform-origin) overflow-hidden rounded-lg border border-hairline bg-surface p-1 text-ink-90 shadow-quote duration-100",
+          "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
           className,
         )}
         position={position}
         align={align}
+        sideOffset={sideOffset}
         {...props}
       >
         <SelectScrollUpButton />
-        <SelectPrimitive.Viewport
-          data-position={position}
-          className={cn(
-            "data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)",
-            position === "popper" && "",
-          )}
-        >
+        {/*
+         * The scroll lives on the viewport, not the content: Radix's scroll
+         * buttons only appear when this is what overflows, and the panel's
+         * padding stays put while the items move under it.
+         */}
+        <SelectPrimitive.Viewport className="max-h-[calc(min(18rem,var(--radix-select-content-available-height))-0.5rem)] w-full min-w-(--radix-select-trigger-width) overflow-x-hidden overflow-y-auto overscroll-contain">
           {children}
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
@@ -102,7 +114,7 @@ function SelectLabel({
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={cn("px-1.5 py-1 text-xs text-muted-foreground", className)}
+      className={cn("px-2.5 pt-2 pb-1 text-xs text-ink-60", className)}
       {...props}
     />
   );
@@ -117,7 +129,12 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // h-10 so a row is a comfortable tap target on a phone, matching
+        // DropdownMenuItem. pr-8 leaves room for the tick.
+        "relative flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-md pr-8 pl-2.5 text-sm text-ink-90 outline-hidden select-none",
+        "focus:bg-surface-2 data-disabled:pointer-events-none data-disabled:opacity-50",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-ink-60 [&_svg:not([class*='size-'])]:size-4",
+        "*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className,
       )}
       {...props}
@@ -139,7 +156,7 @@ function SelectSeparator({
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn("pointer-events-none -mx-1 my-1 h-px bg-border", className)}
+      className={cn("pointer-events-none my-1 h-px bg-hairline", className)}
       {...props}
     />
   );
@@ -153,7 +170,7 @@ function SelectScrollUpButton({
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
       className={cn(
-        "z-10 flex cursor-default items-center justify-center bg-popover py-1 [&_svg:not([class*='size-'])]:size-4",
+        "z-10 flex cursor-default items-center justify-center bg-surface py-1 text-ink-60 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -171,7 +188,7 @@ function SelectScrollDownButton({
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
       className={cn(
-        "z-10 flex cursor-default items-center justify-center bg-popover py-1 [&_svg:not([class*='size-'])]:size-4",
+        "z-10 flex cursor-default items-center justify-center bg-surface py-1 text-ink-60 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
