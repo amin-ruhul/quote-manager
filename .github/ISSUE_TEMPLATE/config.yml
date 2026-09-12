@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Not ready to hand to Claude?
+    url: https://github.com/amin-ruhul/quote-manager/issues/new
+    about: Open a blank issue and add the claude:hold label — nothing will pick it up.

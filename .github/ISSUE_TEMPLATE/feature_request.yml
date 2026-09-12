@@ -1,0 +1,63 @@
+name: Feature
+description: A new capability or an improvement to an existing one.
+title: "feat: "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Adding the **feature** label hands this issue to Claude, which will open
+        a pull request. Claude builds phase by phase per `SPEC.md` §14 and will
+        stop and ask rather than guess at product behaviour — so be concrete
+        about what "done" looks like. Add **claude:hold** instead if this is a
+        backlog note.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What can the electrician not do today, and why does it matter on a job site?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What to build
+      description: The change itself. Screens, fields, behaviour, edge cases.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How a reviewer confirms it works. One checkable statement per line.
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: input
+    id: phase
+    attributes:
+      label: SPEC phase
+      description: Which phase of SPEC.md §14 this belongs to, if you know.
+      placeholder: "Phase 4"
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Explicitly out of scope
+      description: What Claude should NOT touch while doing this.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Before you submit
+      options:
+        - label: This is one change, small enough to review in one pull request.
+          required: true
+        - label: It does not jump ahead of the phase the project is currently on.
+          required: true
