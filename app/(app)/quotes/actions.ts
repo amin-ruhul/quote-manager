@@ -114,6 +114,7 @@ export async function saveQuoteDetails(
     terms: formData.get("terms") ?? "",
     customerId: formData.get("customerId") ?? "",
     discount: formData.get("discount") ?? "",
+    taxRate: formData.get("taxRate") ?? "",
     validUntil: formData.get("validUntil") ?? "",
   });
 

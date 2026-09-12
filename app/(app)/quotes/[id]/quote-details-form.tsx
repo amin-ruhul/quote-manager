@@ -28,7 +28,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import type { Customer, Quote } from "@/db/schema";
 import { customerName } from "@/lib/customers";
-import { centsToInputValue } from "@/lib/money";
+import { basisPointsToPercent, centsToInputValue } from "@/lib/money";
 import {
   type QuoteDetailsFields,
   quoteDetailsSchema,
@@ -53,6 +53,13 @@ function defaultsFor(quote: Quote): QuoteDetailsFields {
     // "none" is the sentinel the Select needs; Radix cannot hold "".
     customerId: quote.customerId ?? "none",
     scopeOfWork: quote.scopeOfWork ?? "",
+    /*
+     * Snapshotted onto the quote at creation from the business default, so
+     * changing settings never rewrites quotes already drafted. Editable here
+     * because without an override a quote created before the owner set a rate
+     * stayed at 0% for ever, with nowhere to fix it.
+     */
+    taxRate: quote.taxRate > 0 ? basisPointsToPercent(quote.taxRate) : "",
     discount: quote.discount > 0 ? centsToInputValue(quote.discount) : "",
     validUntil: toDateInput(quote.validUntil),
     terms: quote.terms ?? "",
@@ -180,6 +187,27 @@ export function QuoteDetailsForm({
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="taxRate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tax rate</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      inputMode="decimal"
+                      className="tabular"
+                      placeholder="0"
+                    />
+                  </FormControl>
+                  <FormMessage>
+                    % on taxable lines. Leave blank for none.
+                  </FormMessage>
                 </FormItem>
               )}
             />

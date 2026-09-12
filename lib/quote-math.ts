@@ -15,6 +15,18 @@ export type LineInput = {
   quantity: number;
   unitPrice: number;
   type?: string;
+  /**
+   * Whether sales tax applies to this line.
+   *
+   * A US electrician's quote routinely mixes the two: in Texas a separated
+   * contract taxes materials but not labour, and in New York a repair is
+   * taxable where a capital improvement isn't. One rate for the whole quote
+   * cannot express that, which is why this lives per line.
+   *
+   * Defaults to taxable when absent, so a line written before this existed
+   * behaves the way the old whole-quote rate did.
+   */
+  taxable?: boolean;
 };
 
 export type QuoteTotals = {
@@ -65,24 +77,49 @@ export function quoteTotals({
   lines,
   discount = 0,
   taxRateBasisPoints = 0,
+  taxExempt = false,
 }: {
   lines: LineInput[];
   discount?: number;
   taxRateBasisPoints?: number;
+  /** Set from the customer, not the quote — exemption belongs to who is buying. */
+  taxExempt?: boolean;
 }): QuoteTotals {
   const subtotal = sumLines(lines);
   const appliedDiscount = Math.min(
     Math.max(discount, 0),
     Math.max(subtotal, 0),
   );
-  const taxable = subtotal - appliedDiscount;
-  const tax = taxOn(taxable, taxRateBasisPoints);
+
+  /*
+   * Discount before tax, allocated proportionally across the taxable and
+   * non-taxable parts of the quote.
+   *
+   * Taking it all off the taxable side would understate the tax and taking it
+   * all off the non-taxable side would overstate it; a $30 discount on $200
+   * taxable + $100 non-taxable reduces the taxable base by $20, not $30 or $0.
+   * This is what Housecall Pro does, and it is easy to get wrong.
+   *
+   * Whether discount comes before or after tax is genuinely state-dependent.
+   * Before is the majority treatment and the common default; if that ever needs
+   * to vary it becomes a setting, not a rewrite of this function.
+   */
+  const taxableLines = lines.filter((line) => line.taxable !== false);
+  const taxableSubtotal = sumLines(taxableLines);
+
+  const taxableAfterDiscount =
+    subtotal > 0
+      ? taxableSubtotal -
+        Math.round((appliedDiscount * taxableSubtotal) / subtotal)
+      : 0;
+
+  const tax = taxExempt ? 0 : taxOn(taxableAfterDiscount, taxRateBasisPoints);
 
   return {
     subtotal,
     discount: appliedDiscount,
     tax,
-    total: taxable + tax,
+    total: subtotal - appliedDiscount + tax,
   };
 }
 

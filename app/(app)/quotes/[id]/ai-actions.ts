@@ -176,11 +176,15 @@ export async function importDraftItems(input: {
     const priced =
       referencedIds.length > 0
         ? await db
-            .select({ id: pricebookItems.id, price: pricebookItems.price })
+            .select({
+              id: pricebookItems.id,
+              price: pricebookItems.price,
+              taxable: pricebookItems.taxable,
+            })
             .from(pricebookItems)
             .where(eq(pricebookItems.businessId, owned.business.id))
         : [];
-    const priceById = new Map(priced.map((row) => [row.id, row.price]));
+    const pricebookById = new Map(priced.map((row) => [row.id, row]));
 
     // New lines land after whatever is already on the quote.
     const [positionRow] = await db
@@ -193,9 +197,10 @@ export async function importDraftItems(input: {
     const startPosition = positionRow?.next ?? 0;
 
     const rows = parsed.data.items.map((item, index) => {
-      const unitPrice = item.pricebookItemId
-        ? (priceById.get(item.pricebookItemId) ?? 0)
-        : 0;
+      const matched = item.pricebookItemId
+        ? pricebookById.get(item.pricebookItemId)
+        : undefined;
+      const unitPrice = matched?.price ?? 0;
       const quantity = toScaledQuantity(item.quantity);
 
       return {
@@ -206,6 +211,13 @@ export async function importDraftItems(input: {
         unit: item.unit,
         unitPrice,
         total: lineTotal({ quantity, unitPrice, type: item.type }),
+        /*
+         * Inherited from the pricebook, same as adding the item by hand. An
+         * unmatched line has no pricebook entry to inherit from, so it takes
+         * the taxable default and the owner adjusts it on review — which they
+         * are doing anyway, because it also has no price (golden rule 8).
+         */
+        taxable: matched?.taxable ?? true,
         type: item.type,
         position: startPosition + index,
       };

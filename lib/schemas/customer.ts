@@ -12,6 +12,7 @@ import {
   optionalText,
   requiredEmail,
   requiredText,
+  switchValue,
 } from "@/lib/schemas/shared";
 
 /**
@@ -49,6 +50,8 @@ export const customerSchema = z.object({
   email: requiredEmail,
   address: optionalText(300),
   notes: optionalText(MAX_DESCRIPTION_LENGTH),
+  /* Exemption follows the buyer, so it lives here and not on each quote. */
+  taxExempt: switchValue,
 });
 
 export type CustomerInput = z.infer<typeof customerSchema>;

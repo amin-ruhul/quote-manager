@@ -7,6 +7,7 @@ import {
   savePricebookItem,
 } from "@/app/(app)/pricebook/actions";
 import { Panel } from "@/components/panel";
+import { SwitchField } from "@/components/switch-field";
 import { SelectOrAdd } from "@/components/select-or-add";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,8 @@ function defaultsFor(item: PricebookItem | null): PricebookItemFields {
     category: item?.category ?? "",
     unit: item?.unit ?? DEFAULT_PRICEBOOK_UNIT,
     price: item ? centsToInputValue(item.price) : "",
+    // New items are taxable by default; the owner turns it off for labour.
+    taxable: item ? (item.taxable ? "true" : "false") : "true",
   };
 }
 
@@ -194,6 +197,20 @@ export function PricebookItemDialog({
                     only read as an asymmetry. */}
                 <FormMessage />
               </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="taxable"
+            render={({ field }) => (
+              <SwitchField
+                name={field.name}
+                value={field.value ?? "true"}
+                onChange={field.onChange}
+                label="Taxable"
+                hint="Off for labour in states that don't tax it."
+              />
             )}
           />
 

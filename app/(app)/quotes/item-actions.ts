@@ -62,6 +62,9 @@ export async function addPricebookItemToQuote(
       unit: item.unit,
       unitPrice: item.price,
       total: item.price,
+      // Inherited, so "labour isn't taxed here" is set once in the pricebook
+      // rather than re-decided on every line of every quote.
+      taxable: item.taxable,
       type: "qty",
       position: await nextPosition(quoteItems, owned.quoteId),
     });
@@ -98,6 +101,8 @@ export async function saveQuoteItem(
     quantity: formData.get("quantity") ?? "",
     unit: formData.get("unit") ?? "each",
     unitPrice: formData.get("unitPrice") ?? "",
+    // A switch that never rendered sends nothing; undefined is the "off" case.
+    taxable: formData.get("taxable") ?? undefined,
     type: formData.get("type") ?? "qty",
     optionId: formData.get("optionId") ?? "",
   });

@@ -8,6 +8,7 @@ import {
   saveCustomer,
 } from "@/app/(app)/customers/actions";
 import { Panel } from "@/components/panel";
+import { SwitchField } from "@/components/switch-field";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,6 +66,7 @@ function defaultsFor(customer: Customer | null): CustomerFields {
     email: customer?.email ?? "",
     address: customer?.address ?? "",
     notes: customer?.notes ?? "",
+    taxExempt: customer?.taxExempt ? "true" : "false",
   };
 }
 
@@ -237,6 +239,20 @@ export function CustomerForm({
                 </FormControl>
                 <FormMessage />
               </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="taxExempt"
+            render={({ field }) => (
+              <SwitchField
+                name={field.name}
+                value={field.value ?? "false"}
+                onChange={field.onChange}
+                label="Tax exempt"
+                hint="No sales tax on this customer's quotes."
+              />
             )}
           />
 

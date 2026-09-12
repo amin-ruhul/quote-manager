@@ -185,6 +185,7 @@ export function QuoteBuilder({
         discount={quote.discount}
         tax={quote.tax}
         taxRate={quote.taxRate}
+        taxExempt={selectedCustomer?.taxExempt ?? false}
         total={quote.total}
         currency={currency}
       />

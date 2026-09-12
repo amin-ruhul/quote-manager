@@ -51,6 +51,7 @@ export function TotalsBlock({
   discount,
   tax,
   taxRate,
+  taxExempt = false,
   total,
   currency,
 }: {
@@ -58,6 +59,7 @@ export function TotalsBlock({
   discount: number;
   tax: number;
   taxRate: number;
+  taxExempt?: boolean;
   total: number;
   currency: Currency;
 }) {
@@ -67,9 +69,19 @@ export function TotalsBlock({
       {discount > 0 ? (
         <Row label="Discount" value={`− ${formatCents(discount, currency)}`} />
       ) : null}
+      {/*
+        Shown whenever a rate is set, even when the tax comes to zero — a
+        customer who is exempt, or whose lines are all non-taxable, should see
+        that tax was considered and came to nothing rather than wonder whether
+        it was forgotten.
+      */}
       {taxRate > 0 ? (
         <Row
-          label={`Tax (${basisPointsToPercent(taxRate)}%)`}
+          label={
+            taxExempt
+              ? "Tax (exempt)"
+              : `Tax (${basisPointsToPercent(taxRate)}%)`
+          }
           value={formatCents(tax, currency)}
         />
       ) : null}

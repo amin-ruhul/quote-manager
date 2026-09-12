@@ -103,6 +103,7 @@ function readCustomer(formData: FormData) {
     email: formData.get("email") ?? "",
     address: formData.get("address") ?? "",
     notes: formData.get("notes") ?? "",
+    taxExempt: formData.get("taxExempt") ?? undefined,
   });
 }
 

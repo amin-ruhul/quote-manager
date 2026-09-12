@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   index,
   integer,
   jsonb,
@@ -128,6 +129,12 @@ export const pricebookItems = pgTable(
     price: integer("price").notNull(),
     /** Integer cents. Optional — what the item costs the business. */
     cost: integer("cost"),
+    /*
+     * Seeds quote_items.taxable when this item is added to a quote, so the
+     * owner sets "labour isn't taxed here" once in the pricebook rather than on
+     * every line of every quote.
+     */
+    taxable: boolean("taxable").notNull().default(true),
     /** Industry-specific extras; keeps the core engine generic. */
     metadata: jsonb("metadata").notNull().default({}),
     createdAt: timestamp("created_at", { withTimezone: true })

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   index,
   pgPolicy,
   pgTable,
@@ -27,6 +28,12 @@ export const customers = pgTable(
     email: text("email"),
     address: text("address"),
     notes: text("notes"),
+    /*
+     * Exemption belongs to the buyer, not the document — a tax-exempt customer
+     * is exempt on every quote — so it lives here and is surfaced as a badge on
+     * the quote rather than as another switch the owner has to remember.
+     */
+    taxExempt: boolean("tax_exempt").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

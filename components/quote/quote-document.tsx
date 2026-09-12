@@ -170,6 +170,7 @@ export function QuoteDocument({
               discount={quote.discount}
               tax={quote.tax}
               taxRate={quote.taxRate}
+              taxExempt={quote.customerTaxExempt ?? false}
               total={quote.total}
               currency={currency}
             />

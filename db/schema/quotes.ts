@@ -129,6 +129,15 @@ export const quoteItems = pgTable(
       .$type<QuoteItemType>()
       .notNull()
       .default(DEFAULT_QUOTE_ITEM_TYPE),
+    /*
+     * Whether the quote's tax rate applies to this line. A US quote routinely
+     * mixes both — Texas separated contracts tax materials but not labour — so
+     * one rate for the whole quote cannot express it.
+     *
+     * Defaults true so existing rows keep behaving as they did under the old
+     * whole-quote rate; the line form seeds it from the pricebook item.
+     */
+    taxable: boolean("taxable").notNull().default(true),
     position: integer("position").notNull().default(0),
   },
   (table) => [

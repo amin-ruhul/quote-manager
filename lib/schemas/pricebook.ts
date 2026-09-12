@@ -5,6 +5,7 @@ import {
   optionalText,
   priceInCents,
   pricebookUnit,
+  switchValue,
 } from "@/lib/schemas/shared";
 
 export const pricebookItemSchema = z.object({
@@ -17,6 +18,8 @@ export const pricebookItemSchema = z.object({
   category: optionalText(MAX_NAME_LENGTH),
   unit: pricebookUnit,
   price: priceInCents,
+  /* Seeds the taxable flag on every quote line made from this item. */
+  taxable: switchValue,
 });
 
 export type PricebookItemInput = z.infer<typeof pricebookItemSchema>;

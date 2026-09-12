@@ -51,6 +51,7 @@ export async function getQuoteByPublicToken(token: string) {
       businessWebsite: businesses.website,
       businessLicense: businesses.licenseNumber,
       currency: businesses.currency,
+      customerTaxExempt: customers.taxExempt,
       customerFirstName: customers.firstName,
       customerLastName: customers.lastName,
       // Drives the "Made with QuotePilot" footer, which Business plans remove.

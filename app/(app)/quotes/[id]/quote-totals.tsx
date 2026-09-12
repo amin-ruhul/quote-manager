@@ -11,6 +11,7 @@ export function QuoteTotals({
   discount,
   tax,
   taxRate,
+  taxExempt = false,
   total,
   currency,
 }: {
@@ -18,6 +19,7 @@ export function QuoteTotals({
   discount: number;
   tax: number;
   taxRate: number;
+  taxExempt?: boolean;
   total: number;
   currency: Currency;
 }) {
@@ -27,9 +29,14 @@ export function QuoteTotals({
       {discount > 0 ? (
         <Row label="Discount" value={`− ${formatCents(discount, currency)}`} />
       ) : null}
+      {/* Shown whenever a rate is set, so a zero reads as considered, not lost. */}
       {taxRate > 0 ? (
         <Row
-          label={`Tax (${basisPointsToPercent(taxRate)}%)`}
+          label={
+            taxExempt
+              ? "Tax (customer is exempt)"
+              : `Tax (${basisPointsToPercent(taxRate)}%)`
+          }
           value={formatCents(tax, currency)}
         />
       ) : null}
