@@ -184,6 +184,18 @@
     @apply bg-background text-foreground;
   }
 
+  /*
+   * Browsers give <button> the arrow cursor — only anchors get a pointer — and
+   * Preflight does not change that. Restore it once here rather than per
+   * component, so every button, menu trigger and dialog close reads as
+   * pressable. Disabled controls keep the arrow: a pointer on something that
+   * cannot be pressed is a lie.
+   */
+  button:not(:disabled):not([aria-disabled="true"]),
+  [role="button"]:not(:disabled):not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
   /* Money and figures are always tabular (DESIGN.md). */
   .tabular {
     font-feature-settings: "tnum";
