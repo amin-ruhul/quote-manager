@@ -106,18 +106,6 @@ export async function getQuoteByPublicToken(token: string) {
   return { ...quoteRow, items, options, photos };
 }
 
-/** A quote past its valid_until date can be read but not accepted. */
-export function isExpired(validUntil: Date | null): boolean {
-  if (!validUntil) return false;
-  return new Date(validUntil).getTime() < Date.now();
-}
-
-/** Statuses a customer is still allowed to act on. */
-export function canAccept(status: string, validUntil: Date | null): boolean {
-  if (isExpired(validUntil)) return false;
-  return status === "sent" || status === "viewed";
-}
-
 /**
  * Records a view (SPEC §11, golden rule 9). Every open is written — how often a
  * customer reopens a quote is exactly the signal the moat is built from.
