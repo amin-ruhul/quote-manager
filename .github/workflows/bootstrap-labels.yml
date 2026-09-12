@@ -1,0 +1,43 @@
+name: Bootstrap automation labels
+
+# Run this once from the Actions tab after merging the automation to `main`.
+# The issue templates and the Claude workflows all key off these labels, and
+# GitHub will not create them on demand. Re-running is safe.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Create or update labels
+        run: |
+          set -euo pipefail
+
+          create() {
+            gh label create "$1" --repo "$REPO" --color "$2" --description "$3" --force
+          }
+
+          # Entry points — adding one of these to an issue starts the pipeline.
+          create "bug"                  "D64545" "Something is broken"
+          create "feature"              "0075DE" "New capability"
+          create "enhancement"          "3F9DE8" "Improvement to something that exists"
+
+          # Pipeline state.
+          create "claude:go"            "0075DE" "Hand this issue to Claude"
+          create "claude:working"       "E6F3FE" "Claude is implementing this"
+          create "claude:review"        "8B6CD9" "Review this PR even though it is not a claude/* branch"
+          create "claude:fix-requested" "E8A33D" "Review found blocking issues; Claude is fixing them"
+          create "claude:human-review"  "2E9E5B" "Automated review is clean — ready for your review"
+
+          # Escape hatches.
+          create "claude:needs-human"   "D64545" "Automation stopped; a person needs to look"
+          create "claude:hold"          "6B6B6B" "Never pick this up automatically"

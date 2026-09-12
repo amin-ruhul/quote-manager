@@ -1,0 +1,76 @@
+name: Bug report
+description: Something in QuotePilot is broken.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Adding the **bug** label hands this issue to Claude, which will open a
+        pull request. The more precisely you describe the wrong behaviour, the
+        less it has to guess. Add **claude:hold** instead if you only want to
+        record the bug for now.
+
+  - type: textarea
+    id: what-happens
+    attributes:
+      label: What happens
+      description: The actual behaviour, and where you saw it.
+      placeholder: |
+        On /quotes/new, saving a quote with a line item priced $0.00 shows
+        "Quote saved" but the quote does not appear in the list.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: where
+    attributes:
+      label: Where in the code
+      description: Route, file or area, if you know it. Optional, but it helps a lot.
+      placeholder: app/(app)/quotes/new/page.tsx, lib/quotes.ts
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - Phone (the main case)
+        - Desktop
+        - Both
+        - Not a UI bug
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Errors, logs or screenshots
+      description: Paste any error text. Screenshots are welcome.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Before you submit
+      options:
+        - label: This is one bug, not several bundled together.
+          required: true
+        - label: I have said what the correct behaviour is, not just that it is wrong.
+          required: true
