@@ -1,4 +1,5 @@
 import { SectionHeading } from "@/components/landing/section-heading";
+import { BILLING_ENABLED, FREE_QUOTES_PER_MONTH } from "@/lib/constants";
 
 /*
  * Native <details> — no JavaScript, keyboard-accessible for free, and it costs
@@ -23,8 +24,10 @@ const QUESTIONS = [
     a: "All of them. We seed your pricebook with common electrical jobs so you're not staring at a blank screen, then you edit every one to your numbers.",
   },
   {
-    q: "What happens when I hit 5 quotes on the free plan?",
-    a: "Nothing breaks. Your existing quotes stay live and your customers can still accept them. You just can't create a new one until next month or until you upgrade.",
+    q: `What happens when I hit ${FREE_QUOTES_PER_MONTH} quotes in a month?`,
+    a: BILLING_ENABLED
+      ? "Nothing breaks. Your existing quotes stay live and your customers can still accept them. You just can't create a new one until next month or until you upgrade."
+      : "Nothing breaks. Your existing quotes stay live and your customers can still accept them. You just can't start a new one until the month rolls over — or until you ask us for more, which is one tap inside the app.",
   },
   {
     q: "Is my pricebook private?",

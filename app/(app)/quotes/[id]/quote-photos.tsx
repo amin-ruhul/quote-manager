@@ -9,7 +9,6 @@ import {
   deleteQuotePhoto,
   uploadQuotePhoto,
 } from "@/app/(app)/quotes/photo-actions";
-import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 import type { QuoteAttachment } from "@/db/schema";
 import { MAX_QUOTE_PHOTOS } from "@/lib/constants";
@@ -42,13 +41,12 @@ export function QuotePhotos({
   }
 
   return (
+    /* The heading lives on the <CollapsibleSection> that wraps this. */
     <section className="space-y-2">
-      <h2 className="font-semibold">Photos</h2>
-
       {attachments.length === 0 ? (
-        <Panel className="text-sm text-ink-60">
+        <p className="text-sm text-ink-60">
           No photos yet. Pictures of the job help a homeowner trust the price.
-        </Panel>
+        </p>
       ) : (
         <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {attachments.map((attachment) => (

@@ -25,6 +25,7 @@ const pricebookItem = {
   category: "",
   unit: "each" as const,
   price: "185.00",
+  taxable: "true" as const,
 };
 
 const quoteItem = {
@@ -35,6 +36,7 @@ const quoteItem = {
   unitPrice: "185",
   type: "qty" as const,
   optionId: "none",
+  taxable: "true" as const,
 };
 
 const quoteDetails = {
@@ -43,6 +45,7 @@ const quoteDetails = {
   terms: "",
   customerId: "none",
   discount: "",
+  taxRate: "",
   validUntil: "",
 };
 
@@ -300,6 +303,7 @@ describe("empty optional boxes become NULL, not empty strings", () => {
     email: "jo@brightspark.com",
     address: "",
     notes: "",
+    taxExempt: "false" as const,
   };
 
   it("nulls every untouched optional field", () => {

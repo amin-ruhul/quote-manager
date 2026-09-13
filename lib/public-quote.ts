@@ -51,6 +51,7 @@ export async function getQuoteByPublicToken(token: string) {
       businessWebsite: businesses.website,
       businessLicense: businesses.licenseNumber,
       currency: businesses.currency,
+      customerTaxExempt: customers.taxExempt,
       customerFirstName: customers.firstName,
       customerLastName: customers.lastName,
       // Drives the "Made with QuotePilot" footer, which Business plans remove.
@@ -77,6 +78,9 @@ export async function getQuoteByPublicToken(token: string) {
         unitPrice: quoteItems.unitPrice,
         total: quoteItems.total,
         type: quoteItems.type,
+        // Needed so the builder's live preview can recompute tax without a
+        // round trip; harmless on the customer page, which only reads totals.
+        taxable: quoteItems.taxable,
       })
       .from(quoteItems)
       .where(eq(quoteItems.quoteId, quoteRow.id))
@@ -104,18 +108,6 @@ export async function getQuoteByPublicToken(token: string) {
   ]);
 
   return { ...quoteRow, items, options, photos };
-}
-
-/** A quote past its valid_until date can be read but not accepted. */
-export function isExpired(validUntil: Date | null): boolean {
-  if (!validUntil) return false;
-  return new Date(validUntil).getTime() < Date.now();
-}
-
-/** Statuses a customer is still allowed to act on. */
-export function canAccept(status: string, validUntil: Date | null): boolean {
-  if (isExpired(validUntil)) return false;
-  return status === "sent" || status === "viewed";
 }
 
 /**

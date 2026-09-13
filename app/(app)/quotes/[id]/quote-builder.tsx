@@ -1,31 +1,18 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 import { CustomerForm } from "@/app/(app)/customers/customer-form";
-import { deleteQuote } from "@/app/(app)/quotes/actions";
-import { AiDraftPanel } from "@/app/(app)/quotes/[id]/ai-draft-panel";
+import { AiQuoteCheck } from "@/app/(app)/quotes/[id]/ai-upsell";
 import { QuoteDetailsForm } from "@/app/(app)/quotes/[id]/quote-details-form";
 import { QuoteLines } from "@/app/(app)/quotes/[id]/quote-lines";
 import { QuoteOptionsPanel } from "@/app/(app)/quotes/[id]/quote-options-panel";
 import { QuotePhotos } from "@/app/(app)/quotes/[id]/quote-photos";
-import { QuoteTotals } from "@/app/(app)/quotes/[id]/quote-totals";
 import { SharePanel } from "@/app/(app)/quotes/[id]/share-panel";
+import { CollapsibleSection, Section } from "@/components/collapsible-section";
 import { QuoteStatusPill } from "@/components/quote-status-pill";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import type {
   Customer,
@@ -36,6 +23,7 @@ import type {
   QuoteOption,
 } from "@/db/schema";
 import type { Currency, QuoteStatus } from "@/lib/constants";
+import { customerName } from "@/lib/customers";
 
 export function QuoteBuilder({
   quote,
@@ -45,6 +33,8 @@ export function QuoteBuilder({
   customers,
   pricebook,
   currency,
+  canEmail,
+  hasRequestedAccess,
 }: {
   quote: Quote;
   items: QuoteItem[];
@@ -53,12 +43,16 @@ export function QuoteBuilder({
   customers: Customer[];
   pricebook: PricebookItem[];
   currency: Currency;
+  /** Sending costs money per email, so it's granted by hand during the beta. */
+  canEmail: boolean;
+  hasRequestedAccess: boolean;
 }) {
   const router = useRouter();
   const [isAddingCustomer, setIsAddingCustomer] = useState(false);
-  const [isDeleting, startDeleting] = useTransition();
 
   const sharedItems = items.filter((item) => item.optionId === null);
+  const selectedCustomer =
+    customers.find((c) => c.id === quote.customerId) ?? null;
 
   if (isAddingCustomer) {
     return (
@@ -82,121 +76,108 @@ export function QuoteBuilder({
         <h1 className="text-3xl font-semibold">{quote.title}</h1>
       </header>
 
-      <QuoteDetailsForm
-        quote={quote}
-        customers={customers}
-        onAddCustomer={() => setIsAddingCustomer(true)}
-      />
-
-      <QuoteOptionsPanel
-        quoteId={quote.id}
-        options={options}
-        currency={currency}
-      />
-
-      <section className="space-y-2">
-        <h2 className="font-semibold">Draft from a description</h2>
-        <AiDraftPanel
-          quoteId={quote.id}
-          currency={currency}
-          hasScope={Boolean(quote.scopeOfWork)}
+      {/*
+       * Order follows the job, not the data model: describe it, price it, see
+       * the number, send it. The details form used to come first and the totals
+       * came last — below the send button — so the owner met a page of optional
+       * metadata before any line item and could send a quote without ever
+       * seeing its price.
+       *
+       * Secondary sections collapse, and their headers carry the answer, so a
+       * quote reads as five decisions rather than fifteen fields.
+       */}
+      <Section
+        title="Details"
+        summary={
+          selectedCustomer ? customerName(selectedCustomer) : "No customer yet"
+        }
+      >
+        <QuoteDetailsForm
+          quote={quote}
+          customers={customers}
+          onAddCustomer={() => setIsAddingCustomer(true)}
         />
-      </section>
+      </Section>
 
-      <div className="space-y-6">
-        <h2 className="font-semibold">Line items</h2>
-
-        <QuoteLines
-          quoteId={quote.id}
-          heading={options.length > 0 ? "Included in every option" : "Lines"}
-          items={sharedItems}
-          options={options}
-          pricebook={pricebook}
-          currency={currency}
-          optionId={null}
-        />
-
-        {options.map((option) => (
+      <Section title="Line items">
+        <div className="space-y-6">
           <QuoteLines
-            key={option.id}
             quoteId={quote.id}
-            heading={`Only in ${option.name}`}
-            items={items.filter((item) => item.optionId === option.id)}
+            // With no options there is only one group, and the section
+            // heading above already names it.
+            heading={options.length > 0 ? "Included in every option" : null}
+            items={sharedItems}
             options={options}
             pricebook={pricebook}
             currency={currency}
-            optionId={option.id}
+            optionId={null}
           />
-        ))}
-      </div>
 
-      <QuotePhotos quoteId={quote.id} attachments={attachments} />
+          {options.map((option) => (
+            <QuoteLines
+              key={option.id}
+              quoteId={quote.id}
+              heading={`Only in ${option.name}`}
+              items={items.filter((item) => item.optionId === option.id)}
+              options={options}
+              pricebook={pricebook}
+              currency={currency}
+              optionId={option.id}
+            />
+          ))}
+        </div>
+      </Section>
+
+      <CollapsibleSection
+        title="Options"
+        summary={
+          options.length > 0
+            ? `${options.length} to choose from`
+            : "One price — no Good/Better/Best"
+        }
+        defaultOpen={options.length > 0}
+      >
+        <QuoteOptionsPanel
+          quoteId={quote.id}
+          options={options}
+          lineCounts={Object.fromEntries(
+            options.map((option) => [
+              option.id,
+              items.filter((item) => item.optionId === option.id).length,
+            ]),
+          )}
+          currency={currency}
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        title="Photos"
+        summary={
+          attachments.length > 0
+            ? `${attachments.length} attached`
+            : "None attached"
+        }
+        defaultOpen={attachments.length > 0}
+      >
+        <QuotePhotos quoteId={quote.id} attachments={attachments} />
+      </CollapsibleSection>
+
+      <AiQuoteCheck />
 
       <SharePanel
         quoteId={quote.id}
         isDraft={quote.status === "draft"}
-        customerEmail={
-          customers.find((c) => c.id === quote.customerId)?.email ?? null
-        }
+        customerEmail={selectedCustomer?.email ?? null}
+        canEmail={canEmail}
+        hasRequestedAccess={hasRequestedAccess}
       />
 
-      <QuoteTotals
-        subtotal={quote.subtotal}
-        discount={quote.discount}
-        tax={quote.tax}
-        taxRate={quote.taxRate}
-        total={quote.total}
-        currency={currency}
-      />
-
-      <div className="flex flex-col gap-2 border-t border-hairline pt-6 sm:flex-row-reverse sm:justify-start">
+      {/* Delete lives in the floating bar now — it acts on the whole quote,
+          and it should not require scrolling to the bottom to find. */}
+      <div className="border-t border-hairline pt-6">
         <Button asChild variant="ghost" size="lg" className="w-full sm:w-auto">
           <Link href="/quotes">Back to quotes</Link>
         </Button>
-
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="lg"
-              className="w-full text-destructive sm:w-auto"
-              loading={isDeleting}
-            >
-              {isDeleting ? null : <Trash2 />}
-              Delete quote
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogTitle>Delete this quote?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {quote.quoteNumber} and everything on it — lines, options and
-              photos — will be removed. This can&apos;t be undone.
-            </AlertDialogDescription>
-            <AlertDialogFooter>
-              <AlertDialogAction asChild>
-                <Button
-                  variant="destructive"
-                  size="lg"
-                  className="w-full sm:w-auto"
-                  onClick={() =>
-                    startDeleting(async () => {
-                      const { error } = await deleteQuote(quote.id);
-                      if (error) toast.error(error);
-                      else router.push("/quotes");
-                    })
-                  }
-                >
-                  Delete quote
-                </Button>
-              </AlertDialogAction>
-              <AlertDialogCancel asChild>
-                <Button variant="ghost" size="lg" className="w-full sm:w-auto">
-                  Keep it
-                </Button>
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </div>
   );

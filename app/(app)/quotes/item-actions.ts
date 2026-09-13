@@ -62,6 +62,9 @@ export async function addPricebookItemToQuote(
       unit: item.unit,
       unitPrice: item.price,
       total: item.price,
+      // Inherited, so "labour isn't taxed here" is set once in the pricebook
+      // rather than re-decided on every line of every quote.
+      taxable: item.taxable,
       type: "qty",
       position: await nextPosition(quoteItems, owned.quoteId),
     });
@@ -98,6 +101,8 @@ export async function saveQuoteItem(
     quantity: formData.get("quantity") ?? "",
     unit: formData.get("unit") ?? "each",
     unitPrice: formData.get("unitPrice") ?? "",
+    // A switch that never rendered sends nothing; undefined is the "off" case.
+    taxable: formData.get("taxable") ?? undefined,
     type: formData.get("type") ?? "qty",
     optionId: formData.get("optionId") ?? "",
   });
@@ -169,6 +174,82 @@ export async function saveQuoteItem(
 
   revalidatePath(`/quotes/${owned.quoteId}`);
   return { error: null, fieldErrors: {}, savedAt: Date.now() };
+}
+
+/**
+ * Moves one line between the shared set and an option, or between options.
+ *
+ * Good/Better/Best almost always starts as a base quote you then upgrade, so
+ * the common move is "this line belongs only in Premium" on a line that already
+ * exists. Without this the owner had to open the line and change a select
+ * buried in the edit form, which is why options so often ended up identical.
+ *
+ * `optionId` null means the line is shared — it counts toward every option.
+ */
+export async function moveQuoteItemToOption(
+  quoteId: string,
+  itemId: string,
+  optionId: string | null,
+): Promise<{ error: string | null }> {
+  const owned = await requireOwnedQuote(quoteId);
+  if (!owned) return { error: "That quote no longer exists." };
+
+  const parsedItemId = idSchema.safeParse(itemId);
+  if (!parsedItemId.success) return { error: "Something went wrong." };
+
+  let target: string | null = null;
+  if (optionId !== null) {
+    const parsedOptionId = idSchema.safeParse(optionId);
+    if (!parsedOptionId.success) return { error: "Pick a valid option." };
+
+    /*
+     * The option has to belong to THIS quote. Without this check a crafted
+     * request could attach a line to another owner's option — the line's own
+     * quote_id is scoped, but the option id arrives from the client.
+     */
+    const [option] = await db
+      .select({ id: quoteOptions.id })
+      .from(quoteOptions)
+      .where(
+        and(
+          eq(quoteOptions.id, parsedOptionId.data),
+          eq(quoteOptions.quoteId, owned.quoteId),
+        ),
+      )
+      .limit(1);
+
+    if (!option) return { error: "That option no longer exists." };
+    target = option.id;
+  }
+
+  try {
+    const moved = await db
+      .update(quoteItems)
+      .set({ optionId: target })
+      .where(
+        and(
+          eq(quoteItems.id, parsedItemId.data),
+          eq(quoteItems.quoteId, owned.quoteId),
+        ),
+      )
+      .returning({ id: quoteItems.id });
+
+    if (moved.length === 0) return { error: "That line no longer exists." };
+
+    // Option totals are derived from which lines belong where, so they all
+    // have to be recomputed, not just the one that moved.
+    await recalculateQuote(owned.quoteId);
+  } catch (error) {
+    console.error("Moving quote item failed", {
+      quoteId: owned.quoteId,
+      itemId,
+      error,
+    });
+    return { error: "We couldn't move that line. Try again." };
+  }
+
+  revalidatePath(`/quotes/${owned.quoteId}`);
+  return { error: null };
 }
 
 export async function deleteQuoteItem(

@@ -9,7 +9,7 @@ import { quoteEvents, quotes } from "@/db/schema";
 import { MAX_NAME_LENGTH } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { notifyOwnerAccepted } from "@/lib/notify-owner";
-import { canAccept } from "@/lib/public-quote";
+import { canAccept } from "@/lib/quote-status";
 import { clientIpFrom, rateLimit } from "@/lib/rate-limit";
 
 export type AcceptState = { error: string | null; acceptedAt: number | null };

@@ -14,6 +14,8 @@ import {
   priceInCents,
   pricebookUnit,
   scaledQuantity,
+  switchValue,
+  taxRatePercent,
 } from "@/lib/schemas/shared";
 
 export const quoteDetailsSchema = z.object({
@@ -26,6 +28,13 @@ export const quoteDetailsSchema = z.object({
   terms: optionalText(8000),
   customerId: optionalUuid("Pick a valid customer."),
   discount: optionalCents("Enter a discount, like 150."),
+  /*
+   * Per quote, not per business. The rate is snapshotted from the business
+   * default when a quote is created, so settings changes never rewrite quotes
+   * already drafted — but without an override here, a quote created before the
+   * owner set their rate was frozen at 0% with no way to fix it.
+   */
+  taxRate: taxRatePercent,
   validUntil: z
     .string()
     .max(MAX_DATE_INPUT_LENGTH, "Enter a valid date.")
@@ -50,6 +59,7 @@ export const quoteItemSchema = z
     quantity: scaledQuantity,
     unit: pricebookUnit,
     unitPrice: priceInCents,
+    taxable: switchValue,
     type: z.enum(QUOTE_ITEM_TYPES),
     optionId: optionalUuid("Pick a valid option."),
   })

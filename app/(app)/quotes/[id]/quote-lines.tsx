@@ -1,16 +1,24 @@
 "use client";
 
-import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { FolderInput, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import {
   addPricebookItemToQuote,
   deleteQuoteItem,
+  moveQuoteItemToOption,
 } from "@/app/(app)/quotes/item-actions";
 import { QuoteLineForm } from "@/app/(app)/quotes/[id]/quote-line-form";
 import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -27,15 +35,26 @@ import { formatQuantity } from "@/lib/quote-math";
 function LineRow({
   quoteId,
   item,
+  options,
   currency,
   onEdit,
 }: {
   quoteId: string;
   item: QuoteItem;
+  /** Every option on the quote, so a line can be moved between them. */
+  options: QuoteOption[];
   currency: Currency;
   onEdit: () => void;
 }) {
   const [isDeleting, startDeleting] = useTransition();
+  const [isMoving, startMoving] = useTransition();
+
+  function moveTo(optionId: string | null) {
+    startMoving(async () => {
+      const { error } = await moveQuoteItemToOption(quoteId, item.id, optionId);
+      if (error) toast.error(error);
+    });
+  }
 
   if (isDeleting) {
     return (
@@ -67,6 +86,46 @@ function LineRow({
         <span className="tabular mr-1 font-medium">
           {formatCents(item.total, currency)}
         </span>
+
+        {/*
+          Only worth showing once there is somewhere to move to. Good/Better/
+          Best usually starts as a base quote you then upgrade, so moving an
+          existing line into one option is the common edit — burying it in the
+          line form's "Applies to" select is what left options identical.
+        */}
+        {options.length > 0 ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Move ${item.name} to an option`}
+                loading={isMoving}
+              >
+                {isMoving ? null : <FolderInput />}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Move this line to</DropdownMenuLabel>
+              <DropdownMenuItem
+                disabled={item.optionId === null}
+                onSelect={() => moveTo(null)}
+              >
+                Every option
+              </DropdownMenuItem>
+              {options.map((option) => (
+                <DropdownMenuItem
+                  key={option.id}
+                  disabled={item.optionId === option.id}
+                  onSelect={() => moveTo(option.id)}
+                >
+                  Only {option.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+
         <Button
           variant="ghost"
           size="icon-sm"
@@ -105,7 +164,8 @@ export function QuoteLines({
   optionId,
 }: {
   quoteId: string;
-  heading: string;
+  /** Null when the section above already names this group. */
+  heading: string | null;
   items: QuoteItem[];
   options: QuoteOption[];
   pricebook: PricebookItem[];
@@ -135,7 +195,9 @@ export function QuoteLines({
 
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-medium text-ink-60">{heading}</h3>
+      {heading ? (
+        <h3 className="text-sm font-medium text-ink-60">{heading}</h3>
+      ) : null}
 
       {items.length === 0 ? (
         <Panel className="text-sm text-ink-60">
@@ -149,6 +211,7 @@ export function QuoteLines({
                 key={item.id}
                 quoteId={quoteId}
                 item={item}
+                options={options}
                 currency={currency}
                 onEdit={() => setEditing(item)}
               />

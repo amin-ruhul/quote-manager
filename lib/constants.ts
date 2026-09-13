@@ -15,11 +15,87 @@ export const PLAN_LABELS: Record<Plan, string> = {
 };
 
 /**
- * The freemium cap (SPEC §16). Displayed today; enforcement lands with the rest
- * of billing in Phase 6 (`lib/quota.ts`), which is the only thing that should
- * ever block a create.
+ * Everything above free is an account we granted by hand during the market
+ * test. The features that cost real money per use — AI drafting, sending email
+ * — are gated on this, never on a plan name spelled out at the call site.
  */
-export const FREE_QUOTES_PER_MONTH = 5;
+export function isPaidPlan(plan: Plan): boolean {
+  return plan !== "free";
+}
+
+/** What a locked feature says when the server refuses it. */
+export const PREMIUM_LOCKED_MESSAGE =
+  "That one's invite-only while we're in beta. Ask for access from Plan & usage.";
+
+/*
+ * THE MARKET-TEST SWITCH.
+ *
+ * While this is false nothing is for sale: no prices, no checkout, no billing
+ * links anywhere in the app or on the landing page. Premium is something an
+ * owner *asks* for, and access is granted by hand (set `profiles.plan`).
+ *
+ * The point is to learn whether people want the paid features before paying to
+ * build the paid plumbing — the number of upgrade requests is the experiment.
+ * None of the Paddle-era billing code was deleted: flipping this to true brings
+ * the price cards and the checkout buttons back.
+ */
+export const BILLING_ENABLED = false;
+
+/**
+ * Where "your plan" lives. Two screens, one link: the market-test page that
+ * sells nothing, or the real billing page once there is something to buy.
+ */
+export const PLAN_PAGE_PATH = BILLING_ENABLED ? "/billing" : "/plan";
+
+/**
+ * Where an owner was standing when they asked for access. Kept so the requests
+ * table can answer "which locked feature actually drives the asking?" — the
+ * whole reason for running the test.
+ */
+export const UPGRADE_REQUEST_SOURCES = [
+  "quota",
+  "ai",
+  "email",
+  "pdf",
+  "plan",
+] as const;
+export type UpgradeRequestSource = (typeof UPGRADE_REQUEST_SOURCES)[number];
+
+/** Asking from the plan page itself, rather than from a lock on the way there. */
+export const DEFAULT_UPGRADE_REQUEST_SOURCE: UpgradeRequestSource = "plan";
+
+/**
+ * What the owner was trying to do when they hit the lock, in their words. Used
+ * to open the request form with the right sentence rather than a generic one —
+ * someone who came from the AI tab shouldn't have to re-explain why they're
+ * there.
+ */
+export const UPGRADE_REQUEST_PROMPTS: Record<UpgradeRequestSource, string> = {
+  quota: "You came from running out of quotes this month.",
+  ai: "You came from AI drafting.",
+  email: "You came from emailing a quote.",
+  pdf: "You came from downloading a PDF.",
+  plan: "",
+};
+
+/** How far a request has got. Moved by hand while the test runs. */
+export const UPGRADE_REQUEST_STATUSES = [
+  "new",
+  "contacted",
+  "granted",
+] as const;
+export type UpgradeRequestStatus = (typeof UPGRADE_REQUEST_STATUSES)[number];
+
+/** Room for "I quote 20 jobs a week" without room for an essay. */
+export const MAX_UPGRADE_NOTE_LENGTH = 500;
+
+/**
+ * The freemium cap (SPEC §16), enforced in `lib/quota.ts` — the only thing that
+ * should ever block a create. Ten a month is deliberately generous for the
+ * market test: enough that a real electrician can run their week on the free
+ * plan, few enough that a busy one hits the wall and tells us so.
+ */
+export const FREE_QUOTES_PER_MONTH = 10;
 
 /**
  * When the usage meter starts warning rather than just informing. Research on

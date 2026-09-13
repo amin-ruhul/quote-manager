@@ -201,3 +201,43 @@ ${input.signedName ? `Signed: ${input.signedName}\n` : ""}
 ${input.builderUrl}`,
   };
 }
+
+/**
+ * Operator notification: someone asked for premium access.
+ *
+ * Goes to us, not to a customer, which is why it reads like a work item rather
+ * than a product email — the whole point is to answer it by hand the same day.
+ */
+export function upgradeRequestEmail(input: {
+  businessName: string | null;
+  ownerName: string | null;
+  ownerEmail: string;
+  source: string;
+  note: string | null;
+  totalRequests: number;
+}): EmailContent {
+  const who = escapeHtml(input.businessName ?? input.ownerName ?? "Someone");
+  const note = input.note
+    ? paragraph(`They said: “${escapeHtml(input.note)}”`)
+    : "";
+
+  return {
+    subject: `Premium request #${input.totalRequests} — ${input.businessName ?? input.ownerEmail}`,
+    html: layout({
+      heading: "Someone asked for premium access",
+      body:
+        paragraph(
+          `<strong style="color:${INK}">${who}</strong> (${escapeHtml(input.ownerEmail)}) ` +
+            `asked from the <strong style="color:${INK}">${escapeHtml(input.source)}</strong> screen.`,
+        ) +
+        note +
+        paragraph(
+          `That's request number ${input.totalRequests} since the test started.`,
+        ),
+      footer: "QuotePilot — market test",
+    }),
+    text: `${input.businessName ?? input.ownerName ?? "Someone"} (${input.ownerEmail}) asked for premium access from the ${input.source} screen.
+${input.note ? `\nThey said: "${input.note}"\n` : ""}
+Request number ${input.totalRequests} since the test started.`,
+  };
+}

@@ -19,9 +19,11 @@ import {
 import {
   MAX_DESCRIPTION_LENGTH,
   MAX_QUANTITY,
+  PREMIUM_LOCKED_MESSAGE,
   QUOTE_ITEM_TYPES,
 } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { hasPremiumAccess } from "@/lib/plan";
 import { lineTotal } from "@/lib/quote-math";
 import { recalculateQuote, requireOwnedQuote } from "@/lib/quotes";
 import { rateLimit } from "@/lib/rate-limit";
@@ -49,6 +51,16 @@ export async function generateDraft(
 ): Promise<DraftState> {
   const owned = await requireOwnedQuote(String(formData.get("quoteId") ?? ""));
   if (!owned) return { error: "That quote no longer exists.", draft: null };
+
+  /*
+   * The UI shows a lock instead of this panel on the free plan, but a lock
+   * drawn in the browser is decoration — an action is callable by anyone with
+   * a session. Every model call is real money, so this is the check that
+   * counts.
+   */
+  if (!(await hasPremiumAccess(owned.user.id))) {
+    return { error: PREMIUM_LOCKED_MESSAGE, draft: null };
+  }
 
   const parsed = jobDescriptionSchema.safeParse(
     formData.get("jobDescription") ?? "",
@@ -167,6 +179,12 @@ export async function importDraftItems(input: {
   const owned = await requireOwnedQuote(parsed.data.quoteId);
   if (!owned) return { error: "That quote no longer exists." };
 
+  // Importing costs nothing to run, but it is the second half of a drafting
+  // session — leaving it open would leave the locked feature half-usable.
+  if (!(await hasPremiumAccess(owned.user.id))) {
+    return { error: PREMIUM_LOCKED_MESSAGE };
+  }
+
   try {
     const referencedIds = parsed.data.items
       .map((item) => item.pricebookItemId)
@@ -176,11 +194,15 @@ export async function importDraftItems(input: {
     const priced =
       referencedIds.length > 0
         ? await db
-            .select({ id: pricebookItems.id, price: pricebookItems.price })
+            .select({
+              id: pricebookItems.id,
+              price: pricebookItems.price,
+              taxable: pricebookItems.taxable,
+            })
             .from(pricebookItems)
             .where(eq(pricebookItems.businessId, owned.business.id))
         : [];
-    const priceById = new Map(priced.map((row) => [row.id, row.price]));
+    const pricebookById = new Map(priced.map((row) => [row.id, row]));
 
     // New lines land after whatever is already on the quote.
     const [positionRow] = await db
@@ -193,9 +215,10 @@ export async function importDraftItems(input: {
     const startPosition = positionRow?.next ?? 0;
 
     const rows = parsed.data.items.map((item, index) => {
-      const unitPrice = item.pricebookItemId
-        ? (priceById.get(item.pricebookItemId) ?? 0)
-        : 0;
+      const matched = item.pricebookItemId
+        ? pricebookById.get(item.pricebookItemId)
+        : undefined;
+      const unitPrice = matched?.price ?? 0;
       const quantity = toScaledQuantity(item.quantity);
 
       return {
@@ -206,6 +229,13 @@ export async function importDraftItems(input: {
         unit: item.unit,
         unitPrice,
         total: lineTotal({ quantity, unitPrice, type: item.type }),
+        /*
+         * Inherited from the pricebook, same as adding the item by hand. An
+         * unmatched line has no pricebook entry to inherit from, so it takes
+         * the taxable default and the owner adjusts it on review — which they
+         * are doing anyway, because it also has no price (golden rule 8).
+         */
+        taxable: matched?.taxable ?? true,
         type: item.type,
         position: startPosition + index,
       };

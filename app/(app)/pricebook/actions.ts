@@ -29,6 +29,7 @@ function parseItem(formData: FormData) {
     category: formData.get("category") ?? "",
     unit: formData.get("unit") ?? "each",
     price: formData.get("price") ?? "",
+    taxable: formData.get("taxable") ?? undefined,
   });
 }
 

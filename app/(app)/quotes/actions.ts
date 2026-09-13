@@ -1,19 +1,23 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-import { quotes } from "@/db/schema";
+import { quoteEvents, quoteItems, quoteOptions, quotes } from "@/db/schema";
 import { requireBusiness } from "@/lib/auth";
 import { DEFAULT_QUOTE_VALID_DAYS } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { toFieldErrors } from "@/lib/form-state";
 import {
   generatePublicToken,
+  getQuoteForBusiness,
   nextQuoteNumber,
   recalculateQuote,
   requireOwnedQuote,
 } from "@/lib/quotes";
+import { consumeQuoteQuota } from "@/lib/quota";
 import { quoteDetailsSchema } from "@/lib/schemas/quote";
 
 export type QuoteFormState = {
@@ -23,6 +27,15 @@ export type QuoteFormState = {
 };
 
 /**
+ * Why a create failed, not just that it did. `atLimit` is the one failure the
+ * owner can act on — it sends them to the plan page instead of asking them to
+ * try again, which would never work.
+ */
+export type CreateQuoteResult =
+  | { quoteId: string; error: null; atLimit: false }
+  | { quoteId: null; error: string; atLimit: boolean };
+
+/**
  * Creates an empty draft and returns its id for the caller to navigate to.
  *
  * Deliberately does NOT call redirect(): redirect() works by throwing, so a
@@ -30,10 +43,21 @@ export type QuoteFormState = {
  * failure for a quote that was in fact created. Returning the id keeps the
  * success and failure paths ordinary values.
  */
-export async function createQuote(): Promise<
-  { quoteId: string; error: null } | { quoteId: null; error: string }
-> {
-  const { business } = await requireBusiness();
+export async function createQuote(): Promise<CreateQuoteResult> {
+  const { user, business } = await requireBusiness();
+
+  /*
+   * The cap is claimed before anything is written. Doing it the other way
+   * around means a failed create still burns a quote off someone's month.
+   */
+  const quota = await consumeQuoteQuota(user.id);
+  if (!quota.allowed) {
+    return {
+      quoteId: null,
+      atLimit: true,
+      error: `That's all ${quota.limit} quotes for this month.`,
+    };
+  }
 
   const validUntil = new Date();
   validUntil.setDate(validUntil.getDate() + DEFAULT_QUOTE_VALID_DAYS);
@@ -62,16 +86,20 @@ export async function createQuote(): Promise<
     if (!quoteId) {
       return {
         quoteId: null,
+        atLimit: false,
         error: "We couldn't start a new quote. Try again.",
       };
     }
 
     revalidatePath("/quotes");
-    return { quoteId, error: null };
+    // The header's usage meter moved, and it is rendered by the layout.
+    revalidatePath("/", "layout");
+    return { quoteId, error: null, atLimit: false };
   } catch (error) {
     console.error("Creating quote failed", { businessId: business.id, error });
     return {
       quoteId: null,
+      atLimit: false,
       error: "We couldn't start a new quote. Try again.",
     };
   }
@@ -95,6 +123,187 @@ export async function deleteQuote(
   return { error: null };
 }
 
+/**
+ * Copies a quote — its lines, options, discount and tax rate — into a fresh
+ * draft. The job an electrician quotes twice a week is the same job; retyping
+ * it is the work this removes.
+ *
+ * What is deliberately NOT copied: the lifecycle (a copy starts as a draft with
+ * its own public token and no events), and the photos. A copied attachment row
+ * would point at the original's storage object, which is deleted with the
+ * original — leaving the copy with broken images.
+ */
+export async function duplicateQuote(
+  quoteId: string,
+): Promise<
+  | { quoteId: string; quoteNumber: string; error: null }
+  | { quoteId: null; quoteNumber: null; error: string }
+> {
+  const failed = {
+    quoteId: null,
+    quoteNumber: null,
+    error: "We couldn't copy that quote. Try again.",
+  } as const;
+
+  const owned = await requireOwnedQuote(quoteId);
+  if (!owned) {
+    return { ...failed, error: "That quote no longer exists." };
+  }
+
+  const source = await getQuoteForBusiness(owned.quoteId, owned.business.id);
+  if (!source) {
+    return { ...failed, error: "That quote no longer exists." };
+  }
+
+  // A copy is a quote. Letting duplicate skip the meter would make the cap
+  // trivially avoidable, and the count meaningless.
+  const quota = await consumeQuoteQuota(owned.user.id);
+  if (!quota.allowed) {
+    return {
+      ...failed,
+      error: `That's all ${quota.limit} quotes for this month. Open Plan & usage to ask for more.`,
+    };
+  }
+
+  const validUntil = new Date();
+  validUntil.setDate(validUntil.getDate() + DEFAULT_QUOTE_VALID_DAYS);
+
+  /*
+   * New option ids are minted here rather than read back from RETURNING, so
+   * each copied line can be pointed at its copied option without depending on
+   * the order rows come back in.
+   */
+  const optionIds = new Map(
+    source.options.map((option) => [option.id, randomUUID()]),
+  );
+
+  try {
+    const created = await db.transaction(async (tx) => {
+      const quoteNumber = await nextQuoteNumber(tx, owned.business.id);
+
+      const [row] = await tx
+        .insert(quotes)
+        .values({
+          businessId: owned.business.id,
+          customerId: source.quote.customerId,
+          quoteNumber,
+          title: `${source.quote.title} (copy)`,
+          scopeOfWork: source.quote.scopeOfWork,
+          terms: source.quote.terms,
+          discount: source.quote.discount,
+          taxRate: source.quote.taxRate,
+          publicToken: generatePublicToken(),
+          validUntil,
+        })
+        .returning({ id: quotes.id, quoteNumber: quotes.quoteNumber });
+
+      if (!row) return null;
+
+      if (source.options.length > 0) {
+        await tx.insert(quoteOptions).values(
+          source.options.map((option) => ({
+            id: optionIds.get(option.id),
+            quoteId: row.id,
+            name: option.name,
+            description: option.description,
+            isRecommended: option.isRecommended,
+            position: option.position,
+          })),
+        );
+      }
+
+      if (source.items.length > 0) {
+        await tx.insert(quoteItems).values(
+          source.items.map((item) => ({
+            quoteId: row.id,
+            optionId: item.optionId
+              ? (optionIds.get(item.optionId) ?? null)
+              : null,
+            name: item.name,
+            description: item.description,
+            quantity: item.quantity,
+            unit: item.unit,
+            unitPrice: item.unitPrice,
+            total: item.total,
+            type: item.type,
+            taxable: item.taxable,
+            position: item.position,
+          })),
+        );
+      }
+
+      return row;
+    });
+
+    if (!created) return failed;
+
+    // Totals are never trusted from the source row — they are derived again.
+    await recalculateQuote(created.id);
+
+    revalidatePath("/quotes");
+    return {
+      quoteId: created.id,
+      quoteNumber: created.quoteNumber,
+      error: null,
+    };
+  } catch (error) {
+    console.error("Duplicating quote failed", {
+      quoteId: owned.quoteId,
+      error,
+    });
+    return failed;
+  }
+}
+
+/**
+ * Statuses the owner may set by hand from the list. The customer-driven ones
+ * (viewed, accepted from the public page) are written by the flows that observe
+ * them, and `expired` is the follow-up job's — none of those are a menu item.
+ *
+ * Marking by hand matters because plenty of quotes are sent and answered off
+ * the platform: read out over the phone, accepted in a driveway.
+ */
+const MANUAL_QUOTE_STATUSES = ["sent", "accepted", "declined"] as const;
+const manualStatusSchema = z.enum(MANUAL_QUOTE_STATUSES);
+
+export async function setQuoteStatus(
+  quoteId: string,
+  status: string,
+): Promise<{ error: string | null }> {
+  const parsed = manualStatusSchema.safeParse(status);
+  if (!parsed.success) return { error: "That isn't a status you can set." };
+
+  const owned = await requireOwnedQuote(quoteId);
+  if (!owned) return { error: "That quote no longer exists." };
+
+  try {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(quotes)
+        .set({ status: parsed.data, updatedAt: new Date() })
+        .where(eq(quotes.id, owned.quoteId));
+
+      // Golden rule 9: the lifecycle is recorded, however it was reached.
+      await tx.insert(quoteEvents).values({
+        quoteId: owned.quoteId,
+        type: parsed.data,
+        meta: { via: "manual", at: new Date().toISOString() },
+      });
+    });
+  } catch (error) {
+    console.error("Setting quote status failed", {
+      quoteId: owned.quoteId,
+      status: parsed.data,
+      error,
+    });
+    return { error: "We couldn't update that quote. Try again." };
+  }
+
+  revalidatePath(`/quotes/${owned.quoteId}`);
+  revalidatePath("/quotes");
+  return { error: null };
+}
+
 export async function saveQuoteDetails(
   _prevState: QuoteFormState,
   formData: FormData,
@@ -114,6 +323,7 @@ export async function saveQuoteDetails(
     terms: formData.get("terms") ?? "",
     customerId: formData.get("customerId") ?? "",
     discount: formData.get("discount") ?? "",
+    taxRate: formData.get("taxRate") ?? "",
     validUntil: formData.get("validUntil") ?? "",
   });
 

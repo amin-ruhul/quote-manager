@@ -123,6 +123,80 @@ describe("quoteTotals", () => {
   });
 });
 
+/*
+ * A US electrician's quote mixes taxable and non-taxable work on one document —
+ * Texas separated contracts tax materials but not labour. These cases are the
+ * reason the flag is per line rather than per quote.
+ */
+describe("quoteTotals — taxable lines only", () => {
+  // $200 of taxable materials, $100 of non-taxable labour.
+  const mixed = [
+    { quantity: 100, unitPrice: 20000, taxable: true },
+    { quantity: 100, unitPrice: 10000, taxable: false },
+  ];
+
+  it("taxes only the taxable lines", () => {
+    const result = quoteTotals({ lines: mixed, taxRateBasisPoints: 1000 });
+    expect(result.subtotal).toBe(30000);
+    // 10% of $200, not of $300.
+    expect(result.tax).toBe(2000);
+    expect(result.total).toBe(32000);
+  });
+
+  it("treats a line with no flag as taxable, as it behaved before", () => {
+    const result = quoteTotals({
+      lines: [{ quantity: 100, unitPrice: 20000 }],
+      taxRateBasisPoints: 1000,
+    });
+    expect(result.tax).toBe(2000);
+  });
+
+  it("allocates a discount proportionally across taxable and non-taxable", () => {
+    // $30 off $300 is 10%, so the $200 taxable base drops by $20 to $180.
+    const result = quoteTotals({
+      lines: mixed,
+      discount: 3000,
+      taxRateBasisPoints: 1000,
+    });
+    expect(result.discount).toBe(3000);
+    expect(result.tax).toBe(1800);
+    expect(result.total).toBe(30000 - 3000 + 1800);
+  });
+
+  it("charges no tax at all when every line is exempt", () => {
+    const result = quoteTotals({
+      lines: mixed.map((line) => ({ ...line, taxable: false })),
+      taxRateBasisPoints: 1000,
+    });
+    expect(result.tax).toBe(0);
+    expect(result.total).toBe(30000);
+  });
+
+  it("charges no tax for a tax-exempt customer, whatever the lines say", () => {
+    const result = quoteTotals({
+      lines: mixed,
+      taxRateBasisPoints: 1000,
+      taxExempt: true,
+    });
+    expect(result.tax).toBe(0);
+    expect(result.total).toBe(30000);
+  });
+
+  it("keeps every field an integer when the split doesn't divide evenly", () => {
+    const result = quoteTotals({
+      lines: [
+        { quantity: 133, unitPrice: 999, taxable: true },
+        { quantity: 77, unitPrice: 333, taxable: false },
+      ],
+      discount: 7,
+      taxRateBasisPoints: 825,
+    });
+    for (const value of Object.values(result)) {
+      expect(Number.isInteger(value)).toBe(true);
+    }
+  });
+});
+
 describe("parseQuantity", () => {
   it("scales typed quantities", () => {
     expect(parseQuantity("1")).toBe(100);

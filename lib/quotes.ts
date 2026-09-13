@@ -5,6 +5,7 @@ import { and, asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import {
+  customers,
   quoteAttachments,
   quoteItems,
   quoteOptions,
@@ -123,17 +124,26 @@ export async function getQuoteForBusiness(
  * because they are the work common to all of them.
  */
 export async function recalculateQuote(quoteId: string): Promise<void> {
+  /*
+   * The exemption is joined from the customer rather than copied onto the
+   * quote: it belongs to who is buying, and a quote reassigned to a different
+   * customer has to pick up their status, not keep the old one's.
+   */
   const [quote] = await db
     .select({
       id: quotes.id,
       discount: quotes.discount,
       taxRate: quotes.taxRate,
+      taxExempt: customers.taxExempt,
     })
     .from(quotes)
+    .leftJoin(customers, eq(customers.id, quotes.customerId))
     .where(eq(quotes.id, quoteId))
     .limit(1);
 
   if (!quote) return;
+
+  const taxExempt = quote.taxExempt ?? false;
 
   const [items, options] = await Promise.all([
     db.select().from(quoteItems).where(eq(quoteItems.quoteId, quoteId)),
@@ -155,6 +165,7 @@ export async function recalculateQuote(quoteId: string): Promise<void> {
       ],
       discount: quote.discount,
       taxRateBasisPoints: quote.taxRate,
+      taxExempt,
     }).total,
   }));
 
@@ -195,6 +206,7 @@ export async function recalculateQuote(quoteId: string): Promise<void> {
       lines: headlineLines,
       discount: quote.discount,
       taxRateBasisPoints: quote.taxRate,
+      taxExempt,
     });
 
     await tx

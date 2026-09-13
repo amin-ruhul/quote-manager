@@ -6,7 +6,7 @@ import { PageShell, Prose } from "@/components/landing/page-shell";
 export const metadata: Metadata = {
   title: "Contact QuotePilot",
   description:
-    "Get in touch with QuotePilot — support, billing questions, and feedback from electricians using the product.",
+    "Get in touch with QuotePilot — support, access requests, and feedback from electricians using the product.",
 };
 
 /*

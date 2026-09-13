@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { QuoteFormState } from "@/app/(app)/quotes/actions";
 import { saveQuoteItem } from "@/app/(app)/quotes/item-actions";
 import { Panel } from "@/components/panel";
+import { SwitchField } from "@/components/switch-field";
 import { SelectOrAdd } from "@/components/select-or-add";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,7 @@ function defaultsFor(
     unitPrice: item ? centsToInputValue(item.unitPrice) : "",
     type: item?.type ?? DEFAULT_QUOTE_ITEM_TYPE,
     optionId: item?.optionId ?? defaultOptionId ?? "none",
+    taxable: item ? (item.taxable ? "true" : "false") : "true",
   };
 }
 
@@ -258,6 +260,20 @@ export function QuoteLineForm({
               <input type="hidden" name="optionId" value="none" />
             )}
           </div>
+
+          <FormField
+            control={form.control}
+            name="taxable"
+            render={({ field }) => (
+              <SwitchField
+                name={field.name}
+                value={field.value ?? "true"}
+                onChange={field.onChange}
+                label="Taxable"
+                hint="Whether this quote's tax rate applies to this line."
+              />
+            )}
+          />
 
           <div className="flex flex-col gap-2 pt-2 sm:flex-row-reverse sm:justify-start">
             <Button

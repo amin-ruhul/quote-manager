@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Building2, CreditCard, LogOut } from "lucide-react";
+import { Building2, CreditCard, Gauge, LogOut } from "lucide-react";
 
 import { signOut } from "@/app/login/actions";
 import {
@@ -12,7 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PLAN_LABELS, type Plan } from "@/lib/constants";
+import {
+  BILLING_ENABLED,
+  PLAN_LABELS,
+  PLAN_PAGE_PATH,
+  type Plan,
+} from "@/lib/constants";
 
 /**
  * Account, billing, and the way out — in exactly one place.
@@ -74,10 +79,16 @@ export function AccountMenu({
           </Link>
         </DropdownMenuItem>
 
+        {/* No card icon and no mention of billing while nothing is for sale —
+            an owner shouldn't go looking for a bill that doesn't exist. */}
         <DropdownMenuItem asChild>
-          <Link href="/billing">
-            <CreditCard aria-hidden />
-            Plan &amp; billing
+          <Link href={PLAN_PAGE_PATH}>
+            {BILLING_ENABLED ? (
+              <CreditCard aria-hidden />
+            ) : (
+              <Gauge aria-hidden />
+            )}
+            {BILLING_ENABLED ? "Plan & billing" : "Plan & usage"}
           </Link>
         </DropdownMenuItem>
 

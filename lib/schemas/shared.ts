@@ -11,7 +11,11 @@ import {
   MAX_UNIT_LENGTH,
   QUANTITY_SCALE,
 } from "@/lib/constants";
-import { formatCents, parseDollarsToCents } from "@/lib/money";
+import {
+  formatCents,
+  parseDollarsToCents,
+  parsePercentToBasisPoints,
+} from "@/lib/money";
 import { parseQuantity } from "@/lib/quote-math";
 
 /*
@@ -21,6 +25,8 @@ import { parseQuantity } from "@/lib/quote-math";
  *
  * Error messages are what the owner reads, so they say what to do.
  */
+
+export const MAX_TAX_RATE_PERCENT = MAX_TAX_RATE_BASIS_POINTS / 100;
 
 /*
  * These all take a string and may return null. The `.transform()` already
@@ -185,7 +191,39 @@ export const safeRedirectPath = (fallback: string) =>
     .refine((value) => value.startsWith("/") && !value.startsWith("//"))
     .catch(fallback);
 
+/**
+ * A <Switch>, crossing as FormData.
+ *
+ * An unchecked control submits nothing at all, so absence is the "off" case —
+ * which is why this accepts undefined rather than requiring a value. The form
+ * also renders a hidden "false" alongside, so an explicit off is unambiguous
+ * even when the browser omits the switch.
+ */
+export const switchValue = z
+  .union([
+    z.literal("true"),
+    z.literal("false"),
+    z.literal("on"),
+    z.undefined(),
+  ])
+  .transform((value) => value === "true" || value === "on");
+
+/** A tax rate typed on one quote -> integer basis points. Empty means none. */
+export const taxRatePercent = z
+  .string()
+  .max(10, `Enter a rate between 0 and ${MAX_TAX_RATE_PERCENT}.`)
+  .transform((value, ctx) => {
+    if (value.trim() === "") return 0;
+    const basisPoints = parsePercentToBasisPoints(value);
+    if (basisPoints === null) {
+      ctx.addIssue({
+        code: "custom",
+        message: `Enter a rate between 0 and ${MAX_TAX_RATE_PERCENT}.`,
+      });
+      return z.NEVER;
+    }
+    return basisPoints;
+  });
+
 /** Row ids arrive from the client, so they are never trusted as given. */
 export const idSchema = z.uuid("Something went wrong. Refresh and try again.");
-
-export const MAX_TAX_RATE_PERCENT = MAX_TAX_RATE_BASIS_POINTS / 100;

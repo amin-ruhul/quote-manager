@@ -10,7 +10,6 @@ import {
   generateDraft,
   importDraftItems,
 } from "@/app/(app)/quotes/[id]/ai-actions";
-import { Panel } from "@/components/panel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -76,47 +75,45 @@ export function AiDraftPanel({
 
   if (!draft) {
     return (
-      <Panel asChild>
-        <form
-          action={formAction}
-          className="space-y-3"
-          noValidate
-          onSubmit={() => {
-            setDismissed(false);
-            setSkipped(new Set());
-          }}
-        >
-          <input type="hidden" name="quoteId" value={quoteId} />
-          <div className="space-y-2">
-            <Label htmlFor="jobDescription">Describe the job</Label>
-            <Textarea
-              id="jobDescription"
-              name="jobDescription"
-              rows={3}
-              placeholder="Swap the old 100A panel for a 200A, add six recessed lights in the kitchen on a new circuit with a dimmer."
-            />
-            <p className="text-sm text-ink-60">
-              We&apos;ll match it against your pricebook. Anything we can&apos;t
-              match comes back without a price for you to set.
-            </p>
-          </div>
+      <form
+        action={formAction}
+        className="space-y-3"
+        noValidate
+        onSubmit={() => {
+          setDismissed(false);
+          setSkipped(new Set());
+        }}
+      >
+        <input type="hidden" name="quoteId" value={quoteId} />
+        <div className="space-y-2">
+          <Label htmlFor="jobDescription">Describe the job</Label>
+          <Textarea
+            id="jobDescription"
+            name="jobDescription"
+            rows={3}
+            placeholder="Swap the old 100A panel for a 200A, add six recessed lights in the kitchen on a new circuit with a dimmer."
+          />
+          <p className="text-sm text-ink-60">
+            We&apos;ll match it against your pricebook. Anything we can&apos;t
+            match comes back without a price for you to set.
+          </p>
+        </div>
 
-          {state.error ? (
-            <Alert variant="destructive">
-              <AlertDescription>{state.error}</AlertDescription>
-            </Alert>
-          ) : null}
+        {state.error ? (
+          <Alert variant="destructive">
+            <AlertDescription>{state.error}</AlertDescription>
+          </Alert>
+        ) : null}
 
-          <GenerateButton />
-        </form>
-      </Panel>
+        <GenerateButton />
+      </form>
     );
   }
 
   const unpriced = draft.lineItems.filter((item) => item.needsPrice).length;
 
   return (
-    <Panel className="space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold">Review this draft</h2>
         <span className="text-sm text-ink-60">
@@ -242,6 +239,6 @@ export function AiDraftPanel({
           Start over
         </Button>
       </div>
-    </Panel>
+    </div>
   );
 }

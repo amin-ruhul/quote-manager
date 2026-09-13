@@ -23,8 +23,11 @@ const {
   quoteOptions,
   quotes,
 } = await import("@/db/schema");
-const { canAccept, getQuoteByPublicToken, isExpired, recordQuoteViewed } =
+const { getQuoteByPublicToken, recordQuoteViewed } =
   await import("@/lib/public-quote");
+// The pure status rules moved out of the server-only module so the shared
+// <QuoteDocument> can use them on the client too.
+const { canAccept, isExpired } = await import("@/lib/quote-status");
 const { generatePublicToken } = await import("@/lib/quotes");
 
 let passed = 0;

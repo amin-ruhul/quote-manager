@@ -15,8 +15,10 @@ export default async function LoginPage({
 
   const { next } = await searchParams;
   // Only same-site paths, so a crafted ?next= can't bounce the owner off-site.
+  // With nowhere in particular to go, the dashboard is home; an owner with no
+  // business profile is moved on to /onboarding by requireBusiness().
   const safeNext =
-    next?.startsWith("/") && !next.startsWith("//") ? next : "/pricebook";
+    next?.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
 
   return (
     <AuthShell

@@ -30,6 +30,7 @@ export default async function CustomersPage() {
       email: customers.email,
       address: customers.address,
       notes: customers.notes,
+      taxExempt: customers.taxExempt,
       createdAt: customers.createdAt,
       updatedAt: customers.updatedAt,
       // Drafts aren't work you did for them, so they don't count.

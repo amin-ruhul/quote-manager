@@ -134,15 +134,23 @@ function AddOptionForm({
 export function QuoteOptionsPanel({
   quoteId,
   options,
+  lineCounts,
   currency,
 }: {
   quoteId: string;
   options: QuoteOption[];
+  /** Lines belonging to each option, keyed by option id. */
+  lineCounts: Record<string, number>;
   currency: Currency;
 }) {
   const [isAdding, setIsAdding] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [, startAction] = useTransition();
+
+  /* Every option carrying nothing of its own means every total is the same. */
+  const identical = options.every(
+    (option) => (lineCounts[option.id] ?? 0) === 0,
+  );
 
   function run(id: string, work: () => Promise<{ error: string | null }>) {
     setPendingId(id);
@@ -154,79 +162,94 @@ export function QuoteOptionsPanel({
   }
 
   return (
+    /* The heading lives on the <CollapsibleSection> that wraps this. */
     <section className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold">Options</h2>
-        {!isAdding ? (
+      {!isAdding ? (
+        <div className="flex justify-end">
           <Button variant="ghost" size="sm" onClick={() => setIsAdding(true)}>
             <Plus />
             Add
           </Button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       {options.length === 0 && !isAdding ? (
-        <Panel className="text-sm text-ink-60">
+        <p className="text-sm text-ink-60">
           This quote has one price. Add options to offer Good / Better / Best.
-        </Panel>
+        </p>
+      ) : null}
+
+      {/*
+        An option with no lines of its own is the shared lines and nothing else
+        — so every such option totals the same, and the owner is left asking
+        what makes them different. The engine is right; it just never said so.
+        Naming the gap here is what turns "why are these identical" into "ah, I
+        need to put something in them".
+      */}
+      {options.length > 1 && identical ? (
+        <Alert>
+          <AlertDescription>
+            These options all cost the same, because none of them has a line of
+            its own yet. Add a line under &ldquo;Only in {options[0]?.name}
+            &rdquo; below to tell them apart.
+          </AlertDescription>
+        </Alert>
       ) : null}
 
       {options.length > 0 ? (
-        <Panel asChild className="p-0">
-          <ul className="divide-y divide-hairline">
-            {options.map((option) => (
-              <li key={option.id} className="flex items-center gap-3 p-4">
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium">
-                    {option.name}
-                    {option.isRecommended ? (
-                      <span className="ml-2 rounded-pill bg-status-accepted-bg px-2 py-0.5 text-xs font-medium text-status-accepted">
-                        Recommended
-                      </span>
-                    ) : null}
-                  </p>
-                  <p className="tabular mt-1 text-sm text-ink-60">
-                    {formatCents(option.total, currency)}
-                  </p>
-                </div>
+        <ul className="divide-y divide-hairline rounded-md border border-hairline">
+          {options.map((option) => (
+            <li key={option.id} className="flex items-center gap-3 p-4">
+              <div className="min-w-0 flex-1">
+                <p className="font-medium">
+                  {option.name}
+                  {option.isRecommended ? (
+                    <span className="ml-2 rounded-pill bg-status-accepted-bg px-2 py-0.5 text-xs font-medium text-status-accepted">
+                      Recommended
+                    </span>
+                  ) : null}
+                </p>
+                <p className="tabular mt-1 text-sm text-ink-60">
+                  {formatCents(option.total, currency)}
+                </p>
+              </div>
 
-                {pendingId === option.id ? (
-                  <Loader2 className="size-4 animate-spin text-ink-60" />
-                ) : (
-                  <div className="flex shrink-0 gap-1">
-                    {!option.isRecommended ? (
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Recommend ${option.name}`}
-                        onClick={() =>
-                          run(option.id, () =>
-                            setRecommendedOption(quoteId, option.id),
-                          )
-                        }
-                      >
-                        <Check />
-                      </Button>
-                    ) : null}
+              {pendingId === option.id ? (
+                <Loader2 className="size-4 animate-spin text-ink-60" />
+              ) : (
+                <div className="flex shrink-0 gap-1">
+                  {!option.isRecommended ? (
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Remove ${option.name}`}
-                      className="text-destructive"
+                      aria-label={`Recommend ${option.name}`}
                       onClick={() =>
                         run(option.id, () =>
-                          deleteQuoteOption(quoteId, option.id),
+                          setRecommendedOption(quoteId, option.id),
                         )
                       }
                     >
-                      <Trash2 />
+                      <Check />
                     </Button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </Panel>
+                  ) : null}
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`Remove ${option.name}`}
+                    className="text-destructive"
+                    onClick={() =>
+                      run(option.id, () =>
+                        deleteQuoteOption(quoteId, option.id),
+                      )
+                    }
+                  >
+                    <Trash2 />
+                  </Button>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
       ) : null}
 
       {isAdding ? (
