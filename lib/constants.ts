@@ -63,7 +63,10 @@ export const INVITE_ONLY_NOTE = BILLING_ENABLED
  * and in the privacy policy, and those three disagreeing is how a support
  * address quietly becomes a dead one.
  */
-export const SUPPORT_EMAIL = "hello@quotepace.app";
+export const SUPPORT_EMAIL = "hello@quotepace.com";
+
+/** The public site. Same domain as the support address, and one we own. */
+export const MARKETING_URL = "https://quotepace.com";
 
 /**
  * Where an owner was standing when they asked for access. Kept so the requests

@@ -1,5 +1,7 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+
+import { MARKETING_URL } from "@/lib/constants";
 import { after } from "next/server";
 
 import { AcceptPanel } from "@/app/q/[token]/accept-panel";
@@ -117,7 +119,7 @@ export default async function PublicQuotePage({
           <footer className="mt-10 text-center text-sm text-ink-60">
             Made with{" "}
             <a
-              href="https://quotepace.app"
+              href={MARKETING_URL}
               className="font-medium text-ink-60 underline-offset-4 hover:underline"
             >
               QuotePace
