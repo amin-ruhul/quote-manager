@@ -16,8 +16,22 @@
  * service worker at all.
  */
 
-const VERSION = "v2";
+/*
+ * Bump VERSION whenever anything in PRECACHE changes. The cache is keyed by it,
+ * so an install that already holds the old copy keeps serving it forever
+ * otherwise — which is how the retired lightning-bolt icon survived the rebrand
+ * in the "Open in app" chip and on every push notification.
+ */
+const VERSION = "v3";
 const CACHE = `quotepace-${VERSION}`;
+
+/*
+ * Cache names this worker is allowed to delete. The old prefix is still here
+ * because the app was renamed: a browser that ran QuotePilot holds a
+ * quotepilot-* cache that a quotepace-* check would never collect.
+ */
+const OWNED_CACHE_PREFIXES = ["quotepace-", "quotepilot-"];
+
 const OFFLINE_URL = "/offline.html";
 
 // Cached at install so the fallback is available the moment the network isn't,
@@ -64,7 +78,11 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith("quotepace-") && key !== CACHE)
+            .filter(
+              (key) =>
+                OWNED_CACHE_PREFIXES.some((prefix) => key.startsWith(prefix)) &&
+                key !== CACHE,
+            )
             .map((key) => caches.delete(key)),
         ),
       )

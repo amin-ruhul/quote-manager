@@ -1,6 +1,10 @@
+import { BRAND_MARK_PATH, BRAND_MARK_VIEWBOX } from "@/lib/brand";
+
 /**
- * The mark: a bolt cut from a rounded blue tile. Drawn rather than an image
- * file so it stays crisp, weighs nothing, and inherits the brand blue.
+ * The mark: an italic quotation mark cut from a rounded blue tile. Drawn rather
+ * than an image file so it stays crisp, weighs nothing, and inherits the brand
+ * blue. The path comes from lib/brand.ts so this and the generated icons cannot
+ * drift apart — they did once, and nobody noticed until the mark changed.
  *
  * `labelClassName` lets a caller hide the wordtext where space is tight — the
  * app's phone nav drops it so the sections themselves get the width.
@@ -18,11 +22,12 @@ export function Wordmark({
         aria-hidden
         className="flex size-7 items-center justify-center rounded-md bg-brand"
       >
-        <svg viewBox="0 0 24 24" className="size-4" fill="none">
-          <path
-            d="M13.5 2 4 13.2h6.2L9.8 22 20 10.6h-6.4L13.5 2Z"
-            fill="#fff"
-          />
+        <svg
+          viewBox={`0 0 ${BRAND_MARK_VIEWBOX} ${BRAND_MARK_VIEWBOX}`}
+          className="size-4"
+          fill="none"
+        >
+          <path d={BRAND_MARK_PATH} fill="#fff" />
         </svg>
       </span>
       <span
