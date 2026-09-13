@@ -2,27 +2,6 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { SectionHeading } from "@/components/landing/section-heading";
 import { formatCents } from "@/lib/money";
 
-/* ========================================================================
- * ⚠️  PLACEHOLDER DATA — NOT REAL TESTIMONIALS. REPLACE BEFORE LAUNCH.  ⚠️
- * ========================================================================
- *
- * Every name, town, quote and figure below is invented, so the section can be
- * designed and reviewed. None of it is true, and shipping it as-is would be
- * the easiest thing on this site for a visitor to catch us out on.
- *
- * To make this section real:
- *   1. Replace every entry with a testimonial you actually collected.
- *   2. Set `USING_PLACEHOLDER_TESTIMONIALS` to false.
- *
- * While the flag is true, the section carries a visible "example content"
- * label and is hidden from search engines' snippets — so a half-finished
- * deploy embarrasses us in front of nobody but ourselves.
- *
- * What makes a real testimonial work is specificity: a first name, a town, and
- * a number. Keep that shape when you swap the content in.
- */
-const USING_PLACEHOLDER_TESTIMONIALS = true;
-
 type Testimonial = {
   quote: string;
   name: string;
@@ -34,56 +13,32 @@ type Testimonial = {
   tone?: "marigold" | "sky" | "coral";
 };
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      "Quoted a panel upgrade from the driveway before I'd packed the van. She accepted it while I was still parked outside.",
-    name: "Dave",
-    location: "Leeds",
-    trade: "Electrician",
-    jobWonCents: 320000,
-    tone: "marigold",
-  },
-  {
-    quote:
-      "I used to lose Sunday nights to quotes. Now the pricebook does the maths and I just check the lines.",
-    name: "Marcus",
-    location: "Bristol",
-    trade: "Electrician",
-  },
-  {
-    quote:
-      "The follow-up email won me a job I'd written off three weeks earlier. I'd never have chased it myself.",
-    name: "Priya",
-    location: "Manchester",
-    trade: "Electrician",
-    jobWonCents: 148500,
-    tone: "sky",
-  },
-  {
-    quote:
-      "Good, better, best changed everything. Nobody picks the cheap one any more — they pick the middle.",
-    name: "Tom",
-    location: "Sheffield",
-    trade: "Electrician",
-  },
-  {
-    quote:
-      "Knowing the second they opened it is the bit I didn't expect to care about. Now I know when to ring.",
-    name: "Aisha",
-    location: "Birmingham",
-    trade: "Electrician",
-  },
-  {
-    quote:
-      "It flagged the permit line instead of guessing at it. That's the only reason I trust it with my prices.",
-    name: "Rob",
-    location: "Newcastle",
-    trade: "Electrician",
-    jobWonCents: 275000,
-    tone: "coral",
-  },
-];
+/*
+ * REAL TESTIMONIALS ONLY. Nothing here until someone has actually said it.
+ *
+ * This list held six invented electricians — names, towns and the value of
+ * jobs they had supposedly won — behind an "example content" label. A label
+ * does not undo a fabricated quote: the visitor who skims sees six happy
+ * customers, and the one who reads the label learns we are willing to make
+ * people up. Both are worse than saying we are new.
+ *
+ * Empty, the page tells the truth on its own: the promise band prints "no
+ * reviews yet, we'd rather say that than invent one" and the wall below
+ * renders nothing at all.
+ *
+ * What makes a real one work is specificity — a first name, a town, and a
+ * number:
+ *
+ *   {
+ *     quote: "Quoted it from the driveway. She accepted before I'd packed up.",
+ *     name: "Dave",
+ *     location: "Leeds",
+ *     trade: "Electrician",
+ *     jobWonCents: 320000,
+ *     tone: "marigold",
+ *   }
+ */
+const TESTIMONIALS: Testimonial[] = [];
 
 const TONES: Record<string, { card: string; chip: string; muted: string }> = {
   marigold: {
@@ -129,14 +84,6 @@ export function ProofPanel() {
             <span className="font-medium text-white/90">{featured.name}</span> ·{" "}
             {featured.trade}, {featured.location}
           </p>
-
-          {/* The wall downpage carries the same warning. This panel quotes a
-              named person, so it cannot be the one place the label is missing. */}
-          {USING_PLACEHOLDER_TESTIMONIALS ? (
-            <p className="mt-4 text-xs text-white/40">
-              Example content — not a real customer yet
-            </p>
-          ) : null}
         </>
       ) : (
         <p className="mt-4 text-pretty text-white/70">
@@ -171,19 +118,6 @@ export function Proof() {
             body="What changes when the quote goes out the same day, in their words."
             align="center"
           />
-
-          {USING_PLACEHOLDER_TESTIMONIALS ? (
-            // The wrapper does the centering: `mx-auto` has no effect on an
-            // inline-flex pill, so the label needs a block-level parent.
-            <div className="mt-6 text-center">
-              <p
-                role="note"
-                className="inline-flex rounded-pill bg-status-viewed-bg px-3 py-1 text-xs font-medium text-status-viewed"
-              >
-                Example content — these are not real customers yet
-              </p>
-            </div>
-          ) : null}
         </Reveal>
 
         <RevealGroup className="mt-10">

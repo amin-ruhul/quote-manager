@@ -45,20 +45,27 @@ export default function AboutPage() {
 
         <h2>How we handle prices</h2>
         <p>
-          Your pricebook is the only source of prices. When the AI drafts a
-          quote from your description, it matches what you actually charge — and
-          when it cannot match a line, it leaves the price blank and flags it
-          rather than inventing a number. You review every quote before it goes
-          anywhere. A tool that guesses at your margins is not saving you time,
-          it is costing you money quietly.
+          Your pricebook is the only source of prices. Build a quote by hand and
+          it uses what you set; ask the AI to draft one and it matches what you
+          actually charge — and when it cannot match a line, it leaves the price
+          blank and flags it rather than inventing a number. You review every
+          quote before it goes anywhere. A tool that guesses at your margins is
+          not saving you time, it is costing you money quietly.
         </p>
 
         <h2>Where we are</h2>
         <p>
-          Early. There are no customer logos on this site because we have not
-          earned them yet, and we would rather say so than borrow someone
-          else&apos;s. If QuotePilot wins you a job, we would genuinely like to
-          hear about it.
+          Early, and in beta. Quoting is free — we have not set a price, and we
+          would rather find out what this is worth to you than guess. The
+          handful of features that cost us money every time they run, AI
+          drafting among them, are switched on by hand for businesses who ask,
+          which is also how we learn which of them anyone actually wants.
+        </p>
+        <p>
+          There are no customer logos on this site because we have not earned
+          them yet, and we would rather say so than borrow someone else&apos;s.
+          If QuotePilot wins you a job, we would genuinely like to hear about
+          it.
         </p>
       </Prose>
     </PageShell>

@@ -16,7 +16,9 @@ const PHRASES = [
   "Opened — you get the email",
   "Accepted on their phone",
   "Signed, no app, no login",
-  "Follow-up sent for you",
+  // Was "Follow-up sent for you". Automatic follow-up is granted by hand while
+  // we test it, and this bar is a capability list, not a wish list.
+  "Good, better, best on one page",
 ];
 
 export function Marquee() {

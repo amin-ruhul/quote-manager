@@ -4,6 +4,7 @@ import { BellRing, FileText, MessageSquareText, Zap } from "lucide-react";
 import { QuoteCardPreview } from "@/components/landing/quote-card-preview";
 import { Reveal, RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { Button } from "@/components/ui/button";
+import { FREE_QUOTES_PER_MONTH } from "@/lib/constants";
 
 /**
  * The thesis, centered: an outcome an electrician recognises as their own
@@ -22,7 +23,9 @@ import { Button } from "@/components/ui/button";
 const FLOATING = [
   {
     icon: MessageSquareText,
-    label: "Describe the job",
+    // "Price the job" rather than "Describe the job": true whether the lines
+    // come from the pricebook by hand or from AI drafting.
+    label: "Price the job",
     tone: "bg-brand-wash text-brand",
     position: "top-4 -left-24 -rotate-6",
   },
@@ -71,10 +74,16 @@ export function Hero() {
         </RevealItem>
 
         <RevealItem>
+          {/*
+           * Deliberately the free path, not the AI one. AI drafting is granted
+           * by hand while we test it, and a headline promising the thing a new
+           * account cannot do is the fastest way to lose the person who
+           * believed it.
+           */}
           <p className="mx-auto mt-6 max-w-xl text-lg text-pretty text-body sm:text-xl">
-            Describe the job in a sentence. QuotePilot builds the quote from
-            your own prices, sends it, and lets the customer accept it on their
-            phone while you&apos;re still parked outside.
+            Build the quote from your own prices in minutes, send the link, and
+            let the customer accept it on their phone while you&apos;re still
+            parked outside.
           </p>
         </RevealItem>
 
@@ -88,9 +97,9 @@ export function Hero() {
 
         <RevealItem>
           <ul className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-sm text-ink-60">
-            <TrustPoint>Free to start</TrustPoint>
+            <TrustPoint>{FREE_QUOTES_PER_MONTH} free quotes a month</TrustPoint>
+            <TrustPoint>No card to start</TrustPoint>
             <TrustPoint>No app for your customer</TrustPoint>
-            <TrustPoint>Works on any phone</TrustPoint>
           </ul>
         </RevealItem>
       </RevealGroup>
