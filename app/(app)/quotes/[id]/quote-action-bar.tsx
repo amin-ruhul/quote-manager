@@ -39,6 +39,7 @@ export function QuoteActionBar({
   quoteNumber,
   publicToken,
   premium,
+  locked,
   previewToggle,
 }: {
   quoteId: string;
@@ -46,6 +47,8 @@ export function QuoteActionBar({
   publicToken: string;
   /** A granted account; the locked stand-ins below are for everyone else. */
   premium: boolean;
+  /** Accepted: there is no details form to submit, so Save has nothing to do. */
+  locked: boolean;
   /** Phone-only Edit/Preview switch. Lives here because this bar is the one
       thing always on screen, whichever pane is showing. */
   previewToggle?: React.ReactNode;
@@ -81,15 +84,17 @@ export function QuoteActionBar({
       <div className="flex max-w-full items-center gap-1 overflow-x-auto rounded-pill border border-hairline bg-surface p-1.5 shadow-quote sm:gap-1.5">
         {previewToggle}
 
-        <Button
-          type="submit"
-          form={QUOTE_DETAILS_FORM_ID}
-          className="shrink-0 rounded-pill max-sm:aspect-square max-sm:px-0"
-          aria-label="Save quote"
-        >
-          <Save />
-          <span className="max-sm:hidden">Save</span>
-        </Button>
+        {locked ? null : (
+          <Button
+            type="submit"
+            form={QUOTE_DETAILS_FORM_ID}
+            className="shrink-0 rounded-pill max-sm:aspect-square max-sm:px-0"
+            aria-label="Save quote"
+          >
+            <Save />
+            <span className="max-sm:hidden">Save</span>
+          </Button>
+        )}
 
         <Button
           variant="soft"

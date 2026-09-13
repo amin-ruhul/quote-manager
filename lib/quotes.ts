@@ -12,6 +12,7 @@ import {
   quotes,
 } from "@/db/schema";
 import { requireBusiness } from "@/lib/auth";
+import { isQuoteLocked, QUOTE_LOCKED_MESSAGE } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { quoteTotals } from "@/lib/quote-math";
 
@@ -37,12 +38,55 @@ export async function requireOwnedQuote(quoteId: string) {
   if (!z.uuid().safeParse(quoteId).success) return null;
 
   const [quote] = await db
-    .select({ id: quotes.id })
+    .select({ id: quotes.id, status: quotes.status })
     .from(quotes)
     .where(and(eq(quotes.id, quoteId), eq(quotes.businessId, business.id)))
     .limit(1);
 
-  return quote ? { user, business, quoteId: quote.id } : null;
+  return quote
+    ? { user, business, quoteId: quote.id, status: quote.status }
+    : null;
+}
+
+type OwnedQuote = NonNullable<Awaited<ReturnType<typeof requireOwnedQuote>>>;
+
+export type EditableQuote =
+  | {
+      ok: true;
+      user: OwnedQuote["user"];
+      business: OwnedQuote["business"];
+      quoteId: string;
+    }
+  | { ok: false; error: string };
+
+/**
+ * Ownership *and* the right to change the quote's contents.
+ *
+ * Every action that writes a line, a price, a photo or the details block goes
+ * through this instead of `requireOwnedQuote`, so the lock is enforced on the
+ * server. Hiding the buttons is not a control: the action ids travel to the
+ * browser, and a stale tab left open before the customer accepted would
+ * otherwise still post edits to a signed quote.
+ *
+ * Actions that do not change the agreement keep using `requireOwnedQuote` —
+ * re-sending the link, correcting a mis-set status, duplicating.
+ */
+export async function requireEditableQuote(
+  quoteId: string,
+): Promise<EditableQuote> {
+  const owned = await requireOwnedQuote(quoteId);
+  if (!owned) return { ok: false, error: "That quote no longer exists." };
+
+  if (isQuoteLocked(owned.status)) {
+    return { ok: false, error: QUOTE_LOCKED_MESSAGE };
+  }
+
+  return {
+    ok: true,
+    user: owned.user,
+    business: owned.business,
+    quoteId: owned.quoteId,
+  };
 }
 
 /**

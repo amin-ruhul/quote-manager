@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import type { HTMLMotionProps, Variants } from "motion/react";
+import { createContext, useContext } from "react";
 
 /**
  * The landing page's entire motion vocabulary, in one file.
@@ -15,11 +16,18 @@ import type { HTMLMotionProps, Variants } from "motion/react";
  * `useReducedMotion` collapses both the offset and the duration to zero, which
  * leaves the content rendered and static rather than hidden.
  *
- * Every wrapper carries `data-reveal`. The hidden state is server-rendered as
- * an inline `opacity: 0`, so without it a visitor whose JavaScript never
- * arrives — blocked, failed chunk, dead signal in a basement — would get a
- * blank page. `globals.css` overrides `[data-reveal]` inside `<noscript>`, and
- * `app/page.tsx` renders that noscript block.
+ * **`onMount` animates in CSS, not here.** A JavaScript reveal has to
+ * server-render its hidden state as an inline `opacity: 0`, which means the
+ * content is invisible until React hydrates. That is survivable for a section
+ * you have to scroll to reach — the bundle has landed by then — and not
+ * survivable for the first screen, where it shipped a blank page to anyone
+ * whose JavaScript was slow. Those wrappers now render as plain elements
+ * carrying `.reveal-rise` / `.reveal-stagger` from `globals.css`, so they are
+ * visible at first paint and animate without a bundle.
+ *
+ * The scroll-triggered wrappers still carry `data-reveal` and still
+ * server-render hidden; `globals.css` overrides `[data-reveal]` inside
+ * `<noscript>` so a visitor without JavaScript sees them too.
  */
 
 /** Distance the element travels on its way in, in pixels. */
@@ -27,6 +35,13 @@ const LIFT = 16;
 
 /** Seconds between siblings inside a RevealGroup. */
 const STAGGER = 0.07;
+
+/**
+ * True inside a group that animates in CSS, so `RevealItem` knows to render a
+ * plain element and let `.reveal-stagger > *` time its entrance. Without this
+ * the item would re-introduce the inline `opacity: 0` its parent just avoided.
+ */
+const CssRevealGroup = createContext(false);
 
 type RevealProps = HTMLMotionProps<"div"> & {
   /** Seconds to wait before this element starts. Ignored inside a RevealGroup. */
@@ -46,6 +61,24 @@ export function Reveal({
 }: RevealProps) {
   const reduced = useReducedMotion();
 
+  // The casts undo what HTMLMotionProps widens: motion allows a MotionValue
+  // where the DOM only takes a plain value. Nothing here passes one — these
+  // wrappers are handed a className and children — so narrowing back to the
+  // React types is safe, and is what the plain element being rendered needs.
+  if (onMount) {
+    const { className, style, ...rest } = props;
+    const base = style as React.CSSProperties | undefined;
+    return (
+      <div
+        {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+        className={`reveal-rise ${className ?? ""}`}
+        style={delay ? { animationDelay: `${delay}s`, ...base } : base}
+      >
+        {children as React.ReactNode}
+      </div>
+    );
+  }
+
   const hidden = reduced ? { opacity: 1 } : { opacity: 0, y: LIFT };
   const shown = { opacity: 1, y: 0 };
 
@@ -53,14 +86,19 @@ export function Reveal({
     <motion.div
       data-reveal
       initial={hidden}
-      {...(onMount
-        ? { animate: shown }
-        : {
-            whileInView: shown,
-            // `once` matters here: re-firing on every scroll past turns a
-            // long marketing page into a flicker gallery.
-            viewport: { once: true, amount: 0.2, margin: "0px 0px -80px 0px" },
-          })}
+      whileInView={shown}
+      /*
+       * `once` matters here: re-firing on every scroll past turns a long
+       * marketing page into a flicker gallery.
+       *
+       * `amount: "some"` matters more. A fractional threshold asks for 20% of
+       * the element to be showing, and a flick-scroll routinely lands with a
+       * tall section only partly on screen — under the threshold, so it never
+       * fires, and `once` means it never gets a second chance. The section just
+       * stays blank. Any visible pixel is the only threshold that cannot strand
+       * content.
+       */
+      viewport={{ once: true, amount: "some", margin: "0px 0px -80px 0px" }}
       transition={{ duration: reduced ? 0 : 0.4, ease: "easeOut", delay }}
       {...props}
     >
@@ -80,16 +118,27 @@ export function RevealGroup({
 }: HTMLMotionProps<"div"> & { onMount?: boolean }) {
   const reduced = useReducedMotion();
 
+  if (onMount) {
+    const { className, ...rest } = props;
+    return (
+      <CssRevealGroup value>
+        <div
+          {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+          className={`reveal-stagger ${className ?? ""}`}
+        >
+          {children as React.ReactNode}
+        </div>
+      </CssRevealGroup>
+    );
+  }
+
   return (
     <motion.div
       data-reveal
       initial="hidden"
-      {...(onMount
-        ? { animate: "shown" }
-        : {
-            whileInView: "shown",
-            viewport: { once: true, amount: 0.15, margin: "0px 0px -80px 0px" },
-          })}
+      whileInView="shown"
+      // "some" rather than a fraction, for the reason given in `Reveal`.
+      viewport={{ once: true, amount: "some", margin: "0px 0px -80px 0px" }}
       variants={{
         shown: {
           transition: { staggerChildren: reduced ? 0 : STAGGER },
@@ -115,6 +164,18 @@ type RevealItemProps =
 
 export function RevealItem(props: RevealItemProps) {
   const reduced = useReducedMotion();
+  const inCssGroup = useContext(CssRevealGroup);
+
+  // Inside a CSS group the entrance belongs to `.reveal-stagger > *`, so this
+  // renders as an ordinary element — no variants, and no inline opacity.
+  if (inCssGroup) {
+    const { as = "div", ...rest } = props;
+    return as === "li" ? (
+      <li {...(rest as React.LiHTMLAttributes<HTMLLIElement>)} />
+    ) : (
+      <div {...(rest as React.HTMLAttributes<HTMLDivElement>)} />
+    );
+  }
 
   const variants: Variants = {
     hidden: reduced ? { opacity: 1 } : { opacity: 0, y: LIFT },

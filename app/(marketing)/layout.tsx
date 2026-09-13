@@ -1,3 +1,6 @@
+import { Analytics } from "@vercel/analytics/next";
+
+import { Clarity } from "@/components/analytics/clarity";
 import { Footer } from "@/components/landing/footer";
 import {
   LandingNav,
@@ -60,6 +63,18 @@ export default async function MarketingLayout({
         <div className="flex-1">{children}</div>
         <Footer />
       </div>
+
+      {/*
+        Both measure the marketing side only — mounted here rather than in the
+        root layout on purpose. The signed-in app would spend the free event
+        allowance on our own navigation, and the customer quote page (/q) must
+        stay free of third-party scripts: that page loads on a homeowner's
+        phone, and what we need from it is already recorded server-side as
+        quote_events (SPEC §9). Clarity in particular replays the DOM, so it
+        must never see a page with a customer's name or address on it.
+      */}
+      <Analytics />
+      <Clarity />
     </>
   );
 }

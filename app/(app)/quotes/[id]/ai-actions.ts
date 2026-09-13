@@ -25,7 +25,7 @@ import {
 import { db } from "@/lib/db";
 import { hasPremiumAccess } from "@/lib/plan";
 import { lineTotal } from "@/lib/quote-math";
-import { recalculateQuote, requireOwnedQuote } from "@/lib/quotes";
+import { recalculateQuote, requireEditableQuote } from "@/lib/quotes";
 import { rateLimit } from "@/lib/rate-limit";
 import { pricebookUnit } from "@/lib/schemas/shared";
 
@@ -49,8 +49,11 @@ export async function generateDraft(
   _prevState: DraftState,
   formData: FormData,
 ): Promise<DraftState> {
-  const owned = await requireOwnedQuote(String(formData.get("quoteId") ?? ""));
-  if (!owned) return { error: "That quote no longer exists.", draft: null };
+  const editable = await requireEditableQuote(
+    String(formData.get("quoteId") ?? ""),
+  );
+  if (!editable.ok) return { error: editable.error, draft: null };
+  const owned = editable;
 
   /*
    * The UI shows a lock instead of this panel on the free plan, but a lock
@@ -176,8 +179,9 @@ export async function importDraftItems(input: {
     };
   }
 
-  const owned = await requireOwnedQuote(parsed.data.quoteId);
-  if (!owned) return { error: "That quote no longer exists." };
+  const editable = await requireEditableQuote(parsed.data.quoteId);
+  if (!editable.ok) return { error: editable.error };
+  const owned = editable;
 
   // Importing costs nothing to run, but it is the second half of a drafting
   // session — leaving it open would leave the locked feature half-usable.

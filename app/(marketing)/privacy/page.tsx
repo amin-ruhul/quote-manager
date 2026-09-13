@@ -72,6 +72,17 @@ export default function PrivacyPage() {
           security and debugging, and we write error logs when something breaks
           so we can fix it. We do not track you across other websites.
         </p>
+        <p>
+          <strong>On these public pages only</strong> — the ones you are reading
+          now, before you sign in — we use Microsoft Clarity to see which parts
+          of the page people read and where they get stuck, so we can write
+          clearer ones. It sets cookies and records how the page was used, and
+          Microsoft may use what it collects for its own purposes, including
+          advertising. It stops at the door: it does not run on the app, and it
+          does not run on a quote you send. If you would rather it did not run
+          at all, blocking third-party cookies or using a tracker blocker is
+          enough — nothing on this site needs it to work.
+        </p>
         {BILLING_ENABLED ? null : (
           <p>
             We take no payments while QuotePace is in beta, so we never ask for
@@ -98,6 +109,11 @@ export default function PrivacyPage() {
             to draft a quote. It is not used to train their models. If you never
             use AI drafting, nothing of yours ever reaches them.
           </li>
+          <li>
+            <strong>Microsoft</strong> — receives how the public pages above
+            were used, through Clarity. It never receives your account, your
+            pricebook, your quotes or your customers.
+          </li>
           {BILLING_ENABLED ? (
             <li>
               <strong>Paddle</strong> — handles payment. Card details go to
@@ -106,8 +122,12 @@ export default function PrivacyPage() {
           ) : null}
         </ul>
         <p>
-          Each one only gets what it needs to do its job, and each is bound by
-          its own terms not to do anything else with it.
+          Each one only gets what it needs to do its job. Every one of them
+          handling your account, your quotes or your customers is bound by its
+          own terms not to do anything else with what it gets. Microsoft is the
+          one exception: its terms let it use what it collects for its own
+          purposes. That is the trade for a free tool, which is why we keep it
+          on the public pages and nowhere near your work.
         </p>
 
         <h2>Your pricebook is yours</h2>

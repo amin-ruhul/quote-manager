@@ -206,6 +206,29 @@ export const QUOTE_STATUSES = [
 export type QuoteStatus = (typeof QUOTE_STATUSES)[number];
 export const DEFAULT_QUOTE_STATUS: QuoteStatus = "draft";
 
+/**
+ * Statuses whose contents are fixed.
+ *
+ * An accepted quote is the document a customer said yes to. Editing its lines,
+ * its prices or its terms afterwards rewrites an agreement that has already
+ * been made, and leaves the quote_events trail (SPEC §9) pointing at a document
+ * that no longer exists — which is exactly the record we would need if the
+ * customer and the owner ever disagreed about what was agreed. The way to
+ * change an accepted quote is to duplicate it and send a new one.
+ *
+ * Declined is deliberately NOT locked: nothing was agreed, so reworking the
+ * price and trying again is the whole point.
+ */
+export const LOCKED_QUOTE_STATUSES = ["accepted"] as const;
+
+export function isQuoteLocked(status: QuoteStatus): boolean {
+  return (LOCKED_QUOTE_STATUSES as readonly QuoteStatus[]).includes(status);
+}
+
+/** Shown wherever an edit is refused because the customer already accepted. */
+export const QUOTE_LOCKED_MESSAGE =
+  "This quote has been accepted, so it can't be changed. Duplicate it if you need to send a revised one.";
+
 /** Line item kinds the generic engine supports (SPEC §8, §10). */
 export const QUOTE_ITEM_TYPES = [
   "fixed",
