@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { ensureProfile } from "@/lib/auth";
+import { absoluteUrl } from "@/lib/email";
 import { type ActionState, toFieldErrors } from "@/lib/form-state";
 import { registerSchema } from "@/lib/schemas/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -37,12 +38,30 @@ export async function register(
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    /*
-     * There is no session until the email is confirmed, so there is nowhere to
-     * write the name yet. Parking it on the auth user means it survives the gap
-     * and gets copied into `profiles` on first sign-in.
-     */
-    options: { data: { full_name: parsed.data.fullName } },
+    options: {
+      /*
+       * There is no session until the email is confirmed, so there is nowhere
+       * to write the name yet. Parking it on the auth user means it survives
+       * the gap and gets copied into `profiles` on first sign-in.
+       */
+      data: { full_name: parsed.data.fullName },
+      /*
+       * Where the confirmation link comes back to.
+       *
+       * Without this Supabase falls back to the project's Site URL, which is
+       * production — so confirming a signup made on localhost sent you to
+       * quotepace.com, and on a machine with the app installed the browser
+       * handed the link to the PWA instead of opening the page.
+       *
+       * Built from NEXT_PUBLIC_APP_URL rather than the Host header: the header
+       * is attacker-controlled, and this one is already correct per
+       * environment. Supabase only honours the value if it matches the
+       * Redirect URLs allow-list, so localhost has to be added there too.
+       */
+      emailRedirectTo: absoluteUrl(
+        `/auth/confirm?next=${encodeURIComponent(parsed.data.next)}`,
+      ),
+    },
   });
 
   if (error) {

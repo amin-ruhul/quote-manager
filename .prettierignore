@@ -3,3 +3,8 @@ node_modules
 db/migrations
 package-lock.json
 *.md
+
+# Supabase Auth templates. They are Go templates: Prettier reflows
+# `{{ .TokenHash }}` across a line break, which puts a newline into the
+# fallback URL the recipient sees.
+supabase/email-templates

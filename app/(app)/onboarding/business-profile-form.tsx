@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -42,12 +43,25 @@ import { useActionForm } from "@/lib/use-action-form";
 
 const initialState: BusinessFormState = { error: null, fieldErrors: {} };
 
-function defaultsFor(business: Business | null): BusinessProfileFields {
+function defaultsFor(
+  business: Business | null,
+  ownerEmail: string,
+): BusinessProfileFields {
   return {
     name: business?.name ?? "",
     licenseNumber: business?.licenseNumber ?? "",
     phone: business?.phone ?? "",
-    email: business?.email ?? "",
+    /*
+     * Prefilled with the address they signed in with.
+     *
+     * This field is not decoration: lib/notify-owner.ts sends every "opened"
+     * and "accepted" alert to it in preference to the login email. Left blank,
+     * it invites whatever a password manager offers — and a wrong address here
+     * fails silently, because a bounce is asynchronous and nothing in the app
+     * ever learns about it. `||` rather than `??` so a saved-but-empty value
+     * falls back too.
+     */
+    email: business?.email || ownerEmail,
     website: business?.website ?? "",
     address: business?.address ?? "",
     currency: business?.currency ?? DEFAULT_CURRENCY,
@@ -87,12 +101,15 @@ function Section({
 
 export function BusinessProfileForm({
   business,
+  ownerEmail,
 }: {
   business: Business | null;
+  /** The address they signed in with; the contact email defaults to it. */
+  ownerEmail: string;
 }) {
   const { form, onSubmit, state, isPending } = useActionForm({
     schema: businessProfileSchema,
-    defaultValues: defaultsFor(business),
+    defaultValues: defaultsFor(business, ownerEmail),
     initialState,
     action: async (prevState, formData) => {
       const result = await saveBusinessProfile(prevState, formData);
@@ -325,6 +342,10 @@ export function BusinessProfileForm({
                         placeholder="hello@brightspark.com"
                       />
                     </FormControl>
+                    <FormDescription>
+                      Where we tell you a customer opened or accepted a quote —
+                      and the address they see on it. Make sure you read it.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

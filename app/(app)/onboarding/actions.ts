@@ -4,8 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { businesses, industryConfig, pricebookItems } from "@/db/schema";
-import type { DefaultPricebookItem } from "@/db/seed-data/electrician";
+import { businesses } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 import {
   ALLOWED_LOGO_TYPES,
@@ -101,33 +100,6 @@ async function deleteLogo(publicUrl: string) {
   }
 }
 
-/** Copies the trade's default pricebook into the new business (SPEC §10). */
-async function seedPricebook(
-  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
-  businessId: string,
-  industry: string,
-) {
-  const [config] = await tx
-    .select({ defaultPricebook: industryConfig.defaultPricebook })
-    .from(industryConfig)
-    .where(eq(industryConfig.industry, industry))
-    .limit(1);
-
-  const defaults = (config?.defaultPricebook ?? []) as DefaultPricebookItem[];
-  if (defaults.length === 0) return;
-
-  await tx.insert(pricebookItems).values(
-    defaults.map((item) => ({
-      businessId,
-      name: item.name,
-      description: item.description,
-      category: item.category,
-      unit: item.unit,
-      price: item.price,
-    })),
-  );
-}
-
 export async function saveBusinessProfile(
   _prevState: BusinessFormState,
   formData: FormData,
@@ -192,21 +164,20 @@ export async function saveBusinessProfile(
         })
         .where(eq(businesses.ownerId, user.id));
     } else {
-      await db.transaction(async (tx) => {
-        const [created] = await tx
-          .insert(businesses)
-          .values({
-            ...profile,
-            settings,
-            ownerId: user.id,
-            industry: DEFAULT_INDUSTRY,
-            ...(logoUrl ? { logoUrl } : {}),
-          })
-          .returning({ id: businesses.id });
-
-        if (created) {
-          await seedPricebook(tx, created.id, DEFAULT_INDUSTRY);
-        }
+      /*
+       * A new business starts with an empty pricebook, on purpose. We used to
+       * copy a default electrician pricebook in here, and it was the wrong
+       * favour: the prices were ours, not theirs, and an owner who trusts a
+       * number we invented is quoting at a margin nobody chose. The pricebook
+       * is the one thing in this product that must be the owner's own work.
+       * app/(app)/pricebook has the empty state that asks for the first item.
+       */
+      await db.insert(businesses).values({
+        ...profile,
+        settings,
+        ownerId: user.id,
+        industry: DEFAULT_INDUSTRY,
+        ...(logoUrl ? { logoUrl } : {}),
       });
     }
   } catch (error) {

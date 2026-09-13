@@ -1,5 +1,5 @@
 import { SectionHeading } from "@/components/landing/section-heading";
-import { BILLING_ENABLED, FREE_QUOTES_PER_MONTH } from "@/lib/constants";
+import { BILLING_ENABLED } from "@/lib/constants";
 
 /*
  * Native <details> — no JavaScript, keyboard-accessible for free, and it costs
@@ -13,18 +13,25 @@ const QUESTIONS: Question[] = [
   {
     q: "Is it really free?",
     a: BILLING_ENABLED
-      ? `Yes, to start. The free plan covers ${FREE_QUOTES_PER_MONTH} quotes a month with no card. Paid plans lift the limit when quoting is making you money.`
-      : `Yes. We are in beta and there is nothing to buy — no card, no trial countdown. You get ${FREE_QUOTES_PER_MONTH} quotes a month, your pricebook, your branding, the customer quote page and the tracking. A few features that cost us money every time they run are switched on by hand for businesses who ask.`,
+      ? "Yes, to start. The free plan needs no card. Paid plans lift the monthly limit when quoting is making you money."
+      : "Yes. We are in beta and there is nothing to buy — no card, no trial countdown. You get your pricebook, your branding, the customer quote page and the tracking. A few features that cost us money every time they run are switched on by hand for businesses who ask.",
   },
   {
     q: "Does my customer need an app or an account?",
     a: "No. They get a link. It opens in whatever browser is already on their phone, and they tap Accept. Nothing to install, nothing to sign up for.",
   },
   {
-    q: `What happens when I hit ${FREE_QUOTES_PER_MONTH} quotes in a month?`,
+    /*
+     * The cap is real (lib/quota.ts), so this question stays and is answered
+     * straight — a visitor who finds the limit by hitting it feels misled. It
+     * just no longer leads with the number: the app shows how many are left,
+     * which is the only place the count is ever the answer to a question
+     * someone is actually asking.
+     */
+    q: "Is there a limit on how many quotes I can send?",
     a: BILLING_ENABLED
-      ? "Nothing breaks. Your existing quotes stay live and your customers can still accept them. You just can't create a new one until next month or until you upgrade."
-      : "Nothing breaks. Your existing quotes stay live and your customers can still accept them. You just can't start a new one until the month rolls over — or until you ask us for more, which is one tap inside the app and usually answered the same day.",
+      ? "There's a monthly cap on the free plan, and the app shows how many you have left. Nothing breaks when you reach it — your existing quotes stay live and your customers can still accept them. You just can't start a new one until next month, or until you upgrade."
+      : "There's a monthly cap while we're in beta, and the app shows how many you have left. Nothing breaks when you reach it — your existing quotes stay live and your customers can still accept them. You just can't start a new one until the month rolls over, or until you ask us for more, which is one tap inside the app and usually answered the same day.",
   },
   {
     q: "Which features are invite-only right now?",

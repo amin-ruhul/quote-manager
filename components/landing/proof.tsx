@@ -193,8 +193,10 @@ function TestimonialCard({
  * The human behind the tool. Source Serif appears exactly here and nowhere else
  * on the page — one editorial voice among the product claims (DESIGN.md).
  *
- * TODO: rewrite in your own words before launch. Two or three lines, plain,
- * about why you built it. Sign it with your real name.
+ * Unsigned on purpose. It read "— Your name, founder", which is placeholder
+ * text shipped as if it were copy: a note whose whole job is to sound like a
+ * person, signed by nobody. Better unsigned than signed by a template. Add a
+ * real name here whenever you want the note attributed.
  */
 export function FounderNote() {
   return (
@@ -206,7 +208,6 @@ export function FounderNote() {
           gets a professional quote out of your hands and into the
           customer&apos;s before they call someone else.
         </p>
-        <p className="mt-4 text-sm text-ink-60">— Your name, founder</p>
       </div>
     </section>
   );

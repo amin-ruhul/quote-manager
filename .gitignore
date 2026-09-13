@@ -33,6 +33,11 @@ yarn-error.log*
 # env files — secrets never get committed; the template does
 .env*
 !.env.example
+# ...and the same files when the leading dot gets lost in a copy or a
+# download. `.env*` does not match `env.vercel`, and that file holds
+# production credentials. Anchored with a leading slash: an unanchored
+# `env.*` matches at every depth and would silently swallow a lib/env.ts.
+/env.*
 
 # vercel
 .vercel

@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { RegisterFooter, RegisterForm } from "@/app/register/register-form";
 import { AuthShell } from "@/components/auth-shell";
 import { getUser } from "@/lib/auth";
-import { FREE_QUOTES_PER_MONTH } from "@/lib/constants";
 
 export const metadata = { title: "Create your account · QuotePace" };
 
@@ -14,9 +13,17 @@ export const metadata = { title: "Create your account · QuotePace" };
  * separate routes now, and this one carries the marigold card: the accent is
  * the fastest way to know at a glance that this is the "new here" page.
  */
+/*
+ * No quote count: "free" is the promise, and a number next to it reads as the
+ * catch. It is not "unlimited" either — lib/quota.ts still caps the month.
+ *
+ * The pricebook line used to say it came "set up for electricians". It doesn't
+ * any more: onboarding stopped copying a default pricebook in, because those
+ * were our prices and not the owner's.
+ */
 const included = [
-  `${FREE_QUOTES_PER_MONTH} quotes a month, free`,
-  "A pricebook set up for electricians",
+  "Free to start — no card",
+  "Your own prices, reused on every quote",
   "Sent, viewed, and accepted — tracked",
 ];
 

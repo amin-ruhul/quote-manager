@@ -27,7 +27,9 @@ export default async function OnboardingPage() {
       </header>
 
       {/* The form owns its own panels — it is three groups, not one card. */}
-      <BusinessProfileForm business={business} />
+      {/* Supabase types the email as nullable; an account without one just
+          gets the empty field it had before. */}
+      <BusinessProfileForm business={business} ownerEmail={user.email ?? ""} />
 
       {/*
         Only once they're set up: the first run is about getting a business

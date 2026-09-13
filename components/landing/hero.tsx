@@ -4,7 +4,6 @@ import { BellRing, FileText, MessageSquareText, Zap } from "lucide-react";
 import { QuoteCardPreview } from "@/components/landing/quote-card-preview";
 import { Reveal, RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { Button } from "@/components/ui/button";
-import { FREE_QUOTES_PER_MONTH } from "@/lib/constants";
 
 /**
  * The thesis, centered: an outcome an electrician recognises as their own
@@ -97,7 +96,7 @@ export function Hero() {
 
         <RevealItem>
           <ul className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-sm text-ink-60">
-            <TrustPoint>{FREE_QUOTES_PER_MONTH} free quotes a month</TrustPoint>
+            <TrustPoint>Free while we&apos;re in beta</TrustPoint>
             <TrustPoint>No card to start</TrustPoint>
             <TrustPoint>No app for your customer</TrustPoint>
           </ul>
