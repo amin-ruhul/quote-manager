@@ -57,8 +57,8 @@ const PLANS = [
  *
  * Quoting a price we don't charge would be the one dishonest thing on the
  * page, and a visitor who signs up expecting a $29 plan and finds no checkout
- * trusts the rest of it less. So the section stays, the prices wait: the card
- * below says free, says which features are invite-only, and says why.
+ * trusts the rest of it less. So the section stays and the prices wait: the
+ * card below says free, and says we will tell you before that changes.
  */
 export function Pricing() {
   return BILLING_ENABLED ? <PricedPlans /> : <BetaAccess />;
@@ -79,14 +79,18 @@ const BETA_INCLUDED = [
   "Photos, and good / better / best options",
 ];
 
-const BETA_INVITE_ONLY = [
-  "Unlimited quotes",
-  "AI drafting from a job description",
-  "Emailing the quote for you",
-  "Automatic follow-up when nobody replies",
-  "Downloading a quote as a PDF",
-];
-
+/*
+ * There used to be a second card here listing the invite-only features. It
+ * came off because it sold the visitor a locked door: five things they cannot
+ * have, read before they have seen the product do anything. Those features are
+ * offered in the app at the moment someone reaches for them, which is when the
+ * offer means something.
+ *
+ * The heading no longer mentions them either — a body promising "a few
+ * features are invite-only" while nothing on the page says which ones is worse
+ * than not raising it. The price promise stays: it is the reassurance a
+ * cautious owner is actually looking for in a pricing section.
+ */
 function BetaAccess() {
   return (
     <section
@@ -96,11 +100,13 @@ function BetaAccess() {
       <SectionHeading
         eyebrow="Beta"
         title="Free while we're in beta."
-        body="No card, no trial countdown. Quoting is free — the few features that cost us money every time they run are invite-only while we find out who wants them."
+        body="No card, no trial countdown. Quote your jobs, send them, win them — while we work out what this should cost."
         align="center"
       />
 
-      <div className="mt-10 grid gap-4 lg:grid-cols-2">
+      {/* One card now, so it is held to a readable measure and centred rather
+          than stretched across the full five-column width. */}
+      <div className="mx-auto mt-10 max-w-md">
         <div className="rounded-lg border-2 border-brand bg-surface p-6">
           <h3 className="font-semibold">Free, right now</h3>
           <p className="mt-2 text-sm text-ink-60">
@@ -119,25 +125,6 @@ function BetaAccess() {
           <Button asChild size="lg" className="mt-6 w-full">
             <Link href="/register">Start free</Link>
           </Button>
-        </div>
-
-        <div className="rounded-lg border border-hairline bg-surface p-6">
-          <h3 className="font-semibold">Invite-only, for now</h3>
-          <p className="mt-2 text-sm text-ink-60">
-            Ask from inside the app and we&apos;ll switch them on by hand.
-          </p>
-
-          <ul className="mt-5 space-y-2.5 text-sm text-ink-60">
-            {BETA_INVITE_ONLY.map((feature) => (
-              <li key={feature} className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="mt-1.5 size-1.5 shrink-0 rounded-pill bg-marigold"
-                />
-                {feature}
-              </li>
-            ))}
-          </ul>
 
           <p className="mt-6 rounded-md bg-surface-2 p-3 text-sm text-ink-60">
             We haven&apos;t set a price yet. When we do, you&apos;ll hear it

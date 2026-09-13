@@ -11,7 +11,6 @@ import { FounderNote, Proof } from "@/components/landing/proof";
 import { Reveal, RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { SectionHeading } from "@/components/landing/section-heading";
 import { Button } from "@/components/ui/button";
-import { FREE_QUOTES_PER_MONTH } from "@/lib/constants";
 
 /*
  * The landing page (SPEC §1, §17). Rendered on the server; the only client
@@ -89,11 +88,12 @@ export default function HomePage() {
               <Link href="/register">Start free — no card</Link>
             </Button>
             {/* Not "free forever" — we intend to charge one day, and a
-                promise we plan to break is worse than no promise. The number
-                comes from the constant the app actually enforces. */}
+                promise we plan to break is worse than no promise. No quote
+                count either: the cap in lib/quota.ts is real, so this must
+                never read as unlimited, but naming it here turns the last
+                line before the button into a limit. */}
             <p className="mt-4 text-sm text-ink-60">
-              {FREE_QUOTES_PER_MONTH} free quotes a month. No card, no trial
-              countdown.
+              Free while we&apos;re in beta. No card, no trial countdown.
             </p>
           </Reveal>
         </section>
