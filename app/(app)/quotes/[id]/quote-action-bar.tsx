@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { deleteQuote } from "@/app/(app)/quotes/actions";
+import { shareQuote } from "@/app/(app)/quotes/share-actions";
 import { QUOTE_DETAILS_FORM_ID } from "@/app/(app)/quotes/[id]/quote-details-form";
 import {
   AlertDialog,
@@ -59,22 +60,48 @@ export function QuoteActionBar({
 
   async function copyLink() {
     /*
-     * The token is minted when the quote is created, so there is nothing to
-     * generate here — the link exists even for a draft. Built from the live
-     * origin rather than a configured base URL, so the copied link is always
-     * for the host the owner is actually on.
+     * The token is minted at creation, so the URL can be built here without
+     * asking the server. Built from the live origin rather than a configured
+     * base URL, so the copied link is always for the host the owner is on.
      */
     const url = `${window.location.origin}/q/${publicToken}`;
 
+    /*
+     * Copy FIRST, and synchronously within the click.
+     *
+     * Safari only allows a clipboard write inside the gesture that triggered
+     * it, and an `await` before the write loses that gesture — so an owner on
+     * an iPhone, which is most of them, would get nothing on the clipboard.
+     * Marking the quote sent happens after, and does not block the copy.
+     */
+    let copiedOk = true;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      toast.success("Link copied.");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Clipboard access can be refused; the link is no use if it is nowhere.
+      copiedOk = false;
       toast.error("Couldn't copy. Use the link in the Share panel.");
     }
+
+    /*
+     * Copying the link IS sending the quote.
+     *
+     * Without this the quote stayed a draft, and a draft link opens for the
+     * customer but cannot be accepted — the owner texts it, the customer reads
+     * it, and the Accept button is not there. It also skipped the `sent` event
+     * that the whole acceptance funnel is measured from (golden rule 9), so a
+     * quote shared this way was invisible in the numbers.
+     */
+    const result = await shareQuote(quoteId);
+    if (result.error) {
+      toast.error(result.error);
+      return;
+    }
+
+    if (copiedOk) toast.success("Link copied. The quote is now sent.");
+    router.refresh();
   }
 
   return (
