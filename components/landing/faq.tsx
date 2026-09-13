@@ -9,7 +9,7 @@ import { BILLING_ENABLED } from "@/lib/constants";
 /** `betaOnly` questions disappear the day there is a paid plan to describe. */
 type Question = { q: string; a: string; betaOnly?: boolean };
 
-const QUESTIONS: Question[] = [
+export const QUESTIONS: Question[] = [
   {
     q: "Is it really free?",
     a: BILLING_ENABLED

@@ -1,6 +1,7 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Faq } from "@/components/landing/faq";
+import { Faq, QUESTIONS } from "@/components/landing/faq";
 import { Features } from "@/components/landing/features";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
@@ -10,7 +11,27 @@ import { PromiseBand } from "@/components/landing/promise";
 import { FounderNote, Proof } from "@/components/landing/proof";
 import { Reveal, RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { SectionHeading } from "@/components/landing/section-heading";
+import { MarketingStructuredData } from "@/components/landing/structured-data";
 import { Button } from "@/components/ui/button";
+
+/*
+ * The title leads with the category, not the slogan.
+ *
+ * "Send the quote before you leave the driveway" is the better line and it is
+ * still the h1 — but nobody searches for it. A search result has about sixty
+ * characters to answer "is this the thing I typed", and the thing they typed is
+ * some arrangement of quoting, software and electrician. The slogan does its
+ * work on the page, once they are here.
+ *
+ * The canonical is explicit because the site answers on both the apex and www;
+ * without it, the two hosts compete as separate pages for the same content.
+ */
+export const metadata: Metadata = {
+  title: "Quoting software for residential electricians — QuotePace",
+  description:
+    "Build a quote from your own prices in minutes on your phone, send the link, and let the customer accept it on theirs. Sent, opened and accepted, all tracked.",
+  alternates: { canonical: "/" },
+};
 
 /*
  * The landing page (SPEC §1, §17). Rendered on the server; the only client
@@ -21,6 +42,10 @@ import { Button } from "@/components/ui/button";
 export default function HomePage() {
   return (
     <>
+      {/* The same questions the page renders, marked up for search and for
+          assistants deciding whether this answers what was asked. */}
+      <MarketingStructuredData faq={QUESTIONS} />
+
       <main>
         <Hero />
         <Marquee />
