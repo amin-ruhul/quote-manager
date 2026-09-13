@@ -2,20 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PageShell, Prose } from "@/components/landing/page-shell";
+import { BILLING_ENABLED, SUPPORT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Contact QuotePilot",
   description:
     "Get in touch with QuotePilot — support, access requests, and feedback from electricians using the product.",
 };
-
-/*
- * TODO before launch: `SUPPORT_EMAIL` is a placeholder on a domain that may not
- * be configured yet. Point it at a mailbox someone actually reads, then delete
- * this comment. A contact page with a dead address is worse than no contact
- * page — it is the one link a frustrated customer clicks.
- */
-const SUPPORT_EMAIL = "hello@quotepilot.app";
 
 export default function ContactPage() {
   return (
@@ -52,11 +45,24 @@ export default function ContactPage() {
           you were quoting are the ones that change our minds.
         </p>
 
-        <h2>Billing</h2>
+        <h2>Getting the invite-only features</h2>
         <p>
-          Cancel any time from your account; your quotes and pricebook stay
-          yours either way. If a charge looks wrong, email us and we will sort
-          it out rather than pointing you at a policy.
+          {BILLING_ENABLED
+            ? "Cancel any time from your account; your quotes and pricebook stay yours either way. If a charge looks wrong, email us and we will sort it out rather than pointing you at a policy."
+            : "AI drafting, emailing quotes, automatic follow-up and PDF download are switched on by hand while we test them. The fastest way to ask is the button on Plan & usage inside the app — it tells us which feature you were reaching for. Emailing works too, and there is nothing to pay either way."}
+        </p>
+
+        <h2>Your data</h2>
+        <p>
+          Want a copy of what we hold, a correction, or your account deleted?
+          Email from the address on your account and we will do it — see the{" "}
+          <Link
+            href="/privacy"
+            className="font-medium text-brand hover:underline"
+          >
+            privacy page
+          </Link>{" "}
+          for what we store in the first place.
         </p>
 
         <h2>Before you email</h2>
@@ -67,7 +73,7 @@ export default function ContactPage() {
           </Link>{" "}
           answers the questions we get most: whether your customer needs an app,
           what happens when the AI cannot price a line, and what changes when
-          you hit the free plan&apos;s limit.
+          you reach the monthly limit.
         </p>
       </Prose>
     </PageShell>

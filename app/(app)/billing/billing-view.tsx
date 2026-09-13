@@ -94,7 +94,7 @@ export function BillingView({ status }: { status: PlanStatus }) {
               <p className="mt-2 text-sm text-ink-60">
                 {status.atLimit
                   ? "You've used this month's quotes. Sent quotes stay live and your customers can still accept them."
-                  : `${FREE_QUOTES_PER_MONTH} a month, free forever. Resets at the start of next month.`}
+                  : `${FREE_QUOTES_PER_MONTH} a month, free. Resets at the start of next month.`}
               </p>
             </div>
           )}

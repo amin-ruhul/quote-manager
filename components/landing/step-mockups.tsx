@@ -11,39 +11,68 @@
  * screen-reader user reads three clean paragraphs instead of stray fragments.
  */
 
-/** Step 01 — the description box, and the pricebook lines it matched. */
-export function DescribeMockup() {
+/**
+ * Step 01 — searching your own pricebook and tapping lines in.
+ *
+ * Deliberately the free path rather than the AI description box this used to
+ * show: the picture beside a step is read as "this is what you get", and AI
+ * drafting is granted by hand while we test it. The step's prose still mentions
+ * AI as the other way in.
+ */
+export function BuildMockup() {
   return (
     <Frame>
       <p className="text-[0.65rem] font-medium tracking-[0.08em] text-ink-60 uppercase">
-        Describe the job
+        Add from your pricebook
       </p>
 
-      <div className="mt-2 rounded-md border border-hairline-strong bg-surface-2 p-3">
+      <div className="mt-2 flex items-center gap-2 rounded-md border border-hairline-strong bg-surface-2 px-3 py-2.5">
+        <svg viewBox="0 0 16 16" className="size-3.5 shrink-0 text-ink-60">
+          <circle
+            cx="7"
+            cy="7"
+            r="4.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+          />
+          <path
+            d="M10.5 10.5L14 14"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          />
+        </svg>
         <p className="text-sm text-ink-90">
-          Swap the 100A panel for a 200A, six recessed lights in the kitchen
+          panel
           <span className="ml-0.5 inline-block h-4 w-px translate-y-0.5 bg-brand" />
         </p>
       </div>
 
+      <ul className="mt-2.5 space-y-1.5">
+        <PricebookLine name="Panel replacement (200A)" price="$2,850.00" />
+        <PricebookLine name="Recessed light — each" price="$185.00" />
+      </ul>
+
       <p className="mt-3 flex items-center gap-1.5 text-[0.7rem] font-medium text-brand">
         <span className="size-1.5 rounded-pill bg-brand" />
-        Matched 2 items from your pricebook
+        Your prices, already set
       </p>
-
-      <ul className="mt-2 space-y-1.5">
-        <MatchedLine name="Panel replacement (200A)" price="$2,850.00" />
-        <MatchedLine name="Recessed light × 6" price="$1,110.00" />
-      </ul>
     </Frame>
   );
 }
 
-function MatchedLine({ name, price }: { name: string; price: string }) {
+/** A pricebook row, with the tap target that puts it on the quote. */
+function PricebookLine({ name, price }: { name: string; price: string }) {
   return (
-    <li className="flex items-baseline justify-between gap-3 rounded-md border border-hairline bg-surface px-2.5 py-2 text-xs">
+    <li className="flex items-center justify-between gap-3 rounded-md border border-hairline bg-surface px-2.5 py-2 text-xs">
       <span className="min-w-0 truncate text-ink-90">{name}</span>
-      <span className="tabular shrink-0 font-medium">{price}</span>
+      <span className="flex shrink-0 items-center gap-2">
+        <span className="tabular font-medium">{price}</span>
+        <span className="flex size-4 items-center justify-center rounded-sm bg-brand-wash text-[0.7rem] leading-none font-medium text-brand">
+          +
+        </span>
+      </span>
     </li>
   );
 }

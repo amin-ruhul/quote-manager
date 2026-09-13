@@ -1,88 +1,175 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { DraftNotice, PageShell, Prose } from "@/components/landing/page-shell";
-import { BILLING_ENABLED, FREE_QUOTES_PER_MONTH } from "@/lib/constants";
+import { PageShell, Prose } from "@/components/landing/page-shell";
+import {
+  BILLING_ENABLED,
+  FREE_QUOTES_PER_MONTH,
+  SUPPORT_EMAIL,
+} from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Terms — QuotePilot",
+  title: "Terms of use — QuotePilot",
   description:
-    "How QuotePilot works as a service: plans, limits, what we are responsible for, and what you are.",
-  // Not indexable until these are real, reviewed terms.
-  robots: { index: false, follow: true },
+    "The terms you agree to by using QuotePilot: what the service does, what it costs, what you are responsible for, and what we are.",
 };
 
 /*
- * ⚠️ THESE ARE NOT TERMS OF SERVICE. This is a plain-English description of how
- * the product works commercially, so the footer link resolves to something
- * honest instead of a 404 or invented contract language.
+ * The operative terms for the beta, written from what the product actually
+ * does. Deliberately plain: QuotePilot takes no payment, stores no card, and
+ * signs nothing on anyone's behalf, so contract language borrowed from a
+ * company that does all three would describe a service this isn't.
  *
- * Before launch: have real terms drafted or reviewed by someone qualified,
- * replace everything below, remove the `robots` block above, and delete the
- * DraftNotice. Generated contract text is not enforceable comfort.
+ * When billing lands, three sections need real text before a single charge:
+ * payment, refunds, and cancellation. `BILLING_ENABLED` already branches them.
  */
 export default function TermsPage() {
   return (
     <PageShell
-      eyebrow="Terms"
+      eyebrow="Terms of use"
       title="How this works between us."
-      standfirst="The commercial shape of the service, stated plainly."
+      standfirst="Plain English, because you should be able to read the whole thing in five minutes and know exactly where you stand."
     >
-      <DraftNotice>
-        This page describes how the product works. It is not our terms of
-        service — the binding agreement has not been published yet. If you need
-        it before signing up, email us and we will tell you where it stands.
-      </DraftNotice>
-
       <Prose>
-        <h2>Plans and limits</h2>
+        <p className="text-sm text-ink-60">
+          Last updated 13 September 2026. By creating an account you agree to
+          what is on this page.
+        </p>
+
+        <h2>What QuotePilot is</h2>
+        <p>
+          QuotePilot is software for building, sending and tracking quotes. You
+          build a pricebook, you make a quote from it, we host a link your
+          customer can open and accept, and we record what happened to it. That
+          is the whole service.
+        </p>
+        <p>
+          We are not a party to the work you quote for. QuotePilot is not a
+          contractor, an accountant, a lawyer or a tax adviser, and nothing the
+          software produces is professional advice.
+        </p>
+
+        <h2>Your account</h2>
+        <p>
+          You need an email address and a password. Keep them to yourself —
+          anything done from your account is treated as done by you. One account
+          is for one business; if you run two businesses, use two accounts.
+        </p>
+        <p>
+          You must be old enough to enter a contract where you live, and the
+          business details you put on a quote must be ones you are entitled to
+          use.
+        </p>
+
+        <h2>What it costs</h2>
         {BILLING_ENABLED ? (
           <p>
             The free plan allows {FREE_QUOTES_PER_MONTH} quotes a month and
-            carries a “Made with QuotePilot” line on the quotes you send. Paid
-            plans lift the limit and the badge. Prices are shown on the home
-            page in USD.
+            carries a &ldquo;Made with QuotePilot&rdquo; line on the quotes you
+            send. Paid plans lift the limit and remove the badge. Prices are
+            shown on the home page.
           </p>
         ) : (
-          /* While the market test runs there is no paid plan to describe —
-             saying otherwise here would be the one place we quote a price we
-             don't charge. */
           <p>
-            QuotePilot is free while we are in beta: {FREE_QUOTES_PER_MONTH}{" "}
-            quotes a month, with a “Made with QuotePilot” line on the quotes you
-            send. There is nothing to buy and no card to enter. A few features
-            that cost us money to run — AI drafting, sending email — are
-            switched on by hand for businesses who ask. If that ever changes,
-            you will hear it from us first.
+            Nothing, right now. QuotePilot is in beta: {FREE_QUOTES_PER_MONTH}{" "}
+            quotes a month, no card, nothing to buy. Some features cost us money
+            every time they run — AI drafting, sending email on your behalf,
+            automatic follow-up, PDF download — so we switch those on by hand
+            for businesses who ask.
           </p>
         )}
-
-        <h2>Hitting the free limit</h2>
         <p>
-          Nothing breaks. Quotes you have already sent stay live and your
-          customers can still accept them. You cannot create a new quote until
-          the month rolls over
+          We intend to charge for QuotePilot one day. If that happens you will
+          be told before it applies to you, and using the free plan now does not
+          commit you to paying later. We will not take money from you without
+          you choosing to give it.
+        </p>
+
+        <h2>Hitting the monthly limit</h2>
+        <p>
+          Nothing breaks. Quotes you have already sent stay live, your customers
+          can still open and accept them, and your pricebook is untouched. You
+          simply cannot start a new quote until the month rolls over
           {BILLING_ENABLED ? " or you upgrade" : " or we raise your limit"}.
         </p>
 
         <h2>The quotes you send are yours</h2>
         <p>
           You are the one quoting. QuotePilot drafts and delivers; you review
-          every quote before it goes out, and the prices come from the pricebook
-          you built. What you commit to a customer is between you and them.
+          every quote before it goes out, and every price comes from the
+          pricebook you built. What you commit to a customer — the price, the
+          scope, the warranty, the licence you hold — is between you and them.
+          We are not responsible for a job quoted wrong, underpriced, or
+          performed badly.
         </p>
 
         <h2>What the AI does and does not do</h2>
         <p>
-          It matches your description to items in your pricebook. It does not
-          set a price it could not match — those lines come back blank and
-          flagged for you. It can still get a match wrong, which is why nothing
-          sends until you have looked at it.
+          It matches your description to items in your pricebook. It cannot
+          invent a price: a line it could not match comes back blank and flagged
+          for you to fill in. It can still match the wrong item or miss
+          something, which is why nothing is sent until you have read it. Treat
+          an AI draft as a first pass by an apprentice, not as a quote.
         </p>
 
-        <h2>Cancelling</h2>
+        <h2>Acceptances and signatures</h2>
         <p>
-          Cancel any time. Your quotes and pricebook stay yours, and quote links
-          already in your customers&apos; hands keep working.
+          When a customer accepts a quote we record that it happened, when, and
+          the name they typed. That record is evidence of what passed between
+          you, not a legal contract drafted by us, and it does not replace
+          whatever paperwork your trade or your jurisdiction requires.
+        </p>
+
+        <h2>What you must not do</h2>
+        <p>
+          Do not use QuotePilot to send anything you were not asked for, to
+          quote for work you are not licensed to do, to impersonate another
+          business, or to break the law where you or your customer are. Do not
+          try to reach other businesses&apos; data, hammer the service
+          automatically, or resell it as your own. We can suspend an account
+          doing any of that.
+        </p>
+
+        <h2>What we promise, and what we don&apos;t</h2>
+        <p>
+          We work hard to keep QuotePilot up, fast and correct. We cannot
+          promise it will never be down, never lose a keystroke, or never have a
+          bug. It is provided as it is. To the extent the law allows, we are not
+          liable for work you lose, a quote that did not arrive, or a number
+          that came out wrong — which is also why every quote passes your eyes
+          before it goes anywhere.
+        </p>
+        <p>
+          During the beta, expect things to change. Features can move, improve
+          or be withdrawn, and we will tell you in the app when something you
+          rely on changes.
+        </p>
+
+        <h2>Leaving</h2>
+        <p>
+          You can stop using QuotePilot whenever you like, and you can ask us to
+          delete your account by emailing{" "}
+          <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>. Deleting an
+          account removes your pricebook, your quotes and the links your
+          customers hold, so export or save anything you still need first.
+        </p>
+        <p>
+          We can close an account that is being used for the things listed
+          above, or if we shut the service down — in which case we will give you
+          notice and a chance to get your data out.
+        </p>
+
+        <h2>Changes to these terms</h2>
+        <p>
+          If we change anything here that matters, we will update the date at
+          the top and tell you in the app. Carrying on using QuotePilot after
+          that means the new version applies.
+        </p>
+
+        <h2>Getting hold of us</h2>
+        <p>
+          <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>, or the{" "}
+          <Link href="/contact">contact page</Link>. A person reads it.
         </p>
       </Prose>
     </PageShell>

@@ -48,6 +48,24 @@ export const BILLING_ENABLED = false;
 export const PLAN_PAGE_PATH = BILLING_ENABLED ? "/billing" : "/plan";
 
 /**
+ * How the marketing pages name the features we grant by hand. Kept here rather
+ * than typed into each page, so flipping the switch above cannot leave the
+ * landing page calling a paid feature "invite-only" — exactly the kind of
+ * stale claim that makes the rest of a page harder to believe.
+ */
+export const INVITE_ONLY_NOTE = BILLING_ENABLED
+  ? "On the paid plans"
+  : "Invite-only in beta";
+
+/**
+ * The one address a customer, a regulator or a curious visitor can reach a
+ * person at. Named here because it appears on the contact page, in the terms
+ * and in the privacy policy, and those three disagreeing is how a support
+ * address quietly becomes a dead one.
+ */
+export const SUPPORT_EMAIL = "hello@quotepilot.app";
+
+/**
  * Where an owner was standing when they asked for access. Kept so the requests
  * table can answer "which locked feature actually drives the asking?" — the
  * whole reason for running the test.

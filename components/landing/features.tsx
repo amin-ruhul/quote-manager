@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 
 import { RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { SectionHeading } from "@/components/landing/section-heading";
+import { INVITE_ONLY_NOTE } from "@/lib/constants";
 
 /*
  * Outcomes, not features: each card names the thing that stops happening.
@@ -31,7 +32,9 @@ const OUTCOMES: Outcome[] = [
     iconTone: "bg-black/10 text-ink-90",
     title: "Never chase a customer again",
     body: "If a quote goes quiet, QuotePilot sends one friendly nudge for you. It stops the moment they accept.",
-    chips: ["One nudge, not five", "Stops on accept", "Automatic"],
+    // Sending costs us money per email, so this one is granted by hand while
+    // we test it. The chip says so on the card rather than in small print.
+    chips: ["One nudge, not five", "Stops on accept", INVITE_ONLY_NOTE],
     wide: true,
   },
   {

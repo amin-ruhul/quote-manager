@@ -11,6 +11,7 @@ import { FounderNote, Proof } from "@/components/landing/proof";
 import { Reveal, RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { SectionHeading } from "@/components/landing/section-heading";
 import { Button } from "@/components/ui/button";
+import { FREE_QUOTES_PER_MONTH } from "@/lib/constants";
 
 /*
  * The landing page (SPEC §1, §17). Rendered on the server; the only client
@@ -87,8 +88,12 @@ export default function HomePage() {
             <Button asChild size="lg" className="mt-8 w-full sm:w-auto">
               <Link href="/register">Start free — no card</Link>
             </Button>
+            {/* Not "free forever" — we intend to charge one day, and a
+                promise we plan to break is worse than no promise. The number
+                comes from the constant the app actually enforces. */}
             <p className="mt-4 text-sm text-ink-60">
-              5 quotes a month, free forever. No card to start.
+              {FREE_QUOTES_PER_MONTH} free quotes a month. No card, no trial
+              countdown.
             </p>
           </Reveal>
         </section>

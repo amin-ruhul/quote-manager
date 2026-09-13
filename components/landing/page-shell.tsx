@@ -64,29 +64,6 @@ export function ComingSoon({
   );
 }
 
-/**
- * The banner on the legal pages.
- *
- * Deliberately loud. What follows it is a plain-English description of how the
- * product handles data, written from the code — it is genuinely useful, and it
- * is NOT a privacy policy or a contract. Publishing generated text as though a
- * lawyer had reviewed it would be the single most damaging thing on this site.
- * Replace those pages with real reviewed text before launch, then delete this.
- */
-export function DraftNotice({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      role="note"
-      className="rounded-lg border border-hairline bg-status-viewed-bg p-5"
-    >
-      <p className="text-xs font-medium tracking-[0.08em] text-status-viewed uppercase">
-        Not the final document
-      </p>
-      <p className="mt-2 text-sm text-ink-90">{children}</p>
-    </div>
-  );
-}
-
 /** Body copy for the prose-ish pages, so they share one measure and rhythm. */
 export function Prose({ children }: { children: React.ReactNode }) {
   return (
