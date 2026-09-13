@@ -33,15 +33,23 @@ export const metadata: Metadata = {
    * traffic, because ChatGPT's search index is Bing's. Without this the site is
    * not eligible to be cited there at all.
    *
-   * Bing offers a meta tag, an XML file at the root, or a CNAME. This is the
-   * same token as the other two, and it is the one kept in the repo: a
-   * BingSiteAuth.xml dropped into public/ reads as stray junk to whoever finds
-   * it next, and a DNS record is invisible to anyone reading the code. The
-   * token is not a secret — it is served in the HTML of every page.
+   * Google is the other half: Search Console is the only place that reports
+   * which queries actually found the site.
    *
-   * Bing re-checks periodically, so this stays after verification succeeds.
+   * Both offered a meta tag, a file at the web root, or a DNS record, and both
+   * meta tags live here for the same reason — a verification file dropped into
+   * public/ reads as stray junk to whoever finds it next and gets deleted in a
+   * tidy-up, silently un-verifying the site, while a DNS record is invisible to
+   * anyone reading the code. Neither token is a secret; both are served in the
+   * HTML of every page, which is the entire mechanism.
+   *
+   * Note Google's two methods do NOT share a token — the file method uses its
+   * own filename, this is the meta tag's separate value. Bing's three did.
+   *
+   * Both re-check periodically, so these stay after verification succeeds.
    */
   verification: {
+    google: "8utyLx0tu3QJ2y7tiCrO94um3n7CsANQy29z0TmyyTg",
     other: { "msvalidate.01": "66EA4F287F3D0634A9DD4E93A0EFF21E" },
   },
   applicationName: "QuotePace",
