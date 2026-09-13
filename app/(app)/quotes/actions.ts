@@ -15,6 +15,7 @@ import {
   getQuoteForBusiness,
   nextQuoteNumber,
   recalculateQuote,
+  requireEditableQuote,
   requireOwnedQuote,
 } from "@/lib/quotes";
 import { consumeQuoteQuota } from "@/lib/quota";
@@ -308,14 +309,13 @@ export async function saveQuoteDetails(
   _prevState: QuoteFormState,
   formData: FormData,
 ): Promise<QuoteFormState> {
-  const owned = await requireOwnedQuote(String(formData.get("quoteId") ?? ""));
-  if (!owned) {
-    return {
-      error: "That quote no longer exists.",
-      fieldErrors: {},
-      savedAt: null,
-    };
+  const editable = await requireEditableQuote(
+    String(formData.get("quoteId") ?? ""),
+  );
+  if (!editable.ok) {
+    return { error: editable.error, fieldErrors: {}, savedAt: null };
   }
+  const owned = editable;
 
   const parsed = quoteDetailsSchema.safeParse({
     title: formData.get("title") ?? "",

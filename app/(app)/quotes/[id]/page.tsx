@@ -9,7 +9,7 @@ import { QuotePreview } from "@/components/quote/quote-preview";
 import { PremiumLock } from "@/components/upgrade/premium-lock";
 import { customers, pricebookItems } from "@/db/schema";
 import { requireBusiness } from "@/lib/auth";
-import { type Currency, isPaidPlan } from "@/lib/constants";
+import { type Currency, isPaidPlan, isQuoteLocked } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { getPlanStatus } from "@/lib/plan";
 import { getQuoteByPublicToken } from "@/lib/public-quote";
@@ -69,6 +69,7 @@ export default async function QuoteBuilderPage({
     // and the preview reads them, which is what makes the preview live.
     <QuoteDraftProvider>
       <QuoteWorkspace
+        locked={isQuoteLocked(quote.quote.status)}
         editor={
           <QuoteBuilder
             quote={quote.quote}

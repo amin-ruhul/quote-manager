@@ -8,7 +8,7 @@ import { QUANTITY_SCALE } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { toFieldErrors } from "@/lib/form-state";
 import { lineTotal } from "@/lib/quote-math";
-import { recalculateQuote, requireOwnedQuote } from "@/lib/quotes";
+import { recalculateQuote, requireEditableQuote } from "@/lib/quotes";
 import { quoteItemSchema, quoteOptionSchema } from "@/lib/schemas/quote";
 import { idSchema } from "@/lib/schemas/shared";
 import type { QuoteFormState } from "@/app/(app)/quotes/actions";
@@ -32,8 +32,9 @@ export async function addPricebookItemToQuote(
   pricebookItemId: string,
   optionId: string | null,
 ): Promise<{ error: string | null }> {
-  const owned = await requireOwnedQuote(quoteId);
-  if (!owned) return { error: "That quote no longer exists." };
+  const editable = await requireEditableQuote(quoteId);
+  if (!editable.ok) return { error: editable.error };
+  const owned = editable;
 
   const parsedItemId = idSchema.safeParse(pricebookItemId);
   if (!parsedItemId.success) return { error: "Pick an item to add." };
@@ -86,14 +87,13 @@ export async function saveQuoteItem(
   _prevState: QuoteFormState,
   formData: FormData,
 ): Promise<QuoteFormState> {
-  const owned = await requireOwnedQuote(String(formData.get("quoteId") ?? ""));
-  if (!owned) {
-    return {
-      error: "That quote no longer exists.",
-      fieldErrors: {},
-      savedAt: null,
-    };
+  const editable = await requireEditableQuote(
+    String(formData.get("quoteId") ?? ""),
+  );
+  if (!editable.ok) {
+    return { error: editable.error, fieldErrors: {}, savedAt: null };
   }
+  const owned = editable;
 
   const parsed = quoteItemSchema.safeParse({
     name: formData.get("name") ?? "",
@@ -191,8 +191,9 @@ export async function moveQuoteItemToOption(
   itemId: string,
   optionId: string | null,
 ): Promise<{ error: string | null }> {
-  const owned = await requireOwnedQuote(quoteId);
-  if (!owned) return { error: "That quote no longer exists." };
+  const editable = await requireEditableQuote(quoteId);
+  if (!editable.ok) return { error: editable.error };
+  const owned = editable;
 
   const parsedItemId = idSchema.safeParse(itemId);
   if (!parsedItemId.success) return { error: "Something went wrong." };
@@ -256,8 +257,9 @@ export async function deleteQuoteItem(
   quoteId: string,
   itemId: string,
 ): Promise<{ error: string | null }> {
-  const owned = await requireOwnedQuote(quoteId);
-  if (!owned) return { error: "That quote no longer exists." };
+  const editable = await requireEditableQuote(quoteId);
+  if (!editable.ok) return { error: editable.error };
+  const owned = editable;
 
   const parsedItemId = idSchema.safeParse(itemId);
   if (!parsedItemId.success) return { error: "Something went wrong." };
@@ -288,14 +290,13 @@ export async function addQuoteOption(
   _prevState: QuoteFormState,
   formData: FormData,
 ): Promise<QuoteFormState> {
-  const owned = await requireOwnedQuote(String(formData.get("quoteId") ?? ""));
-  if (!owned) {
-    return {
-      error: "That quote no longer exists.",
-      fieldErrors: {},
-      savedAt: null,
-    };
+  const editable = await requireEditableQuote(
+    String(formData.get("quoteId") ?? ""),
+  );
+  if (!editable.ok) {
+    return { error: editable.error, fieldErrors: {}, savedAt: null };
   }
+  const owned = editable;
 
   const parsed = quoteOptionSchema.safeParse({
     name: formData.get("name") ?? "",
@@ -337,8 +338,9 @@ export async function deleteQuoteOption(
   quoteId: string,
   optionId: string,
 ): Promise<{ error: string | null }> {
-  const owned = await requireOwnedQuote(quoteId);
-  if (!owned) return { error: "That quote no longer exists." };
+  const editable = await requireEditableQuote(quoteId);
+  if (!editable.ok) return { error: editable.error };
+  const owned = editable;
 
   const parsedOptionId = idSchema.safeParse(optionId);
   if (!parsedOptionId.success) return { error: "Something went wrong." };
@@ -371,8 +373,9 @@ export async function setRecommendedOption(
   quoteId: string,
   optionId: string,
 ): Promise<{ error: string | null }> {
-  const owned = await requireOwnedQuote(quoteId);
-  if (!owned) return { error: "That quote no longer exists." };
+  const editable = await requireEditableQuote(quoteId);
+  if (!editable.ok) return { error: editable.error };
+  const owned = editable;
 
   const parsedOptionId = idSchema.safeParse(optionId);
   if (!parsedOptionId.success) return { error: "Something went wrong." };

@@ -11,15 +11,18 @@ import {
   QUOTE_PHOTO_BUCKET,
 } from "@/lib/constants";
 import { db } from "@/lib/db";
-import { requireOwnedQuote } from "@/lib/quotes";
+import { requireEditableQuote } from "@/lib/quotes";
 import { createClient } from "@/lib/supabase/server";
 import { idSchema } from "@/lib/schemas/shared";
 
 export async function uploadQuotePhoto(
   formData: FormData,
 ): Promise<{ error: string | null }> {
-  const owned = await requireOwnedQuote(String(formData.get("quoteId") ?? ""));
-  if (!owned) return { error: "That quote no longer exists." };
+  const editable = await requireEditableQuote(
+    String(formData.get("quoteId") ?? ""),
+  );
+  if (!editable.ok) return { error: editable.error };
+  const owned = editable;
 
   const photo = formData.get("photo");
   if (!(photo instanceof File) || photo.size === 0) {
@@ -82,8 +85,9 @@ export async function deleteQuotePhoto(
   quoteId: string,
   attachmentId: string,
 ): Promise<{ error: string | null }> {
-  const owned = await requireOwnedQuote(quoteId);
-  if (!owned) return { error: "That quote no longer exists." };
+  const editable = await requireEditableQuote(quoteId);
+  if (!editable.ok) return { error: editable.error };
+  const owned = editable;
 
   const parsedId = idSchema.safeParse(attachmentId);
   if (!parsedId.success) return { error: "Something went wrong." };

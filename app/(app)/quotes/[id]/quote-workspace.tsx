@@ -29,6 +29,7 @@ export function QuoteWorkspace({
   quoteNumber,
   publicToken,
   premium,
+  locked,
 }: {
   editor: React.ReactNode;
   /** The "Create with AI" tab's contents. */
@@ -39,6 +40,8 @@ export function QuoteWorkspace({
   publicToken: string;
   /** Passed straight through to the bar, which locks what isn't granted. */
   premium: boolean;
+  /** Accepted: nothing here may write to the quote, so the ways in go away. */
+  locked: boolean;
 }) {
   const [mode, setMode] = useState<"manual" | "ai">("manual");
   const [showPreview, setShowPreview] = useState(false);
@@ -56,7 +59,7 @@ export function QuoteWorkspace({
           <div
             role="tablist"
             aria-label="How to build this quote"
-            className="mb-6 grid grid-cols-2 rounded-lg bg-surface-2 p-1"
+            className={`mb-6 grid grid-cols-2 rounded-lg bg-surface-2 p-1 ${locked ? "hidden" : ""}`}
           >
             <Tab
               active={mode === "manual"}
@@ -74,14 +77,26 @@ export function QuoteWorkspace({
 
           {/* Both stay mounted: switching tabs must not discard a half-typed
               description or reset an open section. */}
-          <div className={mode === "manual" ? "" : "hidden"}>{editor}</div>
-          <div className={mode === "ai" ? "" : "hidden"}>{aiPanel}</div>
+          <div className={!locked && mode === "ai" ? "hidden" : ""}>
+            {editor}
+          </div>
+          <div className={!locked && mode === "ai" ? "" : "hidden"}>
+            {aiPanel}
+          </div>
         </div>
 
         {/*
          * top-20 clears the sticky app bar. The pane is its own scroll
          * container so a long quote scrolls inside the preview rather than
          * dragging the editor along with it.
+         *
+         * The 12rem subtracted is both ends: 5rem for the app bar this hangs
+         * beneath, and ~5rem for the floating action bar, which is `fixed` and
+         * therefore invisible to layout. It used to be 8rem, which covered only
+         * the top — so the pane ran on underneath the bar and the last inch of
+         * the document was behind it. On a short laptop window that inch was
+         * most of the PDF, which looked like the preview had failed to load
+         * rather than like something was sitting on top of it.
          */}
         {/*
          * A rule in the gutter, not just space. Two columns of white cards on
@@ -90,7 +105,7 @@ export function QuoteWorkspace({
          * document".
          */}
         <div
-          className={`${showPreview ? "" : "hidden lg:block"} lg:sticky lg:top-20 lg:h-[calc(100dvh-8rem)] lg:border-l lg:border-hairline lg:pl-10`}
+          className={`${showPreview ? "" : "hidden lg:block"} lg:sticky lg:top-20 lg:h-[calc(100dvh-12rem)] lg:border-l lg:border-hairline lg:pl-10`}
         >
           {preview}
         </div>
@@ -101,6 +116,7 @@ export function QuoteWorkspace({
         quoteNumber={quoteNumber}
         publicToken={publicToken}
         premium={premium}
+        locked={locked}
         previewToggle={
           // Phone only: from lg the preview is already on screen beside this.
           <button

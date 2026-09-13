@@ -17,6 +17,7 @@ import {
   DEFAULT_QUOTE_STATUS,
   type PricebookUnit,
   type QuoteItemType,
+  type QuoteStatus,
 } from "@/lib/constants";
 import { businesses } from "./core";
 import { customers } from "./customers";
@@ -43,7 +44,12 @@ export const quotes = pgTable(
     quoteNumber: text("quote_number").notNull(),
     title: text("title").notNull(),
     scopeOfWork: text("scope_of_work"),
-    status: text("status").notNull().default(DEFAULT_QUOTE_STATUS),
+    // `$type` so a read comes back as the union rather than a bare string —
+    // what lets `isQuoteLocked` be checked at compile time instead of trusted.
+    status: text("status")
+      .$type<QuoteStatus>()
+      .notNull()
+      .default(DEFAULT_QUOTE_STATUS),
     /** Integer cents, all four. Recomputed server-side on every save. */
     subtotal: integer("subtotal").notNull().default(0),
     discount: integer("discount").notNull().default(0),
