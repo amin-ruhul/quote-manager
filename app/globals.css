@@ -178,6 +178,21 @@
 
   html {
     @apply font-sans;
+
+    /*
+     * No rubber-band overscroll. The nav is sticky and translucent, so bouncing
+     * past the top drags it down and opens a band of bare canvas above it that
+     * reads as a broken layout rather than a scroll effect. Set on <html> so it
+     * also stops the installed app from pull-to-refreshing mid-quote.
+     */
+    overscroll-behavior-y: none;
+
+    /*
+     * The background belongs on the root, not only on <body>. Body's background
+     * is propagated to the canvas, but anything painted outside the body box —
+     * the overscroll area on iOS especially — reads the root.
+     */
+    @apply bg-background;
   }
 
   body {
@@ -333,5 +348,65 @@
   .print-document h2,
   .print-document h3 {
     break-after: avoid;
+  }
+}
+
+/*
+ * Above-the-fold entrance, in CSS.
+ *
+ * The scroll reveals in components/landing/reveal.tsx are JavaScript, which is
+ * right for content further down: by the time you scroll, the bundle has
+ * landed. It is wrong for the first screen. A JavaScript reveal has to
+ * server-render its hidden state as inline `opacity: 0`, so until React
+ * hydrates there is nothing on the page at all — and the visitor this page is
+ * written for is on a phone, on a job site, on one bar. They were getting a
+ * blank screen and reloading to fix it.
+ *
+ * A CSS animation runs at first paint instead. It cannot be delayed by a slow
+ * bundle, and it still finishes if the bundle never arrives at all.
+ */
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Matches the reveal.tsx timing, so both halves of the page move alike. */
+.reveal-rise,
+.reveal-stagger > * {
+  animation: reveal-rise 400ms ease-out both;
+}
+
+/*
+ * The stagger reveal.tsx does with `staggerChildren`. Six steps covers the
+ * longest group on the page (the hero); a seventh child simply arrives with
+ * the sixth rather than never arriving.
+ */
+.reveal-stagger > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+.reveal-stagger > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+.reveal-stagger > *:nth-child(4) {
+  animation-delay: 210ms;
+}
+.reveal-stagger > *:nth-child(5) {
+  animation-delay: 280ms;
+}
+.reveal-stagger > *:nth-child(n + 6) {
+  animation-delay: 350ms;
+}
+
+/* Same contract as useReducedMotion: rendered and static, never hidden. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-rise,
+  .reveal-stagger > * {
+    animation: none;
   }
 }

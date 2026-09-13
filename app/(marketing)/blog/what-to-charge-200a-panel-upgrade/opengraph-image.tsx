@@ -1,15 +1,28 @@
 import { ImageResponse } from "next/og";
 
 import { BRAND_BLUE, BRAND_MARK_PATH, BRAND_MARK_VIEWBOX } from "@/lib/brand";
+import { getPost } from "@/lib/blog";
 
 /*
- * The picture that shows up when the link is pasted into a text or a Facebook
- * group. Headline plus the price, on the brand's warm paper — the two things
- * that make an electrician stop scrolling.
+ * The picture for this post when the link is pasted into a trade Facebook
+ * group or a text — which, for this audience, is most of how it will travel.
+ * The stacked bar is the post's figure in miniature: enough to signal "this is
+ * a breakdown, not another cost guide" at thumbnail size.
  */
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "QuotePace — send the quote before you leave the driveway";
+
+const post = getPost("what-to-charge-200a-panel-upgrade")!;
+export const alt = post.title;
+
+/** The same five shares as the in-post figure, as [width %, color]. */
+const BANDS: [number, string][] = [
+  [27.5, "#62AEF0"],
+  [35.9, BRAND_BLUE],
+  [5.6, "#FFB110"],
+  [17.2, "#B18164"],
+  [13.8, "#02093A"],
+];
 
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -53,36 +66,35 @@ export default function OpengraphImage() {
       <div
         style={{
           display: "flex",
-          fontSize: 76,
-          fontWeight: 700,
-          lineHeight: 1.05,
-          letterSpacing: "-0.03em",
-          color: "rgba(0,0,0,0.9)",
-          maxWidth: 900,
+          flexDirection: "column",
+          gap: 28,
+          maxWidth: 940,
         }}
       >
-        Send the quote before you leave the driveway.
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
         <div
           style={{
             display: "flex",
-            background: "#E4F4EB",
-            color: "#0F7A38",
-            padding: "12px 22px",
-            borderRadius: 999,
-            fontSize: 28,
-            fontWeight: 600,
+            fontSize: 68,
+            fontWeight: 700,
+            lineHeight: 1.05,
+            letterSpacing: "-0.03em",
+            color: "rgba(0,0,0,0.9)",
           }}
         >
-          Accepted · $4,541.09
+          {post.title}
         </div>
-        <div
-          style={{ display: "flex", fontSize: 26, color: "rgba(0,0,0,0.6)" }}
-        >
-          Quoting software for residential electricians
+        <div style={{ display: "flex", width: 940, height: 22, gap: 3 }}>
+          {BANDS.map(([width, color]) => (
+            <div
+              key={color}
+              style={{ width: `${width}%`, height: "100%", background: color }}
+            />
+          ))}
         </div>
+      </div>
+
+      <div style={{ display: "flex", fontSize: 26, color: "rgba(0,0,0,0.6)" }}>
+        Build it from your own costs — not a national average.
       </div>
     </div>,
     size,
