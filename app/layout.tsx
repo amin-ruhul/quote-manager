@@ -28,6 +28,22 @@ export const metadata: Metadata = {
       "Describe the job. QuotePace builds the quote from your own prices and lets the customer accept it on their phone.",
     type: "website",
   },
+  /*
+   * Proves to Bing that we own the domain — which is worth more than Bing's own
+   * traffic, because ChatGPT's search index is Bing's. Without this the site is
+   * not eligible to be cited there at all.
+   *
+   * Bing offers a meta tag, an XML file at the root, or a CNAME. This is the
+   * same token as the other two, and it is the one kept in the repo: a
+   * BingSiteAuth.xml dropped into public/ reads as stray junk to whoever finds
+   * it next, and a DNS record is invisible to anyone reading the code. The
+   * token is not a secret — it is served in the HTML of every page.
+   *
+   * Bing re-checks periodically, so this stays after verification succeeds.
+   */
+  verification: {
+    other: { "msvalidate.01": "66EA4F287F3D0634A9DD4E93A0EFF21E" },
+  },
   applicationName: "QuotePace",
   // Home-screen launch on iOS: full-screen, with the app's own name under the
   // icon rather than the page title (SPEC §6). The icons themselves come from
