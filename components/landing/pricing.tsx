@@ -64,9 +64,15 @@ export function Pricing() {
   return BILLING_ENABLED ? <PricedPlans /> : <BetaAccess />;
 }
 
-/** What the free plan covers today, and what has to be asked for. */
+/*
+ * What the free plan covers today, and what has to be asked for.
+ *
+ * No quote count. The heading, the card title and the button all say free
+ * already, so a "N quotes a month" line only draws the eye to a ceiling
+ * nobody has hit yet. Note what is NOT claimed here either: there is still a
+ * monthly cap in lib/quota.ts, so this must never say "unlimited".
+ */
 const BETA_INCLUDED = [
-  `${FREE_QUOTES_PER_MONTH} quotes a month`,
   "Your pricebook, your logo, your terms",
   "A customer page they can accept on their phone",
   "Sent, opened and accepted — all tracked",
