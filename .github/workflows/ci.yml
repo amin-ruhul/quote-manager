@@ -40,3 +40,18 @@ jobs:
 
       - name: Unit tests
         run: npm test
+
+      # Typecheck does not catch what the bundler does: a client component
+      # importing a server-only module, a bad next.config, a route that fails
+      # to prerender. Without this, the first place a broken build showed up
+      # was the production deploy.
+      - name: Build
+        run: npm run build
+        env:
+          # The build only needs these to exist — it renders no page that
+          # queries the database. Real values live in Vercel, never here.
+          NEXT_PUBLIC_APP_URL: https://quotepace.com
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder

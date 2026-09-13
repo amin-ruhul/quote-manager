@@ -64,8 +64,7 @@ export default function AboutPage() {
         <p>
           There are no customer logos on this site because we have not earned
           them yet, and we would rather say so than borrow someone else&apos;s.
-          If QuotePace wins you a job, we would genuinely like to hear about
-          it.
+          If QuotePace wins you a job, we would genuinely like to hear about it.
         </p>
       </Prose>
     </PageShell>
