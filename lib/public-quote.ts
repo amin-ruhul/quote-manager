@@ -78,6 +78,9 @@ export async function getQuoteByPublicToken(token: string) {
         unitPrice: quoteItems.unitPrice,
         total: quoteItems.total,
         type: quoteItems.type,
+        // Needed so the builder's live preview can recompute tax without a
+        // round trip; harmless on the customer page, which only reads totals.
+        taxable: quoteItems.taxable,
       })
       .from(quoteItems)
       .where(eq(quoteItems.quoteId, quoteRow.id))

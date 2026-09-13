@@ -1,17 +1,51 @@
 import { ChevronDown } from "lucide-react";
 
 /*
- * A section of a long form that answers its own question while shut.
+ * The card every part of the quote builder sits in.
  *
- * Native <details>, deliberately: it needs no JavaScript, it is keyboard and
- * screen-reader correct for free, and browser find-in-page opens it. A Radix
- * Collapsible would add a client component and a state hook to reimplement
- * what the element already does.
+ * One unbroken white surface with a hairline edge. No tint behind the header
+ * and no rule under it: either one splits the card into what looks like two
+ * stacked cards, which defeats the boundary the card exists to draw. The
+ * chevron chip is what reacts to hover instead.
  *
- * The `summary` prop is the point of the whole thing. A collapsed header that
- * says only "Photos" forces you to open it to learn anything; one that says
- * "Photos — 3" means most sections never need opening. That is what turns a
- * flat wall of fields into something you can read at a glance.
+ * The `summary` prop is the load-bearing idea. A collapsed header that says
+ * only "Photos" forces you to open it to learn anything; one that says
+ * "Photos — 3 attached" means most sections never need opening.
+ */
+
+const CARD = "rounded-lg border border-hairline bg-surface";
+const HEADER = "flex items-center gap-3 p-4 sm:p-5";
+const BODY = "px-4 pb-4 sm:px-5 sm:pb-5";
+
+/** A section that is always open — for the one the owner always needs. */
+export function Section({
+  title,
+  summary,
+  children,
+}: {
+  title: string;
+  summary?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={CARD}>
+      <div className={`${HEADER} pb-3 sm:pb-4`}>
+        <h2 className="font-semibold">{title}</h2>
+        {summary ? (
+          <span className="min-w-0 flex-1 truncate text-sm text-ink-60">
+            {summary}
+          </span>
+        ) : null}
+      </div>
+      <div className={BODY}>{children}</div>
+    </section>
+  );
+}
+
+/**
+ * Native <details>, deliberately: no JavaScript, keyboard and screen-reader
+ * correct for free, and browser find-in-page opens it. A Radix Collapsible
+ * would add a client component and a state hook to reimplement the element.
  */
 export function CollapsibleSection({
   title,
@@ -26,14 +60,12 @@ export function CollapsibleSection({
   children: React.ReactNode;
 }) {
   return (
-    /*
-     * A heading row, not a card. The content already brings its own Panel, and
-     * DESIGN.md's cards sit ON the canvas — nesting one inside another gives
-     * two hairlines and two radii for one idea.
-     */
-    <details open={defaultOpen} className="group">
-      <summary className="-mx-2 flex cursor-pointer list-none items-center gap-3 rounded-md px-2 py-1.5 hover:bg-surface-2 [&::-webkit-details-marker]:hidden">
+    <details open={defaultOpen} className={`group ${CARD}`}>
+      <summary
+        className={`${HEADER} cursor-pointer list-none rounded-lg group-open:pb-3 sm:group-open:pb-4 [&::-webkit-details-marker]:hidden`}
+      >
         <span className="font-semibold">{title}</span>
+
         {summary ? (
           <span className="min-w-0 flex-1 truncate text-sm text-ink-60">
             {summary}
@@ -41,10 +73,19 @@ export function CollapsibleSection({
         ) : (
           <span className="flex-1" />
         )}
-        <ChevronDown className="size-4 shrink-0 text-ink-60 transition-transform group-open:rotate-180" />
+
+        {/*
+         * The whole row is the target, but only this reacts — tinting the
+         * header on hover made the card look like two cards again. A bounded
+         * chip also survives sitting at the far edge of a wide row, where a
+         * bare grey chevron on white simply disappears.
+         */}
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-hairline text-ink-60 transition-all group-open:rotate-180 group-hover:border-ink-40 group-hover:text-ink-90">
+          <ChevronDown className="size-4" />
+        </span>
       </summary>
 
-      <div className="mt-2">{children}</div>
+      <div className={BODY}>{children}</div>
     </details>
   );
 }

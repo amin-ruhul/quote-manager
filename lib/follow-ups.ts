@@ -2,11 +2,18 @@ import "server-only";
 
 import { and, eq, inArray, lte, sql } from "drizzle-orm";
 
-import { businesses, customers, quoteEvents, quotes } from "@/db/schema";
-import { followUpDaysFor } from "@/lib/constants";
+import {
+  businesses,
+  customers,
+  profiles,
+  quoteEvents,
+  quotes,
+} from "@/db/schema";
+import { followUpDaysFor, isPaidPlan } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { absoluteUrl, sendEmail } from "@/lib/email";
 import { followUpEmail } from "@/lib/email-templates";
+import { toPlan } from "@/lib/quota";
 
 /*
  * The follow-up nudge (SPEC §12). This is what turns "sent" into "won" for the
@@ -50,6 +57,8 @@ export async function runFollowUps(now = new Date()): Promise<FollowUpRun> {
       customerFirstName: customers.firstName,
       customerLastName: customers.lastName,
       customerEmail: customers.email,
+      /* Chasing is a send, and sends are invite-only during the market test. */
+      ownerPlan: profiles.plan,
       sentAt: sql<Date | null>`(
         select min(${quoteEvents.createdAt})
         from ${quoteEvents}
@@ -59,6 +68,7 @@ export async function runFollowUps(now = new Date()): Promise<FollowUpRun> {
     })
     .from(quotes)
     .innerJoin(businesses, eq(quotes.businessId, businesses.id))
+    .innerJoin(profiles, eq(businesses.ownerId, profiles.id))
     .leftJoin(customers, eq(quotes.customerId, customers.id))
     .where(
       and(
@@ -75,6 +85,17 @@ export async function runFollowUps(now = new Date()): Promise<FollowUpRun> {
   };
 
   for (const quote of candidates) {
+    /*
+     * Automatic follow-up is one of the features granted by hand while we
+     * find out whether anyone wants it. A free-plan quote is counted and
+     * skipped rather than filtered out in SQL, so the run report still says
+     * how many nudges the paid version would have sent.
+     */
+    if (!isPaidPlan(toPlan(quote.ownerPlan))) {
+      run.skipped += 1;
+      continue;
+    }
+
     const days = followUpDaysFor(quote.settings);
 
     // 0 means the owner turned nudges off.

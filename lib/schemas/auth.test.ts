@@ -61,11 +61,13 @@ describe("the next path can't leave the site", () => {
     );
   });
 
+  // The fallback is the dashboard: signing in with nowhere in particular to
+  // go lands on "what happened while I was away".
   it.each(["//evil.com", "https://evil.com", "evil.com", ""])(
     "falls back rather than redirecting to %o",
     (next) => {
       expect(signInSchema.parse({ ...credentials, next }).next).toBe(
-        "/pricebook",
+        "/dashboard",
       );
     },
   );

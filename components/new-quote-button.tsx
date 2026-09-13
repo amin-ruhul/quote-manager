@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { createQuote } from "@/app/(app)/quotes/actions";
 import { Button } from "@/components/ui/button";
+import { PLAN_PAGE_PATH } from "@/lib/constants";
 
 /**
  * The app's primary action, used in the sidebar and on the Quotes page.
@@ -39,9 +40,25 @@ export function NewQuoteButton({
         startCreating(async () => {
           // No try/catch around the action: it reports failure as a value, and
           // catching here would also swallow any navigation error.
-          const { quoteId, error } = await createQuote();
-          if (error) toast.error(error);
-          else router.push(`/quotes/${quoteId}`);
+          const result = await createQuote();
+
+          if (result.atLimit) {
+            /*
+             * The one failure with somewhere to go. A toast that only says
+             * "you're out" leaves the owner stuck mid-job; this puts the way
+             * to ask for more one tap away.
+             */
+            toast.error(result.error, {
+              action: {
+                label: "See options",
+                onClick: () => router.push(PLAN_PAGE_PATH),
+              },
+            });
+            return;
+          }
+
+          if (result.error) toast.error(result.error);
+          else router.push(`/quotes/${result.quoteId}`);
         })
       }
     >

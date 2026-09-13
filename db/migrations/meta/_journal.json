@@ -50,6 +50,13 @@
       "when": 1789216364955,
       "tag": "0006_fluffy_mantis",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789270338690,
+      "tag": "0007_brief_norman_osborn",
+      "breakpoints": true
     }
   ]
 }

@@ -36,7 +36,7 @@ export default async function QuotePrintPage({
 
   return (
     <div className="print-document">
-      <QuoteDocument quote={quote} />
+      <QuoteDocument quote={quote} variant="print" />
     </div>
   );
 }

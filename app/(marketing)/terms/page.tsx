@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { DraftNotice, PageShell, Prose } from "@/components/landing/page-shell";
+import { BILLING_ENABLED, FREE_QUOTES_PER_MONTH } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Terms — QuotePilot",
@@ -34,17 +35,33 @@ export default function TermsPage() {
 
       <Prose>
         <h2>Plans and limits</h2>
-        <p>
-          The free plan allows five quotes a month and carries a “Made with
-          QuotePilot” line on the quotes you send. Paid plans lift the limit and
-          the badge. Prices are shown on the home page in USD.
-        </p>
+        {BILLING_ENABLED ? (
+          <p>
+            The free plan allows {FREE_QUOTES_PER_MONTH} quotes a month and
+            carries a “Made with QuotePilot” line on the quotes you send. Paid
+            plans lift the limit and the badge. Prices are shown on the home
+            page in USD.
+          </p>
+        ) : (
+          /* While the market test runs there is no paid plan to describe —
+             saying otherwise here would be the one place we quote a price we
+             don't charge. */
+          <p>
+            QuotePilot is free while we are in beta: {FREE_QUOTES_PER_MONTH}{" "}
+            quotes a month, with a “Made with QuotePilot” line on the quotes you
+            send. There is nothing to buy and no card to enter. A few features
+            that cost us money to run — AI drafting, sending email — are
+            switched on by hand for businesses who ask. If that ever changes,
+            you will hear it from us first.
+          </p>
+        )}
 
         <h2>Hitting the free limit</h2>
         <p>
           Nothing breaks. Quotes you have already sent stay live and your
           customers can still accept them. You cannot create a new quote until
-          the month rolls over or you upgrade.
+          the month rolls over
+          {BILLING_ENABLED ? " or you upgrade" : " or we raise your limit"}.
         </p>
 
         <h2>The quotes you send are yours</h2>

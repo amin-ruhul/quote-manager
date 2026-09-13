@@ -47,6 +47,12 @@ export const profiles = pgTable(
     plan: text("plan").notNull().default(DEFAULT_PLAN),
     paddleCustomerId: text("paddle_customer_id"),
     quotesUsedThisMonth: integer("quotes_used_this_month").notNull().default(0),
+    /*
+     * First moment of the month the counter above is counting. Without it a
+     * stale count from March silently locks someone out in April — the counter
+     * alone cannot say which month it belongs to. Null means never counted.
+     */
+    quotaPeriodStart: timestamp("quota_period_start", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

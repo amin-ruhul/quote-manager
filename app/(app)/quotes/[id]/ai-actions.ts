@@ -19,9 +19,11 @@ import {
 import {
   MAX_DESCRIPTION_LENGTH,
   MAX_QUANTITY,
+  PREMIUM_LOCKED_MESSAGE,
   QUOTE_ITEM_TYPES,
 } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { hasPremiumAccess } from "@/lib/plan";
 import { lineTotal } from "@/lib/quote-math";
 import { recalculateQuote, requireOwnedQuote } from "@/lib/quotes";
 import { rateLimit } from "@/lib/rate-limit";
@@ -49,6 +51,16 @@ export async function generateDraft(
 ): Promise<DraftState> {
   const owned = await requireOwnedQuote(String(formData.get("quoteId") ?? ""));
   if (!owned) return { error: "That quote no longer exists.", draft: null };
+
+  /*
+   * The UI shows a lock instead of this panel on the free plan, but a lock
+   * drawn in the browser is decoration — an action is callable by anyone with
+   * a session. Every model call is real money, so this is the check that
+   * counts.
+   */
+  if (!(await hasPremiumAccess(owned.user.id))) {
+    return { error: PREMIUM_LOCKED_MESSAGE, draft: null };
+  }
 
   const parsed = jobDescriptionSchema.safeParse(
     formData.get("jobDescription") ?? "",
@@ -166,6 +178,12 @@ export async function importDraftItems(input: {
 
   const owned = await requireOwnedQuote(parsed.data.quoteId);
   if (!owned) return { error: "That quote no longer exists." };
+
+  // Importing costs nothing to run, but it is the second half of a drafting
+  // session — leaving it open would leave the locked feature half-usable.
+  if (!(await hasPremiumAccess(owned.user.id))) {
+    return { error: PREMIUM_LOCKED_MESSAGE };
+  }
 
   try {
     const referencedIds = parsed.data.items

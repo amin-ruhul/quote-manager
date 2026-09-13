@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import type { PlanStatus } from "@/lib/plan";
-import { PLAN_LABELS } from "@/lib/constants";
+import { BILLING_ENABLED, PLAN_LABELS, PLAN_PAGE_PATH } from "@/lib/constants";
 
 /**
  * The app's ONE upgrade surface.
@@ -31,7 +31,7 @@ export function QuotaChip({ status }: { status: PlanStatus }) {
 
   return (
     <Link
-      href="/billing"
+      href={PLAN_PAGE_PATH}
       className="group flex items-center gap-2 rounded-pill py-1 pr-1 pl-2 transition-colors hover:bg-surface-2 sm:gap-2.5 sm:pl-3"
     >
       {/* Only the wording drops on a narrow phone. The meter and the way to
@@ -66,13 +66,23 @@ export function QuotaChip({ status }: { status: PlanStatus }) {
         ))}
       </span>
 
+      {/* Nothing to upgrade *to* during the market test, so the chip stops
+          selling and starts pointing at the plan page — where the only thing
+          on offer is asking. Someone who has already asked is told so here
+          rather than being nudged again. */}
       <span className="rounded-pill bg-brand-wash px-2.5 py-1 text-xs font-medium text-brand">
-        Upgrade
+        {BILLING_ENABLED
+          ? "Upgrade"
+          : status.hasPendingRequest
+            ? "Requested"
+            : "Get more"}
       </span>
 
       <span className="sr-only">
-        {status.used} of {status.limit} quotes used this month. Upgrade your
-        plan.
+        {status.used} of {status.limit} quotes used this month.{" "}
+        {BILLING_ENABLED
+          ? "Upgrade your plan."
+          : "Open plan and usage to ask for more."}
       </span>
     </Link>
   );

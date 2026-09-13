@@ -22,7 +22,7 @@ export async function signIn(
   const parsed = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
-    next: formData.get("next") ?? "/pricebook",
+    next: formData.get("next") ?? undefined,
   });
 
   if (!parsed.success) {

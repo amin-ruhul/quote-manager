@@ -7,8 +7,20 @@ import {
 } from "@/lib/constants";
 import { safeRedirectPath } from "@/lib/schemas/shared";
 
-/** Where the owner lands after signing in. See safeRedirectPath for the why. */
-const nextPath = safeRedirectPath("/pricebook");
+/*
+ * Where the owner lands after signing in, when they didn't arrive from
+ * somewhere specific. The dashboard: it answers "what happened while I was
+ * away", which is the question someone signing in is actually asking — the
+ * pricebook was a setup screen standing in for a home page.
+ *
+ * An account with no business profile never sees it: every screen inside the
+ * app goes through requireBusiness(), which sends them to /onboarding first.
+ * That keeps "you must set up your business" in one place rather than spread
+ * across each entry point.
+ *
+ * See safeRedirectPath for why a crafted ?next= can't leave the site.
+ */
+const nextPath = safeRedirectPath("/dashboard");
 
 const email = z
   .email("Enter a valid email address.")

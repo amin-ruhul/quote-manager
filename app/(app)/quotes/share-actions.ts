@@ -5,11 +5,12 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { businesses, customers, quoteEvents, quotes } from "@/db/schema";
-import type { Currency } from "@/lib/constants";
+import { type Currency, PREMIUM_LOCKED_MESSAGE } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { absoluteUrl, sendEmail } from "@/lib/email";
 import { quoteSentEmail } from "@/lib/email-templates";
 import { formatCents } from "@/lib/money";
+import { hasPremiumAccess } from "@/lib/plan";
 import { requireOwnedQuote } from "@/lib/quotes";
 
 /** Loads everything both the link and the email need, in one query. */
@@ -100,6 +101,15 @@ export async function sendQuoteEmail(
 ): Promise<{ sentTo: string; error: null } | { sentTo: null; error: string }> {
   const owned = await requireOwnedQuote(quoteId);
   if (!owned) return { sentTo: null, error: "That quote no longer exists." };
+
+  /*
+   * Invite-only during the market test: every send is a Resend charge, and the
+   * share panel already offers the free way to get this quote in front of a
+   * customer. The UI locks it too; this is the check that can't be bypassed.
+   */
+  if (!(await hasPremiumAccess(owned.user.id))) {
+    return { sentTo: null, error: PREMIUM_LOCKED_MESSAGE };
+  }
 
   const quote = await loadSendable(owned.quoteId);
   if (!quote) return { sentTo: null, error: "That quote no longer exists." };

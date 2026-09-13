@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { DraftNotice, PageShell, Prose } from "@/components/landing/page-shell";
+import { BILLING_ENABLED } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Privacy — QuotePilot",
@@ -46,9 +47,11 @@ export default function PrivacyPage() {
         <p>
           Supabase hosts the database and handles sign-in. Resend delivers quote
           and notification emails. OpenAI receives the job description you type
-          when you ask it to draft a quote. Paddle handles payment — card
-          details go to Paddle and are never stored by us or seen by us. Vercel
-          serves the app.
+          when you ask it to draft a quote.{" "}
+          {BILLING_ENABLED
+            ? "Paddle handles payment — card details go to Paddle and are never stored by us or seen by us."
+            : "There is no payment processor: QuotePilot is free while we are in beta, so we never ask for or handle card details."}{" "}
+          Vercel serves the app.
         </p>
 
         <h2>Your pricebook</h2>
