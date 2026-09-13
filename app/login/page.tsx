@@ -4,7 +4,7 @@ import { LoginFooter, LoginForm } from "@/app/login/login-form";
 import { AuthShell } from "@/components/auth-shell";
 import { getUser } from "@/lib/auth";
 
-export const metadata = { title: "Sign in · QuotePilot" };
+export const metadata = { title: "Sign in · QuotePace" };
 
 export default async function LoginPage({
   searchParams,

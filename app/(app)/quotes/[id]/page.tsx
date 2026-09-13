@@ -15,7 +15,7 @@ import { getPlanStatus } from "@/lib/plan";
 import { getQuoteByPublicToken } from "@/lib/public-quote";
 import { getQuoteForBusiness } from "@/lib/quotes";
 
-export const metadata = { title: "Edit quote · QuotePilot" };
+export const metadata = { title: "Edit quote · QuotePace" };
 
 export default async function QuoteBuilderPage({
   params,

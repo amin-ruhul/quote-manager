@@ -6,7 +6,7 @@ import { AuthShell } from "@/components/auth-shell";
 import { getUser } from "@/lib/auth";
 import { FREE_QUOTES_PER_MONTH } from "@/lib/constants";
 
-export const metadata = { title: "Create your account · QuotePilot" };
+export const metadata = { title: "Create your account · QuotePace" };
 
 /*
  * Sign in and register used to be one screen with a toggle, which meant the two

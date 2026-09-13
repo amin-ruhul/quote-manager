@@ -1,5 +1,5 @@
 name: Bug report
-description: Something in QuotePilot is broken.
+description: Something in QuotePace is broken.
 title: "bug: "
 labels: ["bug"]
 body:

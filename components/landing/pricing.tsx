@@ -15,7 +15,7 @@ const PLANS = [
       `${FREE_QUOTES_PER_MONTH} quotes a month`,
       "Customer quote page",
       "Accept online",
-      "“Made with QuotePilot” on quotes",
+      "“Made with QuotePace” on quotes",
     ],
     cta: "Start free",
     highlighted: false,

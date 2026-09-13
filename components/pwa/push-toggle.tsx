@@ -72,21 +72,21 @@ export function PushToggle() {
 
   function description(): string {
     if (environment === "unsupported") {
-      return "This browser can't show notifications. Open QuotePilot in Chrome or Safari to turn them on.";
+      return "This browser can't show notifications. Open QuotePace in Chrome or Safari to turn them on.";
     }
 
     if (environment === "needs-install") {
-      return "Add QuotePilot to your home screen first — on iPhone, notifications only work once it's installed. Tap Share, then Add to Home Screen.";
+      return "Add QuotePace to your home screen first — on iPhone, notifications only work once it's installed. Tap Share, then Add to Home Screen.";
     }
 
     if (blocked) {
-      return "Notifications are blocked for QuotePilot in your browser settings. Allow them there, then come back.";
+      return "Notifications are blocked for QuotePace in your browser settings. Allow them there, then come back.";
     }
 
     if (subscribed === null) return "Checking…";
 
     return subscribed
       ? "You'll get a notification here the moment a customer opens or accepts a quote."
-      : "Get a notification the moment a customer opens or accepts a quote — even when QuotePilot is closed.";
+      : "Get a notification the moment a customer opens or accepts a quote — even when QuotePace is closed.";
   }
 }

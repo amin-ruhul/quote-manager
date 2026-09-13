@@ -9,14 +9,14 @@ import {
 } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Terms of use — QuotePilot",
+  title: "Terms of use — QuotePace",
   description:
-    "The terms you agree to by using QuotePilot: what the service does, what it costs, what you are responsible for, and what we are.",
+    "The terms you agree to by using QuotePace: what the service does, what it costs, what you are responsible for, and what we are.",
 };
 
 /*
  * The operative terms for the beta, written from what the product actually
- * does. Deliberately plain: QuotePilot takes no payment, stores no card, and
+ * does. Deliberately plain: QuotePace takes no payment, stores no card, and
  * signs nothing on anyone's behalf, so contract language borrowed from a
  * company that does all three would describe a service this isn't.
  *
@@ -28,7 +28,7 @@ export default function TermsPage() {
     <PageShell
       eyebrow="Terms of use"
       title="How this works between us."
-      standfirst="Plain English, because you should be able to read the whole thing in five minutes and know exactly where you stand."
+      standfirst=""
     >
       <Prose>
         <p className="text-sm text-ink-60">
@@ -36,15 +36,15 @@ export default function TermsPage() {
           what is on this page.
         </p>
 
-        <h2>What QuotePilot is</h2>
+        <h2>What QuotePace is</h2>
         <p>
-          QuotePilot is software for building, sending and tracking quotes. You
+          QuotePace is software for building, sending and tracking quotes. You
           build a pricebook, you make a quote from it, we host a link your
           customer can open and accept, and we record what happened to it. That
           is the whole service.
         </p>
         <p>
-          We are not a party to the work you quote for. QuotePilot is not a
+          We are not a party to the work you quote for. QuotePace is not a
           contractor, an accountant, a lawyer or a tax adviser, and nothing the
           software produces is professional advice.
         </p>
@@ -65,13 +65,13 @@ export default function TermsPage() {
         {BILLING_ENABLED ? (
           <p>
             The free plan allows {FREE_QUOTES_PER_MONTH} quotes a month and
-            carries a &ldquo;Made with QuotePilot&rdquo; line on the quotes you
+            carries a &ldquo;Made with QuotePace&rdquo; line on the quotes you
             send. Paid plans lift the limit and remove the badge. Prices are
             shown on the home page.
           </p>
         ) : (
           <p>
-            Nothing, right now. QuotePilot is in beta: {FREE_QUOTES_PER_MONTH}{" "}
+            Nothing, right now. QuotePace is in beta: {FREE_QUOTES_PER_MONTH}{" "}
             quotes a month, no card, nothing to buy. Some features cost us money
             every time they run — AI drafting, sending email on your behalf,
             automatic follow-up, PDF download — so we switch those on by hand
@@ -79,7 +79,7 @@ export default function TermsPage() {
           </p>
         )}
         <p>
-          We intend to charge for QuotePilot one day. If that happens you will
+          We intend to charge for QuotePace one day. If that happens you will
           be told before it applies to you, and using the free plan now does not
           commit you to paying later. We will not take money from you without
           you choosing to give it.
@@ -95,7 +95,7 @@ export default function TermsPage() {
 
         <h2>The quotes you send are yours</h2>
         <p>
-          You are the one quoting. QuotePilot drafts and delivers; you review
+          You are the one quoting. QuotePace drafts and delivers; you review
           every quote before it goes out, and every price comes from the
           pricebook you built. What you commit to a customer — the price, the
           scope, the warranty, the licence you hold — is between you and them.
@@ -122,7 +122,7 @@ export default function TermsPage() {
 
         <h2>What you must not do</h2>
         <p>
-          Do not use QuotePilot to send anything you were not asked for, to
+          Do not use QuotePace to send anything you were not asked for, to
           quote for work you are not licensed to do, to impersonate another
           business, or to break the law where you or your customer are. Do not
           try to reach other businesses&apos; data, hammer the service
@@ -132,7 +132,7 @@ export default function TermsPage() {
 
         <h2>What we promise, and what we don&apos;t</h2>
         <p>
-          We work hard to keep QuotePilot up, fast and correct. We cannot
+          We work hard to keep QuotePace up, fast and correct. We cannot
           promise it will never be down, never lose a keystroke, or never have a
           bug. It is provided as it is. To the extent the law allows, we are not
           liable for work you lose, a quote that did not arrive, or a number
@@ -147,7 +147,7 @@ export default function TermsPage() {
 
         <h2>Leaving</h2>
         <p>
-          You can stop using QuotePilot whenever you like, and you can ask us to
+          You can stop using QuotePace whenever you like, and you can ask us to
           delete your account by emailing{" "}
           <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>. Deleting an
           account removes your pricebook, your quotes and the links your
@@ -162,7 +162,7 @@ export default function TermsPage() {
         <h2>Changes to these terms</h2>
         <p>
           If we change anything here that matters, we will update the date at
-          the top and tell you in the app. Carrying on using QuotePilot after
+          the top and tell you in the app. Carrying on using QuotePace after
           that means the new version applies.
         </p>
 

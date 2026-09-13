@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { BILLING_ENABLED } from "@/lib/constants";
 import { getPlanStatus } from "@/lib/plan";
 
-export const metadata = { title: "Plan & billing · QuotePilot" };
+export const metadata = { title: "Plan & billing · QuotePace" };
 
 export default async function BillingPage() {
   /*

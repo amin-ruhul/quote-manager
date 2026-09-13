@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/auth";
 import { safeRedirectPath } from "@/lib/schemas/shared";
 
-export const metadata = { title: "Email confirmation · QuotePilot" };
+export const metadata = { title: "Email confirmation · QuotePace" };
 
 const searchSchema = z.object({
   status: z.enum(["success", "expired", "error"]).catch("error"),
@@ -59,7 +59,7 @@ export default async function VerifiedPage({
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-12">
-      <h1 className="text-3xl font-semibold">QuotePilot</h1>
+      <h1 className="text-3xl font-semibold">QuotePace</h1>
 
       <Panel className="mt-8 space-y-4">
         {status === "success" ? (

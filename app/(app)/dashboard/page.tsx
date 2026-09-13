@@ -23,7 +23,7 @@ import {
 } from "@/lib/dashboard";
 import { basisPointsToPercent, formatCents } from "@/lib/money";
 
-export const metadata = { title: "Dashboard · QuotePilot" };
+export const metadata = { title: "Dashboard · QuotePace" };
 
 export default async function DashboardPage() {
   const { business } = await requireBusiness();

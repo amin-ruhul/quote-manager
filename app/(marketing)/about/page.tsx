@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { PageShell, Prose } from "@/components/landing/page-shell";
 
 export const metadata: Metadata = {
-  title: "About QuotePilot",
+  title: "About QuotePace",
   description:
-    "Why QuotePilot exists: quoting software built for residential electricians, not for general contractors or office admin teams.",
+    "Why QuotePace exists: quoting software built for residential electricians, not for general contractors or office admin teams.",
 };
 
 /*
@@ -18,7 +18,7 @@ export default function AboutPage() {
     <PageShell
       eyebrow="About us"
       title="Built for the quote you never get around to writing."
-      standfirst="QuotePilot is quoting software for residential electricians. That is the whole scope, on purpose."
+      standfirst="QuotePace is quoting software for residential electricians. That is the whole scope, on purpose."
     >
       <Prose>
         <h2>The problem we picked</h2>
@@ -39,7 +39,7 @@ export default function AboutPage() {
         <h2>What we decided not to build</h2>
         <p>
           No scheduling. No inventory. No timesheets. No app for your customer
-          to download. Adding those would make QuotePilot a worse version of
+          to download. Adding those would make QuotePace a worse version of
           software that already exists, and a slower way to send a quote.
         </p>
 
@@ -64,7 +64,7 @@ export default function AboutPage() {
         <p>
           There are no customer logos on this site because we have not earned
           them yet, and we would rather say so than borrow someone else&apos;s.
-          If QuotePilot wins you a job, we would genuinely like to hear about
+          If QuotePace wins you a job, we would genuinely like to hear about
           it.
         </p>
       </Prose>

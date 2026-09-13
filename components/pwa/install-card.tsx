@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
  * never becomes a banner the owner has to scroll past every day.
  */
 
-const DISMISSED_KEY = "quotepilot:install-dismissed";
+const DISMISSED_KEY = "quotepace:install-dismissed";
 
 /** Chrome's install prompt event — not in lib.dom, so it is described here. */
 type BeforeInstallPromptEvent = Event & {
@@ -124,10 +124,10 @@ export function InstallCard() {
   return (
     <Panel className="space-y-3">
       <div>
-        <h2 className="font-semibold">Keep QuotePilot one tap away</h2>
+        <h2 className="font-semibold">Keep QuotePace one tap away</h2>
         <p className="mt-1 text-sm text-body">
           {installState === "ios"
-            ? "Tap Share, then Add to Home Screen. QuotePilot opens full-screen — and on iPhone that's the only way it can alert you when a customer accepts."
+            ? "Tap Share, then Add to Home Screen. QuotePace opens full-screen — and on iPhone that's the only way it can alert you when a customer accepts."
             : "Add it to your home screen and it opens full-screen, straight to your quotes."}
         </p>
       </div>

@@ -1,13 +1,13 @@
 ---
-name: supabase-quotepilot
-description: QuotePilot's own Supabase rules — how THIS app does auth, multi-tenant scoping, RLS policy shape, the public quote page, and logo/photo storage. Use alongside the vendor `supabase` skill whenever touching auth, RLS, storage, or any query that reads business-owned data. The vendor skill covers Supabase in general; this one covers the decisions already made here.
+name: supabase-quotepace
+description: QuotePace's own Supabase rules — how THIS app does auth, multi-tenant scoping, RLS policy shape, the public quote page, and logo/photo storage. Use alongside the vendor `supabase` skill whenever touching auth, RLS, storage, or any query that reads business-owned data. The vendor skill covers Supabase in general; this one covers the decisions already made here.
 ---
 
-# Supabase (QuotePilot)
+# Supabase (QuotePace)
 
 The vendor `supabase` skill covers Supabase in general and is the authority on
 Postgres traps, RLS pitfalls, and CLI/MCP usage — read it too. This file covers
-only what is specific to QuotePilot and already decided.
+only what is specific to QuotePace and already decided.
 
 ## The two-layer rule (most important thing here)
 

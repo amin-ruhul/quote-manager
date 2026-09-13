@@ -6,7 +6,7 @@ import { requireBusiness } from "@/lib/auth";
 import type { Currency } from "@/lib/constants";
 import { db } from "@/lib/db";
 
-export const metadata = { title: "Pricebook · QuotePilot" };
+export const metadata = { title: "Pricebook · QuotePace" };
 
 export default async function PricebookPage() {
   const { business } = await requireBusiness();

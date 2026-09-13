@@ -31,7 +31,7 @@ export function PushNudge({ className }: { className?: string }) {
       <Panel className={className}>
         <h2 className="font-semibold">Notifications are blocked</h2>
         <p className="mt-1 text-sm text-body">
-          QuotePilot can&apos;t tell you when a customer opens or accepts your
+          QuotePace can&apos;t tell you when a customer opens or accepts your
           quote. Allow notifications for this site in your browser settings,
           then reload this page.
         </p>
@@ -44,7 +44,7 @@ export function PushNudge({ className }: { className?: string }) {
       <div>
         <h2 className="font-semibold">Know the moment they say yes</h2>
         <p className="mt-1 text-sm text-body">
-          Notifications are off, so QuotePilot can&apos;t tell you when a
+          Notifications are off, so QuotePace can&apos;t tell you when a
           customer opens or accepts your quote. Turn them on and your phone
           buzzes the moment it happens — even when the app is closed.
         </p>

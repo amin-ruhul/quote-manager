@@ -1,9 +1,9 @@
 ---
 name: database
-description: Use when creating or changing database tables, Drizzle schema, migrations, or writing queries for QuotePilot. Enforces the SPEC data model, money-as-cents, and safe multi-tenant queries.
+description: Use when creating or changing database tables, Drizzle schema, migrations, or writing queries for QuotePace. Enforces the SPEC data model, money-as-cents, and safe multi-tenant queries.
 ---
 
-# Database (QuotePilot)
+# Database (QuotePace)
 
 Stack: Postgres (Supabase) + Drizzle ORM. Follow the data model in SPEC §8.
 

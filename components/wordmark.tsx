@@ -28,7 +28,7 @@ export function Wordmark({
       <span
         className={`text-[17px] font-semibold tracking-[-0.01em] ${labelClassName ?? ""}`}
       >
-        QuotePilot
+        QuotePace
       </span>
     </span>
   );

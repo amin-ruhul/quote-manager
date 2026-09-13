@@ -4,9 +4,9 @@ import Link from "next/link";
 import { ComingSoon, PageShell } from "@/components/landing/page-shell";
 
 export const metadata: Metadata = {
-  title: "Guides — QuotePilot",
+  title: "Guides — QuotePace",
   description:
-    "Practical guides for electricians using QuotePilot: building a pricebook, quoting panel upgrades, and following up without nagging.",
+    "Practical guides for electricians using QuotePace: building a pricebook, quoting panel upgrades, and following up without nagging.",
 };
 
 /*

@@ -28,7 +28,7 @@ const QUESTIONS: Question[] = [
   },
   {
     q: "Which features are invite-only right now?",
-    a: "AI drafting, emailing the quote to your customer from QuotePilot, automatic follow-up, and downloading a PDF. Each one costs us money every time it runs, so we open them to a handful of businesses while we work out what this should cost. Asking takes one tap from inside the app — there is no price and no card involved.",
+    a: "AI drafting, emailing the quote to your customer from QuotePace, automatic follow-up, and downloading a PDF. Each one costs us money every time it runs, so we open them to a handful of businesses while we work out what this should cost. Asking takes one tap from inside the app — there is no price and no card involved.",
     betaOnly: true,
   },
   {

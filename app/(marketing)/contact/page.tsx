@@ -5,9 +5,9 @@ import { PageShell, Prose } from "@/components/landing/page-shell";
 import { BILLING_ENABLED, SUPPORT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Contact QuotePilot",
+  title: "Contact QuotePace",
   description:
-    "Get in touch with QuotePilot — support, access requests, and feedback from electricians using the product.",
+    "Get in touch with QuotePace — support, access requests, and feedback from electricians using the product.",
 };
 
 export default function ContactPage() {
@@ -40,7 +40,7 @@ export default function ContactPage() {
 
         <h2>Feature requests</h2>
         <p>
-          Worth sending. QuotePilot is deliberately narrow, so the honest answer
+          Worth sending. QuotePace is deliberately narrow, so the honest answer
           to a lot of requests is no — but the ones that come from a real job
           you were quoting are the ones that change our minds.
         </p>

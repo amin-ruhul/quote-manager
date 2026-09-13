@@ -1,5 +1,5 @@
 /*
- * QuotePilot service worker (SPEC §6, §15).
+ * QuotePace service worker (SPEC §6, §15).
  *
  * Two jobs: make the app installable and serve the hashed static assets from
  * cache so a second visit is instant on a bad job-site connection, and receive
@@ -17,7 +17,7 @@
  */
 
 const VERSION = "v2";
-const CACHE = `quotepilot-${VERSION}`;
+const CACHE = `quotepace-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 
 // Cached at install so the fallback is available the moment the network isn't,
@@ -64,7 +64,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith("quotepilot-") && key !== CACHE)
+            .filter((key) => key.startsWith("quotepace-") && key !== CACHE)
             .map((key) => caches.delete(key)),
         ),
       )
@@ -156,7 +156,7 @@ self.addEventListener("push", (event) => {
 
   // A push we can't read still has to show something: browsers may revoke the
   // subscription if a push arrives and no notification is displayed.
-  const title = payload?.title ?? "QuotePilot";
+  const title = payload?.title ?? "QuotePace";
   const body = payload?.body ?? "Something happened with one of your quotes.";
 
   event.waitUntil(
@@ -167,7 +167,7 @@ self.addEventListener("push", (event) => {
       // Alerts about one quote share a tag, so the newer one replaces the
       // older instead of stacking. renotify makes the replacement still buzz —
       // "accepted" landing silently on top of "opened" would miss the point.
-      tag: payload?.tag ?? "quotepilot",
+      tag: payload?.tag ?? "quotepace",
       renotify: true,
       data: { url: payload?.url ?? "/dashboard" },
     }),

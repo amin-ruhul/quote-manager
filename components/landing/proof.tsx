@@ -87,7 +87,7 @@ export function ProofPanel() {
         </>
       ) : (
         <p className="mt-4 text-pretty text-white/70">
-          QuotePilot is new, so there are no reviews to show you yet. We&apos;d
+          QuotePace is new, so there are no reviews to show you yet. We&apos;d
           rather say that than invent one. Use it free on your next job — if it
           wins you work, tell us and we&apos;ll put your name here.
         </p>

@@ -40,7 +40,7 @@ export async function POST() {
 
   try {
     const result = await sendPushToOwner(user.id, {
-      title: "QuotePilot alerts are on",
+      title: "QuotePace alerts are on",
       body: "This is what a quote alert will look like.",
       url: "/dashboard",
       tag: "test",

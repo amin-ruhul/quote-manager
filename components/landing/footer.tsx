@@ -96,7 +96,7 @@ export function Footer() {
         <div className="h-px bg-white/10" />
 
         <div className="flex flex-col gap-3 py-6 text-xs text-white/40 sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} QuotePilot. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} QuotePace. All rights reserved.</p>
           <p className="sm:ml-auto">
             Built for electricians who&apos;d rather be home.
           </p>

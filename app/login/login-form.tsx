@@ -93,7 +93,7 @@ export function LoginForm({ next }: { next: string }) {
 export function LoginFooter() {
   return (
     <p className="mt-6 text-center text-sm text-ink-60">
-      New to QuotePilot?{" "}
+      New to QuotePace?{" "}
       <Link
         href="/register"
         className="font-medium text-brand underline-offset-4 hover:underline"

@@ -1,6 +1,6 @@
-# QuotePilot — Project Rules
+# QuotePace — Project Rules
 
-QuotePilot is a quote-first SaaS for **residential electricians** (V1). It turns a
+QuotePace is a quote-first SaaS for **residential electricians** (V1). It turns a
 job description into a professional quote that is sent, tracked, and followed up.
 The full plan lives in `SPEC.md` — always follow it and build **phase by phase**
 (SPEC §14). Do not jump ahead to later phases. The visual system lives in `DESIGN.md`
@@ -43,7 +43,7 @@ Next.js (App Router) + TypeScript · Tailwind CSS + shadcn/ui · Supabase (Postg
 
 ## Design system — read `DESIGN.md` before any UI work
 
-`DESIGN.md` is the source of truth for how QuotePilot looks. Never style a screen from
+`DESIGN.md` is the source of truth for how QuotePace looks. Never style a screen from
 memory or invent a color, radius, or font — open `DESIGN.md` first. The short version:
 
 - **Warm paper.** Canvas `#F6F5F4` (never a pure-white page), white cards, flat — no gradients.
@@ -63,10 +63,10 @@ Deep guides live in `.claude/skills/`. Use them when relevant:
 
 - `ui-design` — the working summary of `DESIGN.md` plus screen behaviour (states, a11y).
 - `database` — schema, Drizzle, migrations, money, multi-tenant queries.
-- `supabase-quotepilot` — **this app's** auth, tenant scoping, RLS policy shape,
+- `supabase-quotepace` — **this app's** auth, tenant scoping, RLS policy shape,
   public quote page, and storage. Read it for any Supabase work here.
 - `supabase` (vendor, in `.agents/skills/`) — general Supabase and Postgres guidance.
-  Use it alongside `supabase-quotepilot`, which wins where they overlap.
+  Use it alongside `supabase-quotepace`, which wins where they overlap.
 
 ## Code quality standards
 

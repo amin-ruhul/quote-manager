@@ -10,7 +10,7 @@ import {
 } from "@/lib/constants";
 import { getPlanStatus } from "@/lib/plan";
 
-export const metadata = { title: "Plan & usage · QuotePilot" };
+export const metadata = { title: "Plan & usage · QuotePace" };
 
 /*
  * Which lock sent them here. Anyone can type this into the address bar, so it

@@ -2,7 +2,7 @@ import { PushToggle } from "@/components/pwa/push-toggle";
 import { BusinessProfileForm } from "@/app/(app)/onboarding/business-profile-form";
 import { getBusinessForOwner, requireUser } from "@/lib/auth";
 
-export const metadata = { title: "Business profile · QuotePilot" };
+export const metadata = { title: "Business profile · QuotePace" };
 
 export default async function OnboardingPage() {
   const user = await requireUser();

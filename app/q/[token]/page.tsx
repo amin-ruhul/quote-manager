@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { token } = await params;
   const quote = await getQuoteByPublicToken(token);
 
-  if (!quote) return { title: "Quote · QuotePilot" };
+  if (!quote) return { title: "Quote · QuotePace" };
 
   return {
     title: `${quote.title} · ${quote.businessName}`,
@@ -117,10 +117,10 @@ export default async function PublicQuotePage({
           <footer className="mt-10 text-center text-sm text-ink-60">
             Made with{" "}
             <a
-              href="https://quotepilot.app"
+              href="https://quotepace.app"
               className="font-medium text-ink-60 underline-offset-4 hover:underline"
             >
-              QuotePilot
+              QuotePace
             </a>
           </footer>
         ) : null

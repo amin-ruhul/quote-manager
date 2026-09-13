@@ -50,7 +50,7 @@ export function QuoteDocument({
   quote: NonNullable<PublicQuote>;
   /** The Accept panel or a status message. Omitted when printing. */
   action?: React.ReactNode;
-  /** "Made with QuotePilot". Omitted when printing and in the owner's preview. */
+  /** "Made with QuotePace". Omitted when printing and in the owner's preview. */
   footer?: React.ReactNode;
   /**
    * "print" is the paper version: no job photos, no card shadow — a plain

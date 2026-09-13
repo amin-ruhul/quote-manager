@@ -24,8 +24,8 @@ export async function generateMetadata({
 
   return {
     title: customer
-      ? `${customerName(customer)} · QuotePilot`
-      : "Customer · QuotePilot",
+      ? `${customerName(customer)} · QuotePace`
+      : "Customer · QuotePace",
   };
 }
 

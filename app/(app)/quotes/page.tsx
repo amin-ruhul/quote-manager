@@ -27,7 +27,7 @@ import {
   type QuoteSort,
 } from "@/lib/quote-filters";
 
-export const metadata = { title: "Quotes · QuotePilot" };
+export const metadata = { title: "Quotes · QuotePace" };
 
 /** Shared by the header row and every quote row, so the columns line up. */
 const QUOTE_COLUMNS =

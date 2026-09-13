@@ -1,9 +1,9 @@
 ---
 name: ui-design
-description: Use when building or styling any screen or component in QuotePilot — layouts, forms, the dashboard, and especially the customer-facing quote page. Applies the "warm paper" design system from DESIGN.md, mobile-first.
+description: Use when building or styling any screen or component in QuotePace — layouts, forms, the dashboard, and especially the customer-facing quote page. Applies the "warm paper" design system from DESIGN.md, mobile-first.
 ---
 
-# UI Design (QuotePilot)
+# UI Design (QuotePace)
 
 **`DESIGN.md` in the repo root is the source of truth for the visual system.** Read it before
 styling anything new. This skill is the working summary plus the behaviour rules (states,
@@ -85,7 +85,7 @@ card with one clear next action.
 - **ACCEPT button:** solid brand blue by default; solid accepted-green is the one sanctioned place
   green may be a button, for a stronger "yes" signal. Pick one and keep it consistent.
 - Accept flow: optional name + signature, then a clear confirmation. Writes a `quote_events` row.
-- Footer "Made with QuotePilot" on Free/Pro (removable on Business).
+- Footer "Made with QuotePace" on Free/Pro (removable on Business).
 
 ## Don't
 

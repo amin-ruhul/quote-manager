@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "QuotePilot — send the quote before you leave the driveway",
+    default: "QuotePace — send the quote before you leave the driveway",
     template: "%s",
   },
   description:
@@ -25,17 +25,17 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Send the quote before you leave the driveway",
     description:
-      "Describe the job. QuotePilot builds the quote from your own prices and lets the customer accept it on their phone.",
+      "Describe the job. QuotePace builds the quote from your own prices and lets the customer accept it on their phone.",
     type: "website",
   },
-  applicationName: "QuotePilot",
+  applicationName: "QuotePace",
   // Home-screen launch on iOS: full-screen, with the app's own name under the
   // icon rather than the page title (SPEC §6). The icons themselves come from
   // the app/icon and app/apple-icon file conventions — setting metadata.icons
   // here would replace those generated links rather than adding to them.
   appleWebApp: {
     capable: true,
-    title: "QuotePilot",
+    title: "QuotePace",
     statusBarStyle: "default",
   },
 };

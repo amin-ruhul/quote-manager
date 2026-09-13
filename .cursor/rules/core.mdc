@@ -1,9 +1,9 @@
 ---
-description: QuotePilot core project rules
+description: QuotePace core project rules
 alwaysApply: true
 ---
 
-QuotePilot is a quote-first SaaS for residential electricians (V1). Follow SPEC.md
+QuotePace is a quote-first SaaS for residential electricians (V1). Follow SPEC.md
 and build phase by phase (SPEC §14). Implement only the requested phase.
 
 Stack: Next.js (App Router) + TypeScript, Tailwind + shadcn/ui, Supabase (Postgres +

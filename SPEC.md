@@ -1,4 +1,4 @@
-# QuotePilot — Product & Build Spec (V1 / MVP)
+# QuotePace — Product & Build Spec (V1 / MVP)
 
 **Golden rules for the agent:** mobile-first always (contractors work from a phone at the customer's house); every external call (AI, email, payments) goes through one wrapper module in `/lib`; the generic quote engine must not be hardcoded to electricians (Section 8).
 
@@ -6,7 +6,7 @@
 
 ## 1. Product summary & positioning
 
-**QuotePilot helps a solo electrician win more jobs by turning a customer request into a professional quote — sent, tracked, and followed up — in about 5 minutes, from the phone, on-site.**
+**QuotePace helps a solo electrician win more jobs by turning a customer request into a professional quote — sent, tracked, and followed up — in about 5 minutes, from the phone, on-site.**
 
 Do **not** position this as "business management software" or a "contractor CRM" — those categories are full of giants (Jobber, Housecall Pro, ServiceTitan). Position on the **outcome**:
 
@@ -68,7 +68,7 @@ AI is **not** a moat — competitors copy it. The real, compounding advantages, 
 1. **The business's own pricebook + quote history** — once their prices and past jobs live here, switching is painful. (Build in V1.)
 2. **Acceptance data** — record every view/accept/decline from day 1 (the `QuoteEvent` table, Section 8) so that later you can show _"your panel quotes win 71% of the time."_ No competitor and no ChatGPT can produce this for them.
 3. **Cross-business benchmarks (later)** — _"electricians like you charge $2,400 for a panel swap."_ A dataset that grows stronger every month. This is the long-term moat; design the data to allow it now.
-4. **The "Powered by QuotePilot" loop** — every quote is seen by a homeowner (and sometimes other contractors). This is free, built-in distribution (Section 16).
+4. **The "Powered by QuotePace" loop** — every quote is seen by a homeowner (and sometimes other contractors). This is free, built-in distribution (Section 16).
 
 ---
 
@@ -123,7 +123,7 @@ Give the electrician an app-like experience without the app stores. Keep it mini
 - A minimal **hand-written** service worker (`public/sw.js`) — just enough for installability + caching the hashed build assets for fast loads. **No offline features** beyond a fallback page (`public/offline.html`), which Chrome's installability check requires.
   - _Deviation from the original plan:_ `@serwist/next` was dropped. Push (Section 15) needs custom `push` / `notificationclick` handlers in the worker anyway, which means driving Serwist in `injectManifest` mode — a build plugin to keep compatible with Next 16 in exchange for precaching we don't want. The whole worker is ~60 readable lines instead.
   - **It never caches an HTML document or an API response.** Every signed-in page holds one business's customers and money, and the cache is shared across sessions in a browser profile.
-- Result: the electrician taps **"Add to Home Screen"** and QuotePilot opens full-screen like a native app. The nudge to do so is one dismissible card on the dashboard (`components/pwa/install-card.tsx`).
+- Result: the electrician taps **"Add to Home Screen"** and QuotePace opens full-screen like a native app. The nudge to do so is one dismissible card on the dashboard (`components/pwa/install-card.tsx`).
 - This is for the **electrician's app only.** The public customer quote page (`/q/[token]`) stays a plain, fast web page — **never** prompt a homeowner to install. The worker is registered from the signed-in shell only, and skips `/q/` in its fetch handler.
 
 Push notifications and real offline are roadmap (Section 15). Note that the manifest is the **precondition for push on iPhone** — Safari only allows notifications once the app is installed.
@@ -266,7 +266,7 @@ The engine supports item `type`s: fixed price, quantity × unit price, hourly la
 - Mobile-first. Shows: business name + logo, project title, scope of work, pricing (or Good/Better/Best options), photos, terms/warranty, "valid until" date, and a big **ACCEPT** button.
 - On accept: optional name + signature + date; write a `quote_events` row (type `accepted`), set quote status `accepted`.
 - Opening the page writes a `viewed` event (this powers "your customer opened it").
-- Footer: **"Made with QuotePilot"** (the growth loop) — only on Free/Pro; removable on Business.
+- Footer: **"Made with QuotePace"** (the growth loop) — only on Free/Pro; removable on Business.
 
 ---
 
@@ -285,7 +285,7 @@ Because you won't do sales, the product must pull customers in. Build a **free, 
 
 - **"Free Electrician Quote Template / Job Price Calculator"** at `/free/quote-calculator`.
 - Electrician enters a couple of job details → gets a clean, shareable quote they can download/email — **without an account**.
-- Every output carries "Made with QuotePilot" + a soft CTA: "Save your prices & send quotes that customers can approve online → Sign up free."
+- Every output carries "Made with QuotePace" + a soft CTA: "Save your prices & send quotes that customers can approve online → Sign up free."
 - Capture email to send the result (optional) → your top-of-funnel list.
 - This page is SEO bait for searches like "electrician quote template", "electrical job price calculator". It brings in the exact people who become paying users.
 
@@ -312,7 +312,7 @@ Customer list. Create a quote: pick/add customer, add line items from the priceb
 
 ### Phase 3 — Customer quote page + Accept + tracking (the core value — shippable)
 
-Public `/q/[token]` page (mobile-first) with scope, pricing/options, photos, terms, ACCEPT + signature. `viewed`/`accepted` events; status lifecycle. "Made with QuotePilot" footer.
+Public `/q/[token]` page (mobile-first) with scope, pricing/options, photos, terms, ACCEPT + signature. `viewed`/`accepted` events; status lifecycle. "Made with QuotePace" footer.
 **Done when:** a real customer can open a link on their phone and accept, and the owner sees the status change. **This is the emotional core — get it beautiful.**
 
 ### Phase 4 — AI job → line items
@@ -356,7 +356,7 @@ Build `/free/quote-calculator` (Section 13) + "Powered by" loop. Can be pulled e
 
 ## 16. Pricing & path to $5k
 
-- **Free:** 5 quotes/month, basic template, customer quote page, "Made with QuotePilot".
+- **Free:** 5 quotes/month, basic template, customer quote page, "Made with QuotePace".
 - **Pro — $29/mo:** unlimited quotes, custom branding (remove badge), pricebook, tracking, email send.
 - **Business — $49/mo:** everything + AI drafting, Good/Better/Best, follow-up automation, analytics (later SMS).
 
@@ -375,7 +375,7 @@ Build `/free/quote-calculator` (Section 13) + "Powered by" loop. Can be pulled e
 You don't cold-call. The product and content pull customers in:
 
 1. **Free calculator/template (Section 13)** ranks on Google for electrician searches → signups.
-2. **"Made with QuotePilot" loop** — every quote markets you to homeowners and other contractors for free.
+2. **"Made with QuotePace" loop** — every quote markets you to homeowners and other contractors for free.
 3. **Trade communities + YouTube** — be helpful in r/electricians and electrician Facebook groups; give electrician YouTubers free Business access for an honest review.
 4. **Validation without 30 cold calls:** read the **1–2 star reviews of Jobber, Housecall Pro, and Joist** on G2/Capterra to mine real pain for free; ship the free tool and watch real usage. Aim: 30 signups on the free tool → 10 try the app → **5 pay**. If 5 strangers pay $29–49/mo, keep going.
 
@@ -398,4 +398,4 @@ An electrician signs up, sets up their business + pricebook, describes a job, ge
 
 ## 20. Names
 
-QuotePilot (working) · QuoteSnap · TradeQuote · JobQuote · QuoteFlow · FastQuote. Check name + domain before committing; don't block validation on branding.
+QuotePace (working) · QuoteSnap · TradeQuote · JobQuote · QuoteFlow · FastQuote. Check name + domain before committing; don't block validation on branding.

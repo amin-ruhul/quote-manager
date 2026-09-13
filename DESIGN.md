@@ -1,4 +1,4 @@
-# QuotePilot — DESIGN.md (Notion-inspired "warm paper" system)
+# QuotePace — DESIGN.md (Notion-inspired "warm paper" system)
 
 Build every screen to this system. The feel: a **well-loved paper notebook under afternoon
 light** — a warm off-white canvas, crisp white cards held by **hairline borders (no shadows)**,
@@ -75,7 +75,7 @@ hairlines not shadows.
 --st-declined: Coral   text #B0230F on #FDE7E2
 ```
 
-> Note: the Notion source palette is marketing-focused and had no success-green. QuotePilot
+> Note: the Notion source palette is marketing-focused and had no success-green. QuotePace
 > needs a clear **Accepted / Won** signal, so `--st-accepted` green is a deliberate, restrained
 > extension. Everything else stays faithful.
 
@@ -115,7 +115,7 @@ over and has nothing else to separate it.
 - Shadows appear in exactly two places: the sticky **nav** (`0 .7px 1.5px rgba(0,0,0,.015), 0 3px 9px rgba(0,0,0,.03)`)
   and the floating **customer quote card / product mockup** (`0 4px 12px rgba(0,0,0,.10)`) so it lifts off the page.
 
-## Components (map to QuotePilot)
+## Components (map to QuotePace)
 
 - **Primary button** — bg `--brand`, white text, weight 500, radius 8px, padding 6–12px×15px.
   The ONLY filled chromatic button on a screen (Send quote, Generate quote).

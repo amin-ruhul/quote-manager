@@ -8,7 +8,7 @@ import { getQuoteByPublicToken } from "@/lib/public-quote";
  *
  * Same <QuoteDocument> the customer sees, with the two things ink cannot carry
  * removed: the Accept panel (a PDF cannot be clicked) and the "Made with
- * QuotePilot" footer (a link nobody can follow).
+ * QuotePace" footer (a link nobody can follow).
  *
  * Deliberately does NOT call recordQuoteViewed(). This route exists so the
  * owner can look at their own quote, and the PDF generator can render it —

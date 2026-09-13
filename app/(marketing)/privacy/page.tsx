@@ -5,9 +5,9 @@ import { PageShell, Prose } from "@/components/landing/page-shell";
 import { BILLING_ENABLED, SUPPORT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Privacy — QuotePilot",
+  title: "Privacy — QuotePace",
   description:
-    "What QuotePilot stores, who processes it, how long we keep it, and what we never do with your pricebook.",
+    "What QuotePace stores, who processes it, how long we keep it, and what we never do with your pricebook.",
 };
 
 /*
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
         </p>
         {BILLING_ENABLED ? null : (
           <p>
-            We take no payments while QuotePilot is in beta, so we never ask for
+            We take no payments while QuotePace is in beta, so we never ask for
             or handle card details.
           </p>
         )}
@@ -179,7 +179,7 @@ export default function PrivacyPage() {
 
         <h2>Children</h2>
         <p>
-          QuotePilot is a tool for running a trade business. It is not for
+          QuotePace is a tool for running a trade business. It is not for
           children and we do not knowingly collect anything from them.
         </p>
 

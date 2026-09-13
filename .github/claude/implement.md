@@ -11,7 +11,7 @@ human approves and merges. Optimise for **easy to review**, not for volume.
    multi-tenant scoping plus RLS, server-side secrets, `quote_events`, validated
    AI output, mobile-first, loading/empty/error states on every screen.
 2. Read the relevant skill in `.claude/skills/` before touching its area:
-   `database` for schema or queries, `supabase-quotepilot` for auth, RLS,
+   `database` for schema or queries, `supabase-quotepace` for auth, RLS,
    storage or the public quote page, `ui-design` for any screen work.
 3. Read the issue and every comment on it. Then read the code it concerns —
    never patch from the issue text alone.

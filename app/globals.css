@@ -36,7 +36,7 @@
 }
 
 /*
- * QuotePilot design tokens — see DESIGN.md (the source of truth).
+ * QuotePace design tokens — see DESIGN.md (the source of truth).
  * Tailwind v4 is CSS-first, so DESIGN.md's `tailwind.config.js` block lives here
  * as @theme instead. Values are unchanged.
  */

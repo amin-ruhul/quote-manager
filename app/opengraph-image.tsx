@@ -7,7 +7,7 @@ import { ImageResponse } from "next/og";
  */
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "QuotePilot — send the quote before you leave the driveway";
+export const alt = "QuotePace — send the quote before you leave the driveway";
 
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -40,7 +40,7 @@ export default function OpengraphImage() {
           ⚡
         </div>
         <div style={{ fontSize: 30, fontWeight: 600, color: "#000" }}>
-          QuotePilot
+          QuotePace
         </div>
       </div>
 

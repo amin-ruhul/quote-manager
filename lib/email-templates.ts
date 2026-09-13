@@ -44,7 +44,7 @@ function layout({
     ${body}
     ${cta}
   </div>
-  <p style="max-width:520px;margin:16px auto 0;font-size:13px;color:${INK_40};text-align:center">${footer ?? "Made with QuotePilot"}</p>
+  <p style="max-width:520px;margin:16px auto 0;font-size:13px;color:${INK_40};text-align:center">${footer ?? "Made with QuotePace"}</p>
 </body></html>`;
 }
 
@@ -234,7 +234,7 @@ export function upgradeRequestEmail(input: {
         paragraph(
           `That's request number ${input.totalRequests} since the test started.`,
         ),
-      footer: "QuotePilot — market test",
+      footer: "QuotePace — market test",
     }),
     text: `${input.businessName ?? input.ownerName ?? "Someone"} (${input.ownerEmail}) asked for premium access from the ${input.source} screen.
 ${input.note ? `\nThey said: "${input.note}"\n` : ""}

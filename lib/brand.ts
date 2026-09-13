@@ -1,5 +1,5 @@
 /*
- * The QuotePilot mark, in one place.
+ * The QuotePace mark, in one place.
  *
  * The bolt is drawn from a path rather than the ⚡ emoji so every rendering of
  * it — favicon, home-screen icon, maskable icon — is the same shape. (Emoji

@@ -31,7 +31,7 @@ const OUTCOMES: Outcome[] = [
     tone: "bg-marigold",
     iconTone: "bg-black/10 text-ink-90",
     title: "Never chase a customer again",
-    body: "If a quote goes quiet, QuotePilot sends one friendly nudge for you. It stops the moment they accept.",
+    body: "If a quote goes quiet, QuotePace sends one friendly nudge for you. It stops the moment they accept.",
     // Sending costs us money per email, so this one is granted by hand while
     // we test it. The chip says so on the card rather than in small print.
     chips: ["One nudge, not five", "Stops on accept", INVITE_ONLY_NOTE],

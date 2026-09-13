@@ -54,7 +54,7 @@ export async function getQuoteByPublicToken(token: string) {
       customerTaxExempt: customers.taxExempt,
       customerFirstName: customers.firstName,
       customerLastName: customers.lastName,
-      // Drives the "Made with QuotePilot" footer, which Business plans remove.
+      // Drives the "Made with QuotePace" footer, which Business plans remove.
       ownerPlan: profiles.plan,
     })
     .from(quotes)

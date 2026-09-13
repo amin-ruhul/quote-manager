@@ -15,8 +15,8 @@ import { BRAND_CANVAS } from "@/lib/brand";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "QuotePilot",
-    short_name: "QuotePilot",
+    name: "QuotePace",
+    short_name: "QuotePace",
     description:
       "Describe the job, send a professional quote in minutes, and let your customer accept it on their phone.",
     // Opening the installed app should land on the day's numbers, not marketing.

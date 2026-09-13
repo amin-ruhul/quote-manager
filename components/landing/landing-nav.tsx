@@ -66,7 +66,7 @@ export function LandingNav() {
       }`}
     >
       <nav className="mx-auto flex max-w-5xl items-center gap-6 px-5 py-4 sm:px-8 sm:py-5">
-        <Link href="/" aria-label="QuotePilot home">
+        <Link href="/" aria-label="QuotePace home">
           <Wordmark />
         </Link>
 
