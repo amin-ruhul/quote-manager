@@ -18,6 +18,7 @@ import {
   PLAN_PAGE_PATH,
   type Plan,
 } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 /**
  * Account, billing, and the way out — in exactly one place.
@@ -34,10 +35,12 @@ export function AccountMenu({
   email,
   businessName,
   plan,
+  triggerClassName,
 }: {
   email: string | null;
   businessName: string | null;
   plan: Plan;
+  triggerClassName?: string;
 }) {
   // The mark falls back through business → email → a neutral glyph, so the
   // trigger is never blank on a half-finished account.
@@ -50,7 +53,10 @@ export function AccountMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Account menu"
-        className="flex size-9 items-center justify-center rounded-pill bg-surface-2 text-sm font-semibold text-ink-90 transition-colors outline-none hover:bg-[color-mix(in_oklch,var(--color-surface-2),black_4%)] focus-visible:ring-3 focus-visible:ring-brand/50"
+        className={cn(
+          "flex size-9 items-center justify-center rounded-pill bg-surface-2 text-sm font-semibold text-ink-90 transition-colors outline-none hover:bg-[color-mix(in_oklch,var(--color-surface-2),black_4%)] focus-visible:ring-3 focus-visible:ring-brand/50",
+          triggerClassName,
+        )}
       >
         {initial}
       </DropdownMenuTrigger>

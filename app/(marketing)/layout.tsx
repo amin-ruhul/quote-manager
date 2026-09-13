@@ -1,19 +1,42 @@
 import { Footer } from "@/components/landing/footer";
-import { LandingNav } from "@/components/landing/landing-nav";
+import {
+  LandingNav,
+  type LandingAccount,
+} from "@/components/landing/landing-nav";
+import { getBusinessForOwner, getUser } from "@/lib/auth";
+import { getPlanStatus } from "@/lib/plan";
 
 /**
- * Everything a logged-out visitor sees: the landing page and the company,
- * resource, and legal pages the footer links to.
+ * Marketing chrome: the landing page and the company, resource, and legal
+ * pages the footer links to.
  *
  * The nav and footer live here rather than in each page so the seven marketing
  * routes cannot drift apart — the footer in particular is the only place some
  * of these pages are reachable from.
+ *
+ * A signed-in owner still lands here sometimes (shared link, back-button). The
+ * nav swaps Log in / Start free for the same account menu the app uses, so
+ * they are not offered a second account on a session they already have.
  */
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await getUser();
+  let account: LandingAccount | null = null;
+  if (user) {
+    const [business, planStatus] = await Promise.all([
+      getBusinessForOwner(user.id),
+      getPlanStatus(user.id),
+    ]);
+    account = {
+      email: user.email,
+      businessName: business?.name ?? null,
+      plan: planStatus.plan,
+    };
+  }
+
   return (
     <>
       {/*
@@ -33,7 +56,7 @@ export default function MarketingLayout({
         underneath it.
       */}
       <div className="flex min-h-dvh flex-col">
-        <LandingNav />
+        <LandingNav account={account} />
         <div className="flex-1">{children}</div>
         <Footer />
       </div>

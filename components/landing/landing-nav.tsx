@@ -5,12 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
+import { AccountMenu } from "@/components/app-shell/account-menu";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
+import type { Plan } from "@/lib/constants";
 
 /**
- * The marketing nav: mark on the left, sections in the middle, the way in on
- * the right.
+ * The marketing nav: mark on the left, sections in the middle, the way in
+ * (or the account, if they already have one) on the right.
  *
  * The section links are absolute (`/#features`, not `#features`) so they work
  * from the sub-pages too — from /about, a bare hash would go nowhere.
@@ -45,7 +47,13 @@ const LINKS = [
   { label: "Blog", href: "/blog" },
 ];
 
-export function LandingNav() {
+export type LandingAccount = {
+  email: string | null;
+  businessName: string | null;
+  plan: Plan;
+};
+
+export function LandingNav({ account }: { account: LandingAccount | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const scrolled = useScrolled();
@@ -66,7 +74,10 @@ export function LandingNav() {
       }`}
     >
       <nav className="mx-auto flex max-w-5xl items-center gap-6 px-5 py-4 sm:px-8 sm:py-5">
-        <Link href="/" aria-label="QuotePace home">
+        <Link
+          href={account ? "/dashboard" : "/"}
+          aria-label={account ? "QuotePace dashboard" : "QuotePace home"}
+        >
           <Wordmark />
         </Link>
 
@@ -83,21 +94,32 @@ export function LandingNav() {
         </ul>
 
         <div className="ml-auto flex items-center gap-3 lg:ml-0">
-          <Link
-            href="/login"
-            className="hidden px-2 text-sm font-medium text-ink-60 transition-colors duration-200 hover:text-ink-90 sm:block"
-          >
-            Log in
-          </Link>
+          {account ? (
+            <AccountMenu
+              email={account.email}
+              businessName={account.businessName}
+              plan={account.plan}
+              triggerClassName="size-10 bg-brand-wash text-brand ring-1 ring-brand/30 hover:bg-[color-mix(in_oklch,var(--color-brand-wash),var(--color-brand)_10%)]"
+            />
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden px-2 text-sm font-medium text-ink-60 transition-colors duration-200 hover:text-ink-90 sm:block"
+              >
+                Log in
+              </Link>
 
-          {/*
-            Soft, not filled. The nav is sticky, so a filled blue here would sit
-            on screen beside the hero's primary — two chromatic buttons in one
-            view, which DESIGN.md rules out.
-          */}
-          <Button asChild size="sm" variant="soft">
-            <Link href="/register">Start free</Link>
-          </Button>
+              {/*
+                Soft, not filled. The nav is sticky, so a filled blue here would sit
+                on screen beside the hero's primary — two chromatic buttons in one
+                view, which DESIGN.md rules out.
+              */}
+              <Button asChild size="sm" variant="soft">
+                <Link href="/register">Start free</Link>
+              </Button>
+            </>
+          )}
 
           <button
             type="button"
@@ -135,15 +157,27 @@ export function LandingNav() {
                 </Link>
               </li>
             ))}
-            <li>
-              <Link
-                href="/login"
-                onClick={close}
-                className="flex h-12 items-center text-base font-medium text-brand"
-              >
-                Log in
-              </Link>
-            </li>
+            {account ? (
+              <li>
+                <Link
+                  href="/dashboard"
+                  onClick={close}
+                  className="flex h-12 items-center text-base font-medium text-brand"
+                >
+                  Dashboard
+                </Link>
+              </li>
+            ) : (
+              <li>
+                <Link
+                  href="/login"
+                  onClick={close}
+                  className="flex h-12 items-center text-base font-medium text-brand"
+                >
+                  Log in
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       ) : null}
