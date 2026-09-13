@@ -79,8 +79,8 @@ export default function TermsPage() {
           </p>
         )}
         <p>
-          We intend to charge for QuotePace one day. If that happens you will
-          be told before it applies to you, and using the free plan now does not
+          We intend to charge for QuotePace one day. If that happens you will be
+          told before it applies to you, and using the free plan now does not
           commit you to paying later. We will not take money from you without
           you choosing to give it.
         </p>
@@ -122,22 +122,21 @@ export default function TermsPage() {
 
         <h2>What you must not do</h2>
         <p>
-          Do not use QuotePace to send anything you were not asked for, to
-          quote for work you are not licensed to do, to impersonate another
-          business, or to break the law where you or your customer are. Do not
-          try to reach other businesses&apos; data, hammer the service
-          automatically, or resell it as your own. We can suspend an account
-          doing any of that.
+          Do not use QuotePace to send anything you were not asked for, to quote
+          for work you are not licensed to do, to impersonate another business,
+          or to break the law where you or your customer are. Do not try to
+          reach other businesses&apos; data, hammer the service automatically,
+          or resell it as your own. We can suspend an account doing any of that.
         </p>
 
         <h2>What we promise, and what we don&apos;t</h2>
         <p>
-          We work hard to keep QuotePace up, fast and correct. We cannot
-          promise it will never be down, never lose a keystroke, or never have a
-          bug. It is provided as it is. To the extent the law allows, we are not
-          liable for work you lose, a quote that did not arrive, or a number
-          that came out wrong — which is also why every quote passes your eyes
-          before it goes anywhere.
+          We work hard to keep QuotePace up, fast and correct. We cannot promise
+          it will never be down, never lose a keystroke, or never have a bug. It
+          is provided as it is. To the extent the law allows, we are not liable
+          for work you lose, a quote that did not arrive, or a number that came
+          out wrong — which is also why every quote passes your eyes before it
+          goes anywhere.
         </p>
         <p>
           During the beta, expect things to change. Features can move, improve
