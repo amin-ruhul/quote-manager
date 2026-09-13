@@ -12,6 +12,13 @@
   recommended shape: the token is exchanged on our server, and `next` is
   validated as a same-site path before any redirect happens.
 
+  It builds on {{ .RedirectTo }}, NOT {{ .SiteURL }}. SiteURL is one fixed
+  value for the whole project, so every confirmation link would point at
+  production — including one for a signup made on localhost. RedirectTo is the
+  emailRedirectTo passed by app/register/actions.ts, which already carries
+  /auth/confirm and the `next` path, so only the token is appended here.
+  Supabase only honours it when the host is in the Redirect URLs allow-list.
+
   Styling is copied from the layout() in lib/email-templates.ts — warm paper,
   one blue, hairline border, no gradients. Inline styles only: mail clients
   strip <style> blocks.
@@ -64,7 +71,7 @@
 
       <div style="margin: 28px 0 8px">
         <a
-          href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next=/onboarding"
+          href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=signup"
           style="
             display: inline-block;
             background: #0075de;
@@ -90,7 +97,7 @@
         <!-- prettier-ignore --><!-- One line: a break inside {{ }} is legal Go
         template syntax, but it leaves a newline in the URL the recipient reads
         and copies when the button does not render. -->
-        {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next=/onboarding
+        {{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=signup
       </p>
 
       <p
