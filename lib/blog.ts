@@ -22,6 +22,14 @@ export type BlogPost = {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: "how-to-quote-electrical-work",
+    title: "How to quote electrical work",
+    description:
+      "A seven-step process for writing electrical quotes that cover the job, the price, and what the customer is actually agreeing to.",
+    publishedAt: "2026-09-14",
+    readingMinutes: 8,
+  },
+  {
     slug: "what-to-charge-200a-panel-upgrade",
     title: "What to charge for a 200A panel upgrade",
     description:
