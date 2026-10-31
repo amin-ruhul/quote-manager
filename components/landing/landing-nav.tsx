@@ -42,7 +42,7 @@ function useScrolled() {
 const LINKS = [
   { label: "How it works", href: "/#how-it-works" },
   { label: "Features", href: "/#features" },
-  { label: "Pricing", href: "/#pricing" },
+  { label: "Free template", href: "/free-electrical-quote-template" },
   { label: "About", href: "/about" },
   { label: "Blog", href: "/blog" },
 ];

@@ -29,6 +29,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      // Empty until real guides exist. The footer no longer links here.
+      { source: "/guides", destination: "/blog", statusCode: 301 },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

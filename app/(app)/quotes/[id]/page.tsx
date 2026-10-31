@@ -96,6 +96,7 @@ export default async function QuoteBuilderPage({
               description="Describe the job in a sentence and get priced line items from your own pricebook, ready to review."
               source="ai"
               requested={planStatus.hasPendingRequest}
+              note="Paid extra"
             />
           )
         }

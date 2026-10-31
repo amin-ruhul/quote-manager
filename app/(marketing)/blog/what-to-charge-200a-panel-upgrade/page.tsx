@@ -1,44 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BlogCta } from "@/components/blog/blog-cta";
 import { PriceBuildupFigure } from "@/components/blog/price-buildup-figure";
+import { RelatedPosts } from "@/components/blog/related-posts";
 import { Prose } from "@/components/landing/page-shell";
-import { formatPostDate, getPost } from "@/lib/blog";
+import { articleJsonLd, formatPostDate, getPost } from "@/lib/blog";
+import { pageMetadata } from "@/lib/seo";
 
 const post = getPost("what-to-charge-200a-panel-upgrade")!;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `${post.title} — QuotePace`,
   description: post.description,
-  alternates: { canonical: `/blog/${post.slug}` },
-  openGraph: {
-    type: "article",
-    title: post.title,
-    description: post.description,
-    publishedTime: post.publishedAt,
-  },
-};
-
-/*
- * Schema.org Article, so the post can be attributed in a search result or an AI
- * answer. Kept inline rather than abstracted — there is one post.
- */
-const articleSchema = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  headline: post.title,
-  description: post.description,
-  datePublished: post.publishedAt,
-  author: { "@type": "Organization", name: "QuotePace" },
-  publisher: { "@type": "Organization", name: "QuotePace" },
-};
+  path: `/blog/${post.slug}`,
+  type: "article",
+  publishedTime: post.publishedAt,
+});
 
 export default function Post() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(articleJsonLd(post)).replace(/</g, "\\u003c"),
+        }}
       />
 
       <p className="flex items-center gap-2 text-xs text-ink-60">
@@ -60,66 +47,37 @@ export default function Post() {
       <p className="mt-5 text-lg text-pretty text-body">
         Search that phrase and every result on the first page is a homeowner
         cost guide. Useful for knowing what your customer read before you got
-        there. Useless for pricing the job in front of you. Here is the other
-        side of it.
+        there, but no help when you are the one pricing the job. This post is
+        written for the electrician.
       </p>
 
       <div className="rounded-card mt-8 bg-brand-wash p-6">
         <p className="text-pretty text-ink-90">
           <strong>The short answer:</strong> there is no national figure you can
-          safely copy. Published 2026 guides put a 100A→200A upgrade between
-          $1,500 and $4,000 — and the same guides report the price varying
-          30–50% between contractors in one market. That spread is the whole
-          problem. Build the number from your own costs instead. The method is
-          below.
+          safely copy. A consumer cost page mixes a clean panel swap with a new
+          mast, a moved meter, and a grounding upgrade, then prints one range.
+          Those are different jobs. Build the number from your own costs. The
+          method is below.
         </p>
       </div>
+
+      <BlogCta />
 
       <Prose>
         <h2>What your customer read before you arrived</h2>
         <p>
-          Assume they searched it. These are the ranges the big consumer sites
-          were publishing in 2026, and the numbers already sitting in your
-          customer&apos;s head when you walk up the drive:
+          Assume they searched it. The first page is written for the homeowner,
+          and it offers one national range for &ldquo;panel upgrade.&rdquo; That
+          phrase covers a same-day swap and a service change that needs the
+          utility. The customer has a number in their head. You do not have to
+          match a number nobody sourced to your city.
         </p>
-
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-black/8">
-                <th className="py-2 pr-4 font-medium text-ink-60">Job</th>
-                <th className="py-2 font-medium text-ink-60">
-                  Published range
-                </th>
-              </tr>
-            </thead>
-            <tbody className="tabular-nums">
-              <tr className="border-b border-black/8">
-                <td className="py-2 pr-4">100A → 200A service upgrade</td>
-                <td className="py-2">$1,500 – $4,000</td>
-              </tr>
-              <tr className="border-b border-black/8">
-                <td className="py-2 pr-4">Panel swap, same amperage</td>
-                <td className="py-2">$1,200 – $2,500</td>
-              </tr>
-              <tr className="border-b border-black/8">
-                <td className="py-2 pr-4">100A subpanel</td>
-                <td className="py-2">$500 – $1,500</td>
-              </tr>
-              <tr className="border-b border-black/8">
-                <td className="py-2 pr-4">Permit</td>
-                <td className="py-2">$50 – $300</td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-4">Quoted labor</td>
-                <td className="py-2">$50 – $150 / hr</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p className="text-sm text-ink-60">
-          Ranges as published by HomeAdvisor, Angi and similar consumer cost
-          guides, 2026. They describe a national market, not yours.
+        <p>
+          Ask which job they think they bought. Same amperage, or a step up to
+          200A. Meter staying put, or moving. Mast, grounding, and the drywall
+          around the panel: in the price, or not. Once those are separate
+          lines, the argument about &ldquo;the average&rdquo; is over, because
+          you are no longer quoting the average job.
         </p>
 
         <h2>Why you can&apos;t just copy the average</h2>
@@ -149,8 +107,8 @@ export default function Post() {
 
         <h2>Build the number instead</h2>
         <p>
-          The build-up is five lines, in this order. The order is the point:
-          margin goes on last, which is what stops it becoming the thing you
+          The build-up is five lines, in this order. Margin goes on last on
+          purpose, which is what stops it becoming the thing you
           shave when a customer pauses.
         </p>
 
@@ -159,7 +117,7 @@ export default function Post() {
         <p>
           Two of those lines are the ones people get wrong.{" "}
           <strong>Labor</strong> is hours multiplied by your <em>loaded</em>{" "}
-          rate — the wage plus payroll taxes, insurance, the van, the phone, the
+          rate: the wage plus payroll taxes, insurance, the van, the phone, the
           license. If you are multiplying by what you pay an apprentice per
           hour, you are billing out at a loss and calling it competitive.{" "}
           <strong>Overhead recovery</strong> is this job&apos;s share of the
@@ -173,7 +131,7 @@ export default function Post() {
         <p>
           <strong>1. The inspection wait.</strong> The permit fee is easy to
           remember because it is an invoice. The half-day someone stands around
-          waiting for the inspector is not, because it is only time — and time
+          waiting for the inspector is not, because it is only time, and time
           is the thing you are actually selling.
         </p>
         <p>
@@ -193,7 +151,7 @@ export default function Post() {
         <p>
           A range on a quote reads as uncertainty, and uncertainty is what makes
           a customer get two more prices. Give one firm figure for the work you
-          can see, then list plainly what would change it — mast replacement,
+          can see, then list plainly what would change it: mast replacement,
           meter relocation, concealed damage, an inspection re-visit. You have
           not hedged. You have told them you have done this before and you know
           where the surprises live.
@@ -209,21 +167,25 @@ export default function Post() {
           are quoting it on Monday morning or from the driveway on a Friday.
         </p>
         <p>
-          That is the whole idea behind{" "}
+          That is what{" "}
           <Link href="/" className="text-brand hover:underline">
             QuotePace
           </Link>
-          : your prices, written down once, assembled into a quote in a few
-          minutes on your phone, and sent before you leave. The pricing thinking
-          above is yours and always will be — we are just the thing that stops
-          you doing it twice.
+{" "}
+          is for. You write your prices down once, build a quote from them in a
+          few minutes on your phone, and send it before you leave. The pricing
+          decisions are still yours. QuotePace just saves you from doing them
+          twice.
         </p>
       </Prose>
+
+      <BlogCta />
+      <RelatedPosts slug={post.slug} />
 
       <hr className="mt-12 border-black/8" />
       <p className="mt-6 text-sm text-ink-60">
         Figures in the worked example are illustrative. Nothing here is a
-        recommendation to charge a particular price — that is yours to set, and
+        recommendation to charge a particular price. That is yours to set, and
         in most places it is illegal for competitors to set it together.
       </p>
     </main>

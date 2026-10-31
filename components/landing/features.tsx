@@ -3,8 +3,6 @@ import type { LucideIcon } from "lucide-react";
 
 import { RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { SectionHeading } from "@/components/landing/section-heading";
-import { INVITE_ONLY_NOTE } from "@/lib/constants";
-
 /*
  * Outcomes, not features: each card names the thing that stops happening.
  * Colour lives in the card backgrounds here (DESIGN.md), which is also what
@@ -30,11 +28,9 @@ const OUTCOMES: Outcome[] = [
     icon: Timer,
     tone: "bg-marigold",
     iconTone: "bg-black/10 text-ink-90",
-    title: "Never chase a customer again",
-    body: "If a quote goes quiet, QuotePace sends one friendly nudge for you. It stops the moment they accept.",
-    // Sending costs us money per email, so this one is granted by hand while
-    // we test it. The chip says so on the card rather than in small print.
-    chips: ["One nudge, not five", "Stops on accept", INVITE_ONLY_NOTE],
+    title: "A reminder when a quote goes quiet",
+    body: "If a quote goes quiet, QuotePace sends the customer one short reminder. It stops the moment they accept.",
+    chips: ["One reminder", "Stops on accept"],
     wide: true,
   },
   {
@@ -50,14 +46,14 @@ const OUTCOMES: Outcome[] = [
     tone: "bg-surface",
     iconTone: "bg-brand-wash text-brand",
     title: "Your prices, not ours",
-    body: "Your pricebook is the only source of prices. If we can't match a line, we leave it blank for you to fill in — we never guess a number.",
+    body: "Your pricebook is the only source of prices. If we can't match a line, we leave it blank for you to fill in. We never guess a number.",
     chips: ["Your pricebook", "No invented prices", "You approve every quote"],
   },
   {
     icon: Layers,
     tone: "bg-surface",
     iconTone: "bg-brand-wash text-brand",
-    title: "Offer three options, win the middle",
+    title: "Offer three options on one quote",
     body: "Good, better, best on one page. Customers pick a level instead of deciding yes or no.",
     chips: ["Good / better / best", "One page"],
   },
@@ -90,7 +86,7 @@ export function Features() {
         <SectionHeading
           eyebrow="What you get"
           title="The admin, done before you get home."
-          body="Everything here exists to shorten the gap between “I'll get you a price” and “yes, go ahead”."
+          body="Each of these cuts the time between “I'll get you a price” and “yes, go ahead”."
           align="center"
         />
 

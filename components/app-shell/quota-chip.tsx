@@ -3,6 +3,9 @@ import Link from "next/link";
 import type { PlanStatus } from "@/lib/plan";
 import { BILLING_ENABLED, PLAN_LABELS, PLAN_PAGE_PATH } from "@/lib/constants";
 
+/** Header meter width. Filled by fraction of the month, not one tick per quote. */
+const METER_SEGMENTS = 10;
+
 /**
  * The app's ONE upgrade surface.
  *
@@ -28,6 +31,9 @@ export function QuotaChip({ status }: { status: PlanStatus }) {
   }
 
   const remaining = Math.max(status.limit - status.used, 0);
+  const filledSegments = Math.round(
+    (Math.min(status.used, status.limit) / status.limit) * METER_SEGMENTS,
+  );
 
   return (
     <Link
@@ -48,15 +54,15 @@ export function QuotaChip({ status }: { status: PlanStatus }) {
         )}
       </span>
 
-      {/* One segment per quote rather than a proportional bar: at this few
-          units the shape reads faster than a percentage, and it survives being
-          squeezed into a phone header. */}
+      {/* A fixed run of segments, filled by how much of the month is used.
+          One segment per quote only worked at a cap of about ten — past that
+          the header becomes a barcode. */}
       <span className="flex items-center gap-0.5" aria-hidden>
-        {Array.from({ length: status.limit }, (_, index) => (
+        {Array.from({ length: METER_SEGMENTS }, (_, index) => (
           <span
             key={index}
             className={`h-3 w-1 rounded-sm ${
-              index < status.used
+              index < filledSegments
                 ? status.nearLimit
                   ? "bg-status-declined"
                   : "bg-brand"

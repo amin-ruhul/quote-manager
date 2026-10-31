@@ -22,7 +22,7 @@ const LINES: Line[] = [
     label: "Materials",
     cents: 88_000,
     swatch: "bg-sky",
-    note: "Panel, breakers, conductors, ground rods — at your cost, not list.",
+    note: "Panel, breakers, conductors, ground rods, at your cost rather than list.",
   },
   {
     label: "Labor",
@@ -66,7 +66,7 @@ export function PriceBuildupFigure() {
   return (
     <figure className="rounded-card my-10 border border-black/8 bg-surface p-6">
       <figcaption className="text-sm text-ink-60">
-        A worked example, not a recommendation — every figure here should be
+        A worked example, not a recommendation. Every figure here should be
         yours.
       </figcaption>
 

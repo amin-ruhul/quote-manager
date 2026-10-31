@@ -6,42 +6,26 @@ import { BILLING_ENABLED } from "@/lib/constants";
  * the page nothing on a phone. The questions are the objections that stop
  * someone signing up, answered plainly.
  */
-/** `betaOnly` questions disappear the day there is a paid plan to describe. */
-type Question = { q: string; a: string; betaOnly?: boolean };
+type Question = { q: string; a: string };
 
 export const QUESTIONS: Question[] = [
   {
     q: "Is it really free?",
     a: BILLING_ENABLED
       ? "Yes, to start. The free plan needs no card. Paid plans lift the monthly limit when quoting is making you money."
-      : "Yes. We are in beta and there is nothing to buy — no card, no trial countdown. You get your pricebook, your branding, the customer quote page and the tracking. A few features that cost us money every time they run are switched on by hand for businesses who ask.",
+      : "Yes. Core quoting is free. No card, no trial countdown. You get your pricebook, your branding, the customer quote page and the tracking.",
   },
   {
     q: "Does my customer need an app or an account?",
     a: "No. They get a link. It opens in whatever browser is already on their phone, and they tap Accept. Nothing to install, nothing to sign up for.",
   },
   {
-    /*
-     * The cap is real (lib/quota.ts), so this question stays and is answered
-     * straight — a visitor who finds the limit by hitting it feels misled. It
-     * just no longer leads with the number: the app shows how many are left,
-     * which is the only place the count is ever the answer to a question
-     * someone is actually asking.
-     */
-    q: "Is there a limit on how many quotes I can send?",
-    a: BILLING_ENABLED
-      ? "There's a monthly cap on the free plan, and the app shows how many you have left. Nothing breaks when you reach it — your existing quotes stay live and your customers can still accept them. You just can't start a new one until next month, or until you upgrade."
-      : "There's a monthly cap while we're in beta, and the app shows how many you have left. Nothing breaks when you reach it — your existing quotes stay live and your customers can still accept them. You just can't start a new one until the month rolls over, or until you ask us for more, which is one tap inside the app and usually answered the same day.",
+    q: "Do I need to download anything?",
+    a: "No. It's a web app. Add it to your home screen if you like.",
   },
   {
-    q: "Which features are invite-only right now?",
-    a: "AI drafting, emailing the quote to your customer from QuotePace, automatic follow-up, and downloading a PDF. Each one costs us money every time it runs, so we open them to a handful of businesses while we work out what this should cost. Asking takes one tap from inside the app — there is no price and no card involved.",
-    betaOnly: true,
-  },
-  {
-    q: "Can I still send a quote without the email feature?",
-    a: "Yes, and most people do. Copy the quote link and send it however you already talk to that customer — text, WhatsApp, or reading it out. It is tracked exactly the same way: you still get told the moment they open it and when they accept.",
-    betaOnly: true,
+    q: "How do you make money?",
+    a: "AI drafting is a paid extra. Quoting stays free.",
   },
   {
     q: "What if the AI gets a price wrong?",
@@ -49,7 +33,7 @@ export const QUESTIONS: Question[] = [
   },
   {
     q: "Do I have to use the AI?",
-    a: "No — and right now most accounts don't have it. Plenty of jobs are faster to build by hand from your pricebook, which is what the free plan is built around.",
+    a: "No. AI drafting is optional, and it's a paid extra. Plenty of jobs are faster to build by hand from your pricebook.",
   },
   {
     q: "Can I change the prices you start me with?",
@@ -61,9 +45,9 @@ export const QUESTIONS: Question[] = [
   },
   {
     q: "Does it work with no signal at the job?",
-    a: "You need a connection to send. Build the quote in the driveway, send it when you've got a bar — most jobs it's the same minute.",
+    a: "You need a connection to send. Build the quote in the driveway, send it when you've got a bar. On most jobs that's the same minute.",
   },
-].filter((item) => !(item.betaOnly && BILLING_ENABLED));
+];
 
 export function Faq() {
   return (

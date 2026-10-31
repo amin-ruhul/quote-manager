@@ -16,12 +16,15 @@ export function PremiumLock({
   description,
   source,
   requested,
+  note = "Invite-only while we're in beta",
   children,
 }: {
   title: string;
   description: string;
   source: UpgradeRequestSource;
   requested: boolean;
+  /** Short label on the lock. AI drafting is a paid extra; other locks stay as they are. */
+  note?: string;
   /** Anything worth keeping on screen behind the lock — a preview, a hint. */
   children?: React.ReactNode;
 }) {
@@ -35,7 +38,7 @@ export function PremiumLock({
           </h3>
           <p className="mt-1 max-w-prose text-sm text-ink-60">{description}</p>
           <p className="mt-2 inline-flex rounded-pill bg-marigold px-2.5 py-1 text-xs font-medium">
-            Invite-only while we&apos;re in beta
+            {note}
           </p>
         </div>
 

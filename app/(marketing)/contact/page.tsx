@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PageShell, Prose } from "@/components/landing/page-shell";
-import { BILLING_ENABLED, SUPPORT_EMAIL } from "@/lib/constants";
+import { SUPPORT_EMAIL } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact QuotePace",
   description:
-    "Get in touch with QuotePace — support, access requests, and feedback from electricians using the product.",
-};
+    "Email QuotePace. Support and feedback from electricians, read by a person who can change the product.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (
@@ -40,29 +42,22 @@ export default function ContactPage() {
 
         <h2>Feature requests</h2>
         <p>
-          Worth sending. QuotePace is deliberately narrow, so the honest answer
-          to a lot of requests is no — but the ones that come from a real job
-          you were quoting are the ones that change our minds.
-        </p>
-
-        <h2>Getting the invite-only features</h2>
-        <p>
-          {BILLING_ENABLED
-            ? "Cancel any time from your account; your quotes and pricebook stay yours either way. If a charge looks wrong, email us and we will sort it out rather than pointing you at a policy."
-            : "AI drafting, emailing quotes, automatic follow-up and PDF download are switched on by hand while we test them. The fastest way to ask is the button on Plan & usage inside the app — it tells us which feature you were reaching for. Emailing works too, and there is nothing to pay either way."}
+          Send them. QuotePace does a small number of things on purpose, so we
+          say no to a lot of requests. The ones that come from a real job you
+          were quoting are the ones most likely to change our minds.
         </p>
 
         <h2>Your data</h2>
         <p>
           Want a copy of what we hold, a correction, or your account deleted?
-          Email from the address on your account and we will do it — see the{" "}
+          Email from the address on your account and we will do it. The{" "}
           <Link
             href="/privacy"
             className="font-medium text-brand hover:underline"
           >
             privacy page
           </Link>{" "}
-          for what we store in the first place.
+          lists what we store.
         </p>
 
         <h2>Before you email</h2>
@@ -72,8 +67,7 @@ export default function ContactPage() {
             FAQ
           </Link>{" "}
           answers the questions we get most: whether your customer needs an app,
-          what happens when the AI cannot price a line, and what changes when
-          you reach the monthly limit.
+          and what happens when the AI cannot price a line.
         </p>
       </Prose>
     </PageShell>

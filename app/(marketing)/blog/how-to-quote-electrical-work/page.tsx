@@ -1,34 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BlogCta } from "@/components/blog/blog-cta";
 import { QuoteAnatomyFigure } from "@/components/blog/quote-anatomy-figure";
 import { QuoteWorkflowFigure } from "@/components/blog/quote-workflow-figure";
+import { RelatedPosts } from "@/components/blog/related-posts";
 import { Prose } from "@/components/landing/page-shell";
-import { formatPostDate, getPost } from "@/lib/blog";
+import { articleJsonLd, formatPostDate, getPost } from "@/lib/blog";
+import { pageMetadata } from "@/lib/seo";
 
 const post = getPost("how-to-quote-electrical-work")!;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `${post.title} — QuotePace`,
   description: post.description,
-  alternates: { canonical: `/blog/${post.slug}` },
-  openGraph: {
-    type: "article",
-    title: post.title,
-    description: post.description,
-    publishedTime: post.publishedAt,
-  },
-};
-
-const articleSchema = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  headline: post.title,
-  description: post.description,
-  datePublished: post.publishedAt,
-  author: { "@type": "Organization", name: "QuotePace" },
-  publisher: { "@type": "Organization", name: "QuotePace" },
-};
+  path: `/blog/${post.slug}`,
+  type: "article",
+  publishedTime: post.publishedAt,
+});
 
 const MATERIALS = [
   "Cable and wiring",
@@ -46,7 +35,9 @@ export default function Post() {
     <main className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(articleJsonLd(post)).replace(/</g, "\\u003c"),
+        }}
       />
 
       <p className="flex items-center gap-2 text-xs text-ink-60">
@@ -82,6 +73,8 @@ export default function Post() {
         </p>
       </div>
 
+      <BlogCta />
+
       <Prose>
         <h2>1. Write the scope before you price it</h2>
         <p>
@@ -114,11 +107,10 @@ export default function Post() {
         </p>
         <p>
           Pick the method that matches how predictable the work is. Repetitive
-          jobs — a run of outlets, a set of lights — often price cleanly per
+          jobs, like a run of outlets or a set of lights, often price cleanly per
           item. Uncertain work, such as troubleshooting, is safer as an hourly
           rate. Fixed price is fine when you have done the job enough times to
-          know the day. The method is not a philosophy. It is a match to the job
-          in front of you.
+          know the day. Choose based on the job in front of you.
         </p>
 
         <h2>3. List the materials at your cost</h2>
@@ -139,8 +131,8 @@ export default function Post() {
           ))}
         </ul>
         <p>
-          On a larger job, grouping materials into categories — rough-in,
-          finish, panel gear — makes the estimate easier to review before it
+          On a larger job, grouping materials into categories (rough-in,
+          finish, panel gear) makes the estimate easier to review before it
           goes out. A flat lump called &ldquo;materials&rdquo; is how things get
           missed.
         </p>
@@ -150,7 +142,7 @@ export default function Post() {
           The quote has to cover more than the direct cost of doing the work.
           Insurance, the van, tools, software, licensing, and the hours you
           spend quoting jobs you do not win all sit in the number whether you
-          write them down or not. If you leave them off, they still get paid —
+          write them down or not. If you leave them off, they still get paid,
           out of the profit you thought you had.
         </p>
         <div className="rounded-card border border-black/8 bg-surface px-5 py-4">
@@ -180,7 +172,7 @@ export default function Post() {
         <h2>5. Draw the line around what is not included</h2>
         <p>
           Electrical work hides things. Concealed damage, extra wiring behind a
-          wall, a ground that was legal in 1974 — none of that belongs in your
+          wall, a ground that was legal in 1974. None of that belongs in your
           margin as a guess. It belongs in the exclusions, with a plain sentence
           that additional work needs the customer&apos;s approval before it is
           charged.
@@ -194,10 +186,9 @@ export default function Post() {
 
         <h2>6. Write it so they can read it</h2>
         <p>
-          A professional quote is not a number with a logo on it. It is a
-          document the customer can take to the kitchen table and still
-          understand. Itemizing also makes it easier for them to compare you
-          with the other two quotes they asked for — which they will.
+          A good quote is one the customer can read at the kitchen table
+          without calling you to explain it. Itemizing also makes it easier for them to compare you
+          with the other quotes they asked for, which they will.
         </p>
 
         <QuoteAnatomyFigure />
@@ -212,7 +203,7 @@ export default function Post() {
         <p>
           That is why most shops that quote well do not start from a blank page.
           They keep common services, prices, and customer details somewhere
-          reusable — a template, a pricebook, estimating software — and adjust
+          reusable, like a template, a pricebook or estimating software, and adjust
           the job in front of them instead of rebuilding the document every
           time.
         </p>
@@ -238,6 +229,9 @@ export default function Post() {
           doing it twice.
         </p>
       </Prose>
+
+      <BlogCta />
+      <RelatedPosts slug={post.slug} />
     </main>
   );
 }

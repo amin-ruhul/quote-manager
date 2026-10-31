@@ -13,7 +13,7 @@ const PHRASES = [
   "Panel upgrade quoted in 4 minutes",
   "Priced from your own pricebook",
   "Sent before you leave the driveway",
-  "Opened — you get the email",
+  "Opened, and you get an email",
   "Accepted on their phone",
   "Signed, no app, no login",
   // Was "Follow-up sent for you". Automatic follow-up is granted by hand while

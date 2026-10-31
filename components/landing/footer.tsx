@@ -17,7 +17,6 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
       links: [
         { label: "How it works", href: "/#how-it-works" },
         { label: "Features", href: "/#features" },
-        { label: "Pricing", href: "/#pricing" },
         { label: "FAQ", href: "/#faq" },
       ],
     },
@@ -32,9 +31,9 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
     {
       heading: "Get started",
       links: [
+        { label: "Free quote template", href: "/free-electrical-quote-template" },
         { label: "Start free", href: "/register" },
         { label: "Log in", href: "/login" },
-        { label: "Guides", href: "/guides" },
       ],
     },
     {

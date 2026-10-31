@@ -349,6 +349,16 @@
   .print-document h3 {
     break-after: avoid;
   }
+
+  /*
+   * The free template page prints only the quote. The nav, the form and the
+   * article underneath are screen chrome.
+   */
+  body:has(.quote-template) .site-frame > header,
+  body:has(.quote-template) .site-frame > footer,
+  .no-print {
+    display: none !important;
+  }
 }
 
 /*

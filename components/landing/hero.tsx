@@ -58,7 +58,7 @@ export function Hero() {
 
         <RevealItem>
           <p className="inline-flex rounded-pill bg-brand-wash px-3 py-1.5 text-sm font-medium text-brand">
-            For residential electricians
+            For residential electricians · 100% free
           </p>
         </RevealItem>
 
@@ -73,12 +73,6 @@ export function Hero() {
         </RevealItem>
 
         <RevealItem>
-          {/*
-           * Deliberately the free path, not the AI one. AI drafting is granted
-           * by hand while we test it, and a headline promising the thing a new
-           * account cannot do is the fastest way to lose the person who
-           * believed it.
-           */}
           <p className="mx-auto mt-6 max-w-xl text-lg text-pretty text-body sm:text-xl">
             Build the quote from your own prices in minutes, send the link, and
             let the customer accept it on their phone while you&apos;re still
@@ -89,15 +83,15 @@ export function Hero() {
         <RevealItem>
           <div className="mt-8">
             <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link href="/register">Start free — no card</Link>
+              <Link href="/register">Send your first quote free</Link>
             </Button>
           </div>
         </RevealItem>
 
         <RevealItem>
           <ul className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-sm text-ink-60">
-            <TrustPoint>Free while we&apos;re in beta</TrustPoint>
-            <TrustPoint>No card to start</TrustPoint>
+            <TrustPoint>Free forever</TrustPoint>
+            <TrustPoint>No card, no trial</TrustPoint>
             <TrustPoint>No app for your customer</TrustPoint>
           </ul>
         </RevealItem>

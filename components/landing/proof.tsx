@@ -1,5 +1,6 @@
 import { Reveal, RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { SectionHeading } from "@/components/landing/section-heading";
+import { FOUNDER_NAME, SUPPORT_EMAIL } from "@/lib/constants";
 import { formatCents } from "@/lib/money";
 
 type Testimonial = {
@@ -86,11 +87,20 @@ export function ProofPanel() {
           </p>
         </>
       ) : (
-        <p className="mt-4 text-pretty text-white/70">
-          QuotePace is new, so there are no reviews to show you yet. We&apos;d
-          rather say that than invent one. Use it free on your next job — if it
-          wins you work, tell us and we&apos;ll put your name here.
-        </p>
+        <>
+          <p className="mt-4 text-pretty text-white/70">
+            I kept hearing the same thing from electricians: the work is fine,
+            the paperwork is what kills the evening. So I built the smallest
+            tool that gets a quote out before the customer calls someone else.
+          </p>
+          <p className="mt-4 text-sm text-white/60">
+            <span className="font-medium text-white/90">{FOUNDER_NAME}</span>,
+            {" founder"}
+          </p>
+          <p className="mt-2 text-sm text-white/60">
+            Used it on a job? Tell me what happened: {SUPPORT_EMAIL}
+          </p>
+        </>
       )}
     </div>
   );
@@ -193,20 +203,18 @@ function TestimonialCard({
  * The human behind the tool. Source Serif appears exactly here and nowhere else
  * on the page — one editorial voice among the product claims (DESIGN.md).
  *
- * Unsigned on purpose. It read "— Your name, founder", which is placeholder
- * text shipped as if it were copy: a note whose whole job is to sound like a
- * person, signed by nobody. Better unsigned than signed by a template. Add a
- * real name here whenever you want the note attributed.
+ * Signed with FOUNDER_NAME, a stand-in until the real name is set.
  */
 export function FounderNote() {
   return (
     <section className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
       <div className="border-l-2 border-hairline pl-6">
         <p className="font-serif text-xl leading-relaxed text-pretty text-body">
-          I kept hearing the same thing from electricians: the work is fine, the
-          paperwork is what kills the evening. So I built the smallest tool that
-          gets a professional quote out of your hands and into the
-          customer&apos;s before they call someone else.
+          Your prices, your logo, sent before you leave the driveway. If it
+          wins you a job, I want to hear how: {SUPPORT_EMAIL}
+        </p>
+        <p className="mt-4 text-sm font-medium text-ink-90">
+          {FOUNDER_NAME}, founder
         </p>
       </div>
     </section>

@@ -7,15 +7,17 @@ import {
   FREE_QUOTES_PER_MONTH,
   SUPPORT_EMAIL,
 } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Terms of use — QuotePace",
   description:
-    "The terms you agree to by using QuotePace: what the service does, what it costs, what you are responsible for, and what we are.",
-};
+    "The terms you agree to by using QuotePace: what the service does, what it costs, and what you are responsible for.",
+  path: "/terms",
+});
 
 /*
- * The operative terms for the beta, written from what the product actually
+ * The operative terms, written from what the product actually
  * does. Deliberately plain: QuotePace takes no payment, stores no card, and
  * signs nothing on anyone's behalf, so contract language borrowed from a
  * company that does all three would describe a service this isn't.
@@ -40,8 +42,7 @@ export default function TermsPage() {
         <p>
           QuotePace is software for building, sending and tracking quotes. You
           build a pricebook, you make a quote from it, we host a link your
-          customer can open and accept, and we record what happened to it. That
-          is the whole service.
+          customer can open and accept, and we record what happened to it.
         </p>
         <p>
           We are not a party to the work you quote for. QuotePace is not a
@@ -51,7 +52,7 @@ export default function TermsPage() {
 
         <h2>Your account</h2>
         <p>
-          You need an email address and a password. Keep them to yourself —
+          You need an email address and a password. Keep them to yourself, because
           anything done from your account is treated as done by you. One account
           is for one business; if you run two businesses, use two accounts.
         </p>
@@ -71,18 +72,15 @@ export default function TermsPage() {
           </p>
         ) : (
           <p>
-            Nothing, right now. QuotePace is in beta: {FREE_QUOTES_PER_MONTH}{" "}
-            quotes a month, no card, nothing to buy. Some features cost us money
-            every time they run — AI drafting, sending email on your behalf,
-            automatic follow-up, PDF download — so we switch those on by hand
-            for businesses who ask.
+            Quoting is free. No card. You can create {FREE_QUOTES_PER_MONTH}{" "}
+            quotes a month. AI drafting is a paid extra. Sending email on your
+            behalf, automatic follow-up and PDF download are switched on for
+            businesses who ask.
           </p>
         )}
         <p>
-          We intend to charge for QuotePace one day. If that happens you will be
-          told before it applies to you, and using the free plan now does not
-          commit you to paying later. We will not take money from you without
-          you choosing to give it.
+          Core quoting stays free. AI drafting is optional and paid. We will not
+          take money from you without you choosing to give it.
         </p>
 
         <h2>Hitting the monthly limit</h2>
@@ -97,8 +95,8 @@ export default function TermsPage() {
         <p>
           You are the one quoting. QuotePace drafts and delivers; you review
           every quote before it goes out, and every price comes from the
-          pricebook you built. What you commit to a customer — the price, the
-          scope, the warranty, the licence you hold — is between you and them.
+          pricebook you built. What you commit to a customer (the price, the
+          scope, the warranty, the license you hold) is between you and them.
           We are not responsible for a job quoted wrong, underpriced, or
           performed badly.
         </p>
@@ -135,13 +133,12 @@ export default function TermsPage() {
           it will never be down, never lose a keystroke, or never have a bug. It
           is provided as it is. To the extent the law allows, we are not liable
           for work you lose, a quote that did not arrive, or a number that came
-          out wrong — which is also why every quote passes your eyes before it
+          out wrong. That is also why every quote passes your eyes before it
           goes anywhere.
         </p>
         <p>
-          During the beta, expect things to change. Features can move, improve
-          or be withdrawn, and we will tell you in the app when something you
-          rely on changes.
+          Features can move, improve or be withdrawn, and we will tell you in the
+          app when something you rely on changes.
         </p>
 
         <h2>Leaving</h2>
@@ -154,7 +151,7 @@ export default function TermsPage() {
         </p>
         <p>
           We can close an account that is being used for the things listed
-          above, or if we shut the service down — in which case we will give you
+          above, or if we shut the service down. If we shut it down, we will give you
           notice and a chance to get your data out.
         </p>
 

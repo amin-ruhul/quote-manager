@@ -94,7 +94,7 @@ export default function OpengraphImage() {
       </div>
 
       <div style={{ display: "flex", fontSize: 26, color: "rgba(0,0,0,0.6)" }}>
-        Build it from your own costs — not a national average.
+        Build it from your own costs, not a national average.
       </div>
     </div>,
     size,

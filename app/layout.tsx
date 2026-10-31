@@ -6,10 +6,17 @@ import { BRAND_CANVAS } from "@/lib/brand";
 import "./globals.css";
 
 // Inter for all UI; Source Serif 4 only for sparing editorial moments (DESIGN.md).
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+  preload: true,
+});
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
   variable: "--font-source-serif",
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {

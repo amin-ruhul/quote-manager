@@ -47,7 +47,7 @@ export function QuoteWorkflowFigure() {
   return (
     <figure className="rounded-card my-10 border border-black/8 bg-surface p-6">
       <figcaption className="text-sm text-ink-60">
-        The same sequence, every job — so quoting is a habit, not a blank page.
+        The same steps on every job, so you never start from a blank page.
       </figcaption>
 
       <ol className="mt-5 list-none space-y-0">

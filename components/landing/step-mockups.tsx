@@ -51,7 +51,7 @@ export function BuildMockup() {
 
       <ul className="mt-2.5 space-y-1.5">
         <PricebookLine name="Panel replacement (200A)" price="$2,850.00" />
-        <PricebookLine name="Recessed light — each" price="$185.00" />
+        <PricebookLine name="Recessed light (each)" price="$185.00" />
       </ul>
 
       <p className="mt-3 flex items-center gap-1.5 text-[0.7rem] font-medium text-brand">
@@ -103,7 +103,7 @@ export function ReviewMockup() {
         {/* The needs_price case, shown rather than described. */}
         <li className="flex items-baseline justify-between gap-3 py-2 text-xs">
           <span className="min-w-0 truncate text-ink-90">
-            Permit — city of Leeds
+            Permit, City of Austin
           </span>
           <span className="shrink-0 rounded-sm bg-status-viewed-bg px-1.5 py-0.5 text-[0.65rem] font-medium text-status-viewed">
             Set price

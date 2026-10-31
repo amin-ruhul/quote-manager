@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 
 import { PageShell, Prose } from "@/components/landing/page-shell";
+import { FOUNDER_NAME, SUPPORT_EMAIL } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About QuotePace",
   description:
-    "Why QuotePace exists: quoting software built for residential electricians, not for general contractors or office admin teams.",
-};
+    "Why QuotePace exists: free quoting software for residential electricians, so the quote goes out from the driveway.",
+  path: "/about",
+});
 
 /*
  * TODO before launch: this is written in the product's voice and is true of the
@@ -18,54 +21,52 @@ export default function AboutPage() {
     <PageShell
       eyebrow="About us"
       title="Built for the quote you never get around to writing."
-      standfirst="QuotePace is quoting software for residential electricians. That is the whole scope, on purpose."
+      standfirst="QuotePace is quoting software for residential electricians. It does one job: getting a quote to your customer the same day."
     >
       <Prose>
         <h2>The problem we picked</h2>
         <p>
-          Most jobs are not lost on price. They are lost on the three days
-          between the visit and the quote landing in someone&apos;s inbox. The
-          electrician who quotes from the driveway wins work from the
-          electrician who quotes at 10pm on Thursday — not because they are
-          cheaper, but because they were first and the customer had stopped
-          waiting.
+          A lot of jobs are lost in the days between the visit and the quote.
+          The customer usually asked two or three electricians. If one of them
+          sends a price that afternoon and yours shows up Thursday night, they
+          may have already said yes to the first one. Being cheaper doesn&apos;t
+          help much if you&apos;re late.
         </p>
         <p>
-          Every tool we looked at treated quoting as one feature inside a job
-          management suite: scheduling, invoicing, timesheets, inventory. All
-          useful, none of it the thing standing between you and a yes.
+          Most of the tools we looked at treat quoting as one small part of a
+          job management suite with scheduling, invoicing, timesheets and
+          inventory. That&apos;s useful stuff, but none of it gets the quote out
+          any faster.
         </p>
 
         <h2>What we decided not to build</h2>
         <p>
-          No scheduling. No inventory. No timesheets. No app for your customer
-          to download. Adding those would make QuotePace a worse version of
-          software that already exists, and a slower way to send a quote.
+          We left out scheduling, inventory and timesheets, and your customer
+          doesn&apos;t need to download anything. Plenty of good software
+          already does those jobs, and adding them here would only make sending
+          a quote slower.
         </p>
 
         <h2>How we handle prices</h2>
         <p>
           Your pricebook is the only source of prices. Build a quote by hand and
           it uses what you set; ask the AI to draft one and it matches what you
-          actually charge — and when it cannot match a line, it leaves the price
-          blank and flags it rather than inventing a number. You review every
-          quote before it goes anywhere. A tool that guesses at your margins is
-          not saving you time, it is costing you money quietly.
+          actually charge. If it can&apos;t match a line, it leaves the price
+          blank and flags it for you. It won&apos;t make up a number. You review
+          every quote before it goes anywhere, because a wrong price costs you
+          more than the minutes the tool saved.
         </p>
 
-        <h2>Where we are</h2>
+        <h2>Why it&apos;s free</h2>
         <p>
-          Early, and in beta. Quoting is free — we have not set a price, and we
-          would rather find out what this is worth to you than guess. The
-          handful of features that cost us money every time they run, AI
-          drafting among them, are switched on by hand for businesses who ask,
-          which is also how we learn which of them anyone actually wants.
+          Quoting costs very little to run, and a tool you have to justify
+          paying for is a tool you don&apos;t use. Core quoting stays free. AI
+          drafting is a paid extra.
         </p>
         <p>
-          There are no customer logos on this site because we have not earned
-          them yet, and we would rather say so than borrow someone else&apos;s.
-          If QuotePace wins you a job, we would genuinely like to hear about it.
+          If QuotePace wins you a job, I&apos;d like to hear about it: {SUPPORT_EMAIL}.
         </p>
+        <p>{FOUNDER_NAME}, founder</p>
       </Prose>
     </PageShell>
   );

@@ -3,12 +3,14 @@ import Link from "next/link";
 
 import { PageShell, Prose } from "@/components/landing/page-shell";
 import { BILLING_ENABLED, SUPPORT_EMAIL } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy — QuotePace",
   description:
     "What QuotePace stores, who processes it, how long we keep it, and what we never do with your pricebook.",
-};
+  path: "/privacy",
+});
 
 /*
  * Written from the code, not from a template: every processor named here is one
@@ -22,7 +24,7 @@ export default function PrivacyPage() {
     <PageShell
       eyebrow="Privacy"
       title="What we store, and who touches it."
-      standfirst="Written in plain English so you can see exactly what happens to your data — yours and your customers'."
+      standfirst="Written in plain English so you can see exactly what happens to your data and your customers' data."
     >
       <Prose>
         <p className="text-sm text-ink-60">Last updated 13 September 2026.</p>
@@ -39,8 +41,8 @@ export default function PrivacyPage() {
         <h2>What we collect from you</h2>
         <p>
           <strong>Your account.</strong> Your name, email address and a password
-          you choose. The password is hashed by our authentication provider — we
-          never see it.
+          you choose. The password is hashed by our authentication provider, so
+          we never see it.
         </p>
         <p>
           <strong>Your business.</strong> Business name, contact details,
@@ -60,33 +62,33 @@ export default function PrivacyPage() {
         <p>
           <strong>What happened to each quote.</strong> Sent, opened, accepted,
           declined, follow-up sent, with timestamps. This is what powers your
-          acceptance rate. It records the quote and the moment — not a profile
+          acceptance rate. It records the quote and the moment, not a profile
           of the person reading it.
         </p>
 
         <h2>What we collect automatically</h2>
         <p>
-          A session cookie so you stay signed in — strictly necessary, and there
+          A session cookie so you stay signed in. It is strictly necessary, and there
           are no advertising or analytics cookies on the app. Our hosting keeps
           ordinary server logs (IP address, browser, page requested) for
           security and debugging, and we write error logs when something breaks
           so we can fix it. We do not track you across other websites.
         </p>
         <p>
-          <strong>On these public pages only</strong> — the ones you are reading
-          now, before you sign in — we use Microsoft Clarity to see which parts
+          <strong>On these public pages only</strong> (the ones you are reading
+          now, before you sign in), we use Microsoft Clarity to see which parts
           of the page people read and where they get stuck, so we can write
           clearer ones. It sets cookies and records how the page was used, and
           Microsoft may use what it collects for its own purposes, including
           advertising. It stops at the door: it does not run on the app, and it
           does not run on a quote you send. If you would rather it did not run
           at all, blocking third-party cookies or using a tracker blocker is
-          enough — nothing on this site needs it to work.
+          enough. Nothing on this site needs it to work.
         </p>
         {BILLING_ENABLED ? null : (
           <p>
-            We take no payments while QuotePace is in beta, so we never ask for
-            or handle card details.
+            We don&apos;t take payments, so we never ask for or handle card
+            details.
           </p>
         )}
 
@@ -94,29 +96,29 @@ export default function PrivacyPage() {
         <p>These are the only companies your data passes through:</p>
         <ul>
           <li>
-            <strong>Supabase</strong> — hosts the database and handles sign-in.
+            <strong>Supabase</strong> hosts the database and handles sign-in.
           </li>
           <li>
-            <strong>Vercel</strong> — serves the app and the quote links.
+            <strong>Vercel</strong> serves the app and the quote links.
           </li>
           <li>
-            <strong>Resend</strong> — delivers email: a quote to your customer,
+            <strong>Resend</strong> delivers email: a quote to your customer,
             a follow-up, or a notification to you.
           </li>
           <li>
-            <strong>OpenAI</strong> — receives the job description you type, and
+            <strong>OpenAI</strong> receives the job description you type, and
             the pricebook items it needs to match against, only when you ask it
             to draft a quote. It is not used to train their models. If you never
             use AI drafting, nothing of yours ever reaches them.
           </li>
           <li>
-            <strong>Microsoft</strong> — receives how the public pages above
+            <strong>Microsoft</strong> receives how the public pages above
             were used, through Clarity. It never receives your account, your
             pricebook, your quotes or your customers.
           </li>
           {BILLING_ENABLED ? (
             <li>
-              <strong>Paddle</strong> — handles payment. Card details go to
+              <strong>Paddle</strong> handles payment. Card details go to
               Paddle and are never stored or seen by us.
             </li>
           ) : null}
@@ -141,7 +143,7 @@ export default function PrivacyPage() {
         <h2>What your customer sees</h2>
         <p>
           A quote link opens one page showing one quote: your business details,
-          the lines, the total, and an Accept button. It exposes nothing else —
+          the lines, the total, and an Accept button. Nothing else is on it:
           not your pricebook, not your other customers, not your other quotes.
           The link contains a long random token, so it cannot be guessed, but
           treat it like any link: whoever holds it can open the quote.
@@ -164,7 +166,7 @@ export default function PrivacyPage() {
 
         <h2>How long we keep it</h2>
         <p>
-          Your account data stays until you delete it — a quote from two years
+          Your account data stays until you delete it. A quote from two years
           ago is still your record of what you charged. Delete a quote or a
           customer and it goes; ask us to delete your account and all of it
           goes, including the links your customers hold. Deleted data can
@@ -176,7 +178,7 @@ export default function PrivacyPage() {
         <h2>Security</h2>
         <p>
           Everything travels over HTTPS. Access is scoped to your business in
-          two independent layers — every query is filtered by your business, and
+          two independent layers: every query is filtered by your business, and
           the database itself enforces row-level security so one business cannot
           read another&apos;s rows even if the application asked it to. Nobody
           on our side reads your data as routine; we look at your account only
@@ -185,15 +187,15 @@ export default function PrivacyPage() {
         </p>
         <p>
           No system is perfect. If something happens to your data that you ought
-          to know about, we will tell you — quickly and in plain terms.
+          to know about, we will tell you quickly and in plain terms.
         </p>
 
         <h2>What you can ask for</h2>
         <p>
           A copy of what we hold, a correction, or deletion. Email{" "}
           <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> from the
-          address on your account and we will sort it out — no form, no ticket
-          number. If you are unhappy with how we handled it, tell us and we will
+          address on your account and we will sort it out. There is no form
+          and no ticket number. If you are unhappy with how we handled it, tell us and we will
           try again properly.
         </p>
 

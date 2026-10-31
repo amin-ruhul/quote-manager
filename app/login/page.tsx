@@ -3,8 +3,14 @@ import { redirect } from "next/navigation";
 import { LoginFooter, LoginForm } from "@/app/login/login-form";
 import { AuthShell } from "@/components/auth-shell";
 import { getUser } from "@/lib/auth";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Sign in · QuotePace" };
+export const metadata = pageMetadata({
+  title: "Sign in · QuotePace",
+  description:
+    "Sign in to QuotePace and pick up the quote you were writing.",
+  path: "/login",
+});
 
 export default async function LoginPage({
   searchParams,

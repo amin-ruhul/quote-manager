@@ -3,12 +3,14 @@ import Link from "next/link";
 
 import { PageShell } from "@/components/landing/page-shell";
 import { BLOG_POSTS, formatPostDate } from "@/lib/blog";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Blog — QuotePace",
   description:
-    "Writing about quoting, pricing, and winning residential electrical work — from the contractor's side of the job, not the homeowner's.",
-};
+    "Quoting and pricing for residential electricians, written from the van, not from a homeowner cost guide.",
+  path: "/blog",
+});
 
 export default function BlogPage() {
   return (

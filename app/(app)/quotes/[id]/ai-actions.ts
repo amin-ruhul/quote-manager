@@ -17,9 +17,9 @@ import {
   toScaledQuantity,
 } from "@/lib/ai";
 import {
+  AI_PAID_MESSAGE,
   MAX_DESCRIPTION_LENGTH,
   MAX_QUANTITY,
-  PREMIUM_LOCKED_MESSAGE,
   QUOTE_ITEM_TYPES,
 } from "@/lib/constants";
 import { db } from "@/lib/db";
@@ -62,7 +62,7 @@ export async function generateDraft(
    * counts.
    */
   if (!(await hasPremiumAccess(owned.user.id))) {
-    return { error: PREMIUM_LOCKED_MESSAGE, draft: null };
+    return { error: AI_PAID_MESSAGE, draft: null };
   }
 
   const parsed = jobDescriptionSchema.safeParse(
@@ -186,7 +186,7 @@ export async function importDraftItems(input: {
   // Importing costs nothing to run, but it is the second half of a drafting
   // session — leaving it open would leave the locked feature half-usable.
   if (!(await hasPremiumAccess(owned.user.id))) {
-    return { error: PREMIUM_LOCKED_MESSAGE };
+    return { error: AI_PAID_MESSAGE };
   }
 
   try {

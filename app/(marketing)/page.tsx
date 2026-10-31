@@ -6,13 +6,13 @@ import { Features } from "@/components/landing/features";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { Marquee } from "@/components/landing/marquee";
-import { Pricing } from "@/components/landing/pricing";
 import { PromiseBand } from "@/components/landing/promise";
 import { FounderNote, Proof } from "@/components/landing/proof";
 import { Reveal, RevealGroup, RevealItem } from "@/components/landing/reveal";
 import { SectionHeading } from "@/components/landing/section-heading";
 import { MarketingStructuredData } from "@/components/landing/structured-data";
 import { Button } from "@/components/ui/button";
+import { pageMetadata } from "@/lib/seo";
 
 /*
  * The title leads with the category, not the slogan.
@@ -26,12 +26,12 @@ import { Button } from "@/components/ui/button";
  * The canonical is explicit because the site answers on both the apex and www;
  * without it, the two hosts compete as separate pages for the same content.
  */
-export const metadata: Metadata = {
-  title: "Quoting software for residential electricians — QuotePace",
+export const metadata: Metadata = pageMetadata({
+  title: "Free Quoting App for Electricians — QuotePace",
   description:
-    "Build a quote from your own prices in minutes on your phone, send the link, and let the customer accept it on theirs. Sent, opened and accepted, all tracked.",
-  alternates: { canonical: "/" },
-};
+    "Free quoting app for electricians. Price the job on your phone from your own prices. Your customer accepts on theirs.",
+  path: "/",
+});
 
 /*
  * The landing page (SPEC §1, §17). Rendered on the server; the only client
@@ -94,9 +94,6 @@ export default function HomePage() {
           <FounderNote />
         </Reveal>
         <Reveal>
-          <Pricing />
-        </Reveal>
-        <Reveal>
           <Faq />
         </Reveal>
 
@@ -110,15 +107,10 @@ export default function HomePage() {
               Set up your pricebook once. Quote in minutes after that.
             </p>
             <Button asChild size="lg" className="mt-8 w-full sm:w-auto">
-              <Link href="/register">Start free — no card</Link>
+              <Link href="/register">Send your first quote free</Link>
             </Button>
-            {/* Not "free forever" — we intend to charge one day, and a
-                promise we plan to break is worse than no promise. No quote
-                count either: the cap in lib/quota.ts is real, so this must
-                never read as unlimited, but naming it here turns the last
-                line before the button into a limit. */}
             <p className="mt-4 text-sm text-ink-60">
-              Free while we&apos;re in beta. No card, no trial countdown.
+              Free forever. No card, no trial countdown.
             </p>
           </Reveal>
         </section>

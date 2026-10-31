@@ -27,6 +27,10 @@ export function isPaidPlan(plan: Plan): boolean {
 export const PREMIUM_LOCKED_MESSAGE =
   "That one's invite-only while we're in beta. Ask for access from Plan & usage.";
 
+/** AI drafting is a paid extra. Quoting stays free. Checkout is not on yet. */
+export const AI_PAID_MESSAGE =
+  "AI drafting is a paid extra. Quoting stays free.";
+
 /*
  * THE MARKET-TEST SWITCH.
  *
@@ -64,6 +68,12 @@ export const INVITE_ONLY_NOTE = BILLING_ENABLED
  * address quietly becomes a dead one.
  */
 export const SUPPORT_EMAIL = "hello@quotepace.com";
+
+/**
+ * Stand-in on the public pages until the real name is set. One place, so the
+ * homepage, the about page and the founder note cannot disagree.
+ */
+export const FOUNDER_NAME = "Alex";
 
 /** The public site. Same domain as the support address, and one we own. */
 export const MARKETING_URL = "https://quotepace.com";
@@ -112,11 +122,11 @@ export const MAX_UPGRADE_NOTE_LENGTH = 500;
 
 /**
  * The freemium cap (SPEC §16), enforced in `lib/quota.ts` — the only thing that
- * should ever block a create. Ten a month is deliberately generous for the
- * market test: enough that a real electrician can run their week on the free
- * plan, few enough that a busy one hits the wall and tells us so.
+ * should ever block a create. High enough that a working electrician can quote
+ * every job in a month. The header meter stays a short bar; it does not draw
+ * one segment per quote.
  */
-export const FREE_QUOTES_PER_MONTH = 10;
+export const FREE_QUOTES_PER_MONTH = 100;
 
 /**
  * When the usage meter starts warning rather than just informing. Research on

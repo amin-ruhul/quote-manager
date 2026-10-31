@@ -58,7 +58,7 @@ export default async function MarketingLayout({
         short pages (blog, guides) instead of floating halfway up with canvas
         underneath it.
       */}
-      <div className="flex min-h-dvh flex-col">
+      <div className="site-frame flex min-h-dvh flex-col">
         <LandingNav account={account} />
         <div className="flex-1">{children}</div>
         <Footer />

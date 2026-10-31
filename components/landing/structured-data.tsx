@@ -46,7 +46,7 @@ const application = {
   url: MARKETING_URL,
   applicationCategory: "BusinessApplication",
   applicationSubCategory: "Quoting and estimating software",
-  operatingSystem: "Web browser, iOS, Android",
+  operatingSystem: "Web",
   audience: {
     "@type": "Audience",
     audienceType: "Residential electricians and electrical contractors",
@@ -57,14 +57,13 @@ const application = {
     "Send the quote as a link the customer opens on their phone",
     "Customer accepts online with no app and no account",
     "Track sent, opened and accepted",
-    "Automatic follow-up when a customer does not reply",
     "Good / better / best options on one quote",
   ],
   offers: {
     "@type": "Offer",
     price: "0",
     priceCurrency: "USD",
-    description: "Free while in beta. No card required.",
+    description: "Free. No card required.",
   },
 };
 
