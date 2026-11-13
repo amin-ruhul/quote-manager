@@ -17,6 +17,8 @@ export const metadata: Metadata = pageMetadata({
   path: `/blog/${post.slug}`,
   type: "article",
   publishedTime: post.publishedAt,
+  // This folder's opengraph-image.tsx is the share card, not the site default.
+  ownShareImage: true,
 });
 
 const MATERIALS = [

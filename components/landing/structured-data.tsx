@@ -1,4 +1,5 @@
 import { MARKETING_URL, SUPPORT_EMAIL } from "@/lib/constants";
+import { ORGANIZATION_LOGO } from "@/lib/seo";
 
 /*
  * Schema.org for the marketing site.
@@ -21,6 +22,8 @@ const organization = {
   name: "QuotePace",
   url: MARKETING_URL,
   email: SUPPORT_EMAIL,
+  logo: ORGANIZATION_LOGO,
+  image: `${MARKETING_URL}/opengraph-image`,
   description:
     "Quoting software for residential electricians. QuotePace turns a job description into a professional quote that is sent, tracked and accepted from the customer's phone.",
 };

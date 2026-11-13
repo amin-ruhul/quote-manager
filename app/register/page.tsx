@@ -11,6 +11,8 @@ export const metadata = pageMetadata({
   description:
     "Create a free QuotePace account. No card. Your prices, and a link your customer accepts on their phone.",
   path: "/register",
+  // Reachable from every page, but never a search result worth landing on.
+  noIndex: true,
 });
 
 /*

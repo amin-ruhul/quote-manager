@@ -10,6 +10,8 @@ export const metadata = pageMetadata({
   description:
     "Sign in to QuotePace and pick up the quote you were writing.",
   path: "/login",
+  // Reachable from every page, but never a search result worth landing on.
+  noIndex: true,
 });
 
 export default async function LoginPage({

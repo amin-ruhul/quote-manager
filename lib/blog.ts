@@ -1,4 +1,5 @@
 import { FOUNDER_NAME, MARKETING_URL } from "@/lib/constants";
+import { ORGANIZATION_LOGO } from "@/lib/seo";
 
 /*
  * The blog index, in one place.
@@ -157,10 +158,18 @@ export function articleJsonLd(post: BlogPost) {
       name: FOUNDER_NAME,
       url: `${MARKETING_URL}/about`,
     },
+    /*
+     * The site card, even for the posts with their own share image: Next
+     * serves those at a hashed path (`opengraph-image-<hash>`) that is an
+     * implementation detail, and a guessed URL that 404s is worse than none.
+     */
+    image: `${MARKETING_URL}/opengraph-image`,
     publisher: {
       "@type": "Organization",
+      "@id": `${MARKETING_URL}/#organization`,
       name: "QuotePace",
       url: MARKETING_URL,
+      logo: ORGANIZATION_LOGO,
     },
   };
 }
