@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -53,7 +53,53 @@ export type LandingAccount = {
   plan: Plan;
 };
 
-export function LandingNav({ account }: { account: LandingAccount | null }) {
+/**
+ * Supabase keeps the session in `sb-<project>-auth-token` (chunked as `.0`,
+ * `.1`… when large). It is readable from the browser by design, which lets a
+ * visitor with no session skip the account request entirely.
+ */
+const SESSION_COOKIE = /(?:^|;\s*)sb-[^=;]+-auth-token(?:\.\d+)?=/;
+
+/**
+ * The signed-in account, fetched from the browser.
+ *
+ * The marketing pages are static and shared by every visitor, so they cannot
+ * know who is looking. Everyone gets the signed-out nav in the HTML; an owner
+ * with a session sees it swap to the account menu once this resolves. A failed
+ * request leaves the signed-out nav, which still works — "Log in" takes a
+ * signed-in owner straight on to the app.
+ */
+function useAccount(): LandingAccount | null {
+  const [account, setAccount] = useState<LandingAccount | null>(null);
+
+  useEffect(() => {
+    if (!SESSION_COOKIE.test(document.cookie)) return;
+
+    const controller = new AbortController();
+    fetch("/api/account", {
+      signal: controller.signal,
+      cache: "no-store",
+      credentials: "same-origin",
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { account: LandingAccount | null } | null) => {
+        setAccount(body?.account ?? null);
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        console.error(
+          "Could not load the signed-in account for the nav",
+          error,
+        );
+      });
+    return () => controller.abort();
+  }, []);
+
+  return account;
+}
+
+export function LandingNav() {
+  const account = useAccount();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const scrolled = useScrolled();

@@ -2,12 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 
 import { Clarity } from "@/components/analytics/clarity";
 import { Footer } from "@/components/landing/footer";
-import {
-  LandingNav,
-  type LandingAccount,
-} from "@/components/landing/landing-nav";
-import { getBusinessForOwner, getUser } from "@/lib/auth";
-import { getPlanStatus } from "@/lib/plan";
+import { LandingNav } from "@/components/landing/landing-nav";
 
 /**
  * Marketing chrome: the landing page and the company, resource, and legal
@@ -20,26 +15,17 @@ import { getPlanStatus } from "@/lib/plan";
  * A signed-in owner still lands here sometimes (shared link, back-button). The
  * nav swaps Log in / Start free for the same account menu the app uses, so
  * they are not offered a second account on a session they already have.
+ *
+ * Nothing here reads the session, and nothing may. These pages are built once
+ * and served from the CDN to everyone; a cookie read in this layout would make
+ * every one of them dynamic and uncacheable again. The nav finds out who is
+ * signed in from the browser instead (see `app/api/account/route.ts`).
  */
-export default async function MarketingLayout({
+export default function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getUser();
-  let account: LandingAccount | null = null;
-  if (user) {
-    const [business, planStatus] = await Promise.all([
-      getBusinessForOwner(user.id),
-      getPlanStatus(user.id),
-    ]);
-    account = {
-      email: user.email,
-      businessName: business?.name ?? null,
-      plan: planStatus.plan,
-    };
-  }
-
   return (
     <>
       {/*
@@ -59,7 +45,7 @@ export default async function MarketingLayout({
         underneath it.
       */}
       <div className="site-frame flex min-h-dvh flex-col">
-        <LandingNav account={account} />
+        <LandingNav />
         <div className="flex-1">{children}</div>
         <Footer />
       </div>

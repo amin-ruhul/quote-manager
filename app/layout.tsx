@@ -3,6 +3,8 @@ import { Inter, Source_Serif_4 } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
 import { BRAND_CANVAS } from "@/lib/brand";
+import { MARKETING_URL } from "@/lib/constants";
+import { DEFAULT_SHARE_IMAGE } from "@/lib/seo";
 import "./globals.css";
 
 // Inter for all UI; Source Serif 4 only for sparing editorial moments (DESIGN.md).
@@ -20,9 +22,14 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-  ),
+  /*
+   * The production domain, always — not NEXT_PUBLIC_APP_URL. Canonicals and
+   * share-image URLs resolve against this, and they must point at
+   * quotepace.com even when the page is served from a Vercel preview or
+   * localhost: a preview that canonicalises to itself competes with the real
+   * site, and a share card pointing at localhost is a broken image.
+   */
+  metadataBase: new URL(MARKETING_URL),
   title: {
     default: "QuotePace — send the quote before you leave the driveway",
     template: "%s",
@@ -33,7 +40,16 @@ export const metadata: Metadata = {
     title: "Send the quote before you leave the driveway",
     description:
       "Describe the job. QuotePace builds the quote from your own prices and lets the customer accept it on their phone.",
+    siteName: "QuotePace",
     type: "website",
+    images: [DEFAULT_SHARE_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Send the quote before you leave the driveway",
+    description:
+      "Describe the job. QuotePace builds the quote from your own prices and lets the customer accept it on their phone.",
+    images: [DEFAULT_SHARE_IMAGE],
   },
   /*
    * Proves to Bing that we own the domain — which is worth more than Bing's own
